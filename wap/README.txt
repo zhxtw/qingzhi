@@ -1,0 +1,6 @@
+在实际环境下需要软链接
+location.json
+to_sql.php
+两个文件到本目录
+Windows服务器请使用mklink
+Linux服务器请使用ln
