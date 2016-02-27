@@ -219,7 +219,7 @@ if($_POST){
 <div class="row">
 	<div class="text-center col-md-offset-3 col-md-6">
       <div id="codeFather">
-   	  	<div class="checkbox form-group">
+   	  	<div class="checkbox form-group" onclick="$(this).children().children()[0].checked=true">
             <label>
               <input type="checkbox" id="agree"> 我同意以上协议，不在志愿服务地点搞破坏
             </label>
