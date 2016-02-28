@@ -33,6 +33,7 @@
           <ul class="dropdown-menu" role="menu">
           	<li><a href="#"><b><?php echo($_SESSION['adminname']); ?></b></a></li>
             <li><a href="personal.php">个人信息</a></li>
+            <li><a href="toModifyPW.php">修改密码</a></li>
             <li class="divider"></li>
             <li><a href="logout.php">退出登录</a></li>
           </ul>
