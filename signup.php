@@ -219,11 +219,24 @@ if($_POST){
 <div class="row">
 	<div class="text-center col-md-offset-3 col-md-6">
       <div id="codeFather">
-   	  	<div class="checkbox form-group" onclick="$(this).children().children()[0].checked=true">
+   	  	<div id="agu" class="checkbox form-group">
             <label>
-              <input type="checkbox" id="agree"> 我同意以上协议，不在志愿服务地点搞破坏
+              <input type="checkbox" id="agree" onclick="fuckthis()"> 我同意以上协议，不在志愿服务地点搞破坏
             </label>
         </div>
+				<script>
+					clicktime=0;
+					function fuckthis(){
+						if(++clicktime>2){
+							alert("你用的浏览器实在是太恶心了~");
+							$("<input type='checkbox' id='agre' checked='true'>").insertBefore("#agu");
+							$("<span> 我同意以上协议，不在志愿服务地点搞破坏</span>").insertAfter("#agre");
+							$("#agu").remove();
+							$("#agre")[0].id="agree";
+							clicktime=0;
+						}
+					}
+				</script>
     	<br><br>
       	<input type="text" class="input-sm" placeholder="请输入验证码" name="verify_code" id="verify_code" autocomplete="off">
 	  <!--img id="code" onClick="getCode()"-->
