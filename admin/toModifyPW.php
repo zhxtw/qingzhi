@@ -62,7 +62,7 @@
 <script src="addToken.js"></script>
 <script>
   function verify(){
-    if(!$("#newpwd").val()||!$("#origpwd").val()||$("#newpwd").val()!=$("#verifypwd").val()||$("#newpwd").val().length<8){alert("两次输入的密码不一致或密码不够，请检查。");return;}
+    if(!$("#newpwd").val()||!$("#origpwd").val()||$("#newpwd").val()!=$("#verifypwd").val()||$("#newpwd").val().length<6){alert("两次输入的密码不一致或密码不够，请检查。");return;}
     $("#newpwd")[0].disabled=1;
     $("#verifypwd")[0].disabled=1;
     $("#origpwd")[0].disabled=1;
