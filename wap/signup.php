@@ -25,8 +25,7 @@
     	$name=htmlspecialchars($_POST['name']);
     	$classno=$_POST['classno'];
     	$mobile=$_POST['mobile'];
-      //不支持？！$cn="/^[\u4e00-\u9fa5]+$/";
-    	if(mb_strlen($name,'UTF8')<2||mb_strlen($name,'UTF8')>5||is_numeric($name)){
+    	if(mb_strlen($name,'UTF8')<2||mb_strlen($name,'UTF8')>5||!preg_match("/^[\x{4e00}-\x{9fa5}]+$/u",$name)){
     		diecho("请检查名字，长度应为2~4个中文字符。");
     	}
       $flag=true;
@@ -73,9 +72,9 @@
     	}
 
     	//Query whether the man has signed up
-    	$query="SELECT * FROM signup where loc_name='{$loc_name}' and name='{$name}' and classno='{$classno}' and tworone='{$tworone}' and `go`=0";
+    	$query="SELECT * FROM signup where loc_name='{$loc_name}' and name='{$name}' and classno='{$classno}' and tworone='{$tworone}' and (`go`=0 or `go`=1)";
     	$result=mysqli_fetch_array(mysqli_query($conn,$query));
-    	if($result!=NULL){session_destroy();echo("<script>alert('您已经报名过这个地点了，换一个吧~');window.location.href='/location.php'</script>");die();}
+    	if($result!=NULL){session_destroy();diecho("您已经报名过这个地点了，换一个吧~");}
 
     	$ip=mysqli_real_escape_string($conn,htmlspecialchars($_SERVER['REMOTE_ADDR']));
     	$query="INSERT signup(name,mobile,classno,tworone,loc_name,times,ip,email,fromwap)

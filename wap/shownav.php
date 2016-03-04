@@ -1,6 +1,6 @@
 <?php
   //sleep(2);
-  session_start();
+  @session_start();
   if(!isset($_SESSION)){
     die("请开启Cookie再访问本页面。");
   }

@@ -50,8 +50,8 @@ if($_POST){
 	if($_POST['name']&&$_POST['classno']){
 		$name=htmlspecialchars($_POST['name']);
 		$classno=$_POST['classno'];
-		if(mb_strlen($name,'UTF8')<2||mb_strlen($name,'UTF8')>5||is_numeric($name)){
-			diecho("请检查名字，长度应为2~4个字符。",1);
+		if(mb_strlen($name,'UTF8')<2||mb_strlen($name,'UTF8')>5||!preg_match("/^[\x{4e00}-\x{9fa5}]+$/u",$name)){
+			diecho("请检查名字，长度应为2~4个中文字符。",1);
 		}
 		if((!is_numeric($classno))||strlen($classno)!=4||substr($classno,0,2)<1||substr($classno,0,2)>17||substr($classno,2,2)<1||substr($classno,2,2)>60){
 			diecho("请检查学号。",1);
