@@ -118,7 +118,7 @@ function md5t(val){
       $("#login").html("修改成功，即将退出登录...");
       $("#login").removeClass("btn-primary");
       $("#login").addClass("btn-success");
-      window.location.href="logout.php?"+TOKEN;
+      window.location.href="logout.php?token="+TOKEN;
       return 0;
     }else if(pass==-1){
       alert("网络连接失败。");
