@@ -72,7 +72,6 @@
 					若有任何问题或名单缺漏等可找高二5班刘抒欣或高二17班龙盈禧咨询噢:D<br>
 					谢谢你们~</p>
       </div>
-        <h4 class="text-center">你选择的地点</h4>
         <div class="panel panel-info">
     		<div class="panel-heading">
     	    	<h3 class="panel-title text-center"><b id="locname">某某某</b></h3>
@@ -86,20 +85,10 @@
 
         </div>
         <center><button type="button" class="btn btn-success btn-raised" onclick="window.location.href='/'">返回主页</button>
-        <button type="button" class="btn btn-danger btn-raised" onclick="closeFrm()">关闭窗口</button>
         <button type="button" class="btn btn-warning btn-raised" onclick="window.location.href='/query.php'">志愿者查询</button>
         </center>
     </div>
     <script>
-		function closeFrm(){
-		    var browserName=navigator.appName;
-		    if(browserName=="Netscape"){
-		        window.open('','_self','');
-		        window.close();
-		    }else{
-		        window.close();
-		    }
-		}
 		function tr(sth){
 			return "<tr>"+sth+"</tr>";
 		}
@@ -153,7 +142,7 @@
 		function showloc(id){
 			//-1 for array
 			gen(id-1);
-			$("#locname")[0].innerHTML=loc[id-1].name;
+			$("#locname")[0].innerHTML=loc[id-1].name+" "+loc[id-1].times[<?php echo($_SESSION['times']); ?>];
 			$('#locimg')[0].src='/img/'+id+'.jpg';
 			$('#msg').append(tb);
 		}
