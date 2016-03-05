@@ -61,7 +61,11 @@ window.onload=function(){
   ljson=eval("("+l.responseText+")");
   loc=ljson.loc;
   for(i=0;i<loc.length;i++){
-    assert='<div class="text-justify col-sm-4"><div class="panel panel-'+loc[i].color+'"><div class="panel-heading"><h3 class="panel-title text-center"><b>'+loc[i].name+'</b></h3></div><div class="panel-body text-center row"><img class="tu2 col-md-10 col-md-offset-1 col-sm-12 col-xs-12" src="/img/'+(i-0+1)+'.jpg"></div><div class="panel-footer text-center"><button data-id="'+loc[i].id+'" onclick="showloc(this.dataset.id)" class="btn btn-sm btn-default">编辑</button>&nbsp;<button data-id="'+loc[i].id+'" onclick="delloc(this.dataset.id)" class="btn btn-sm btn-danger">删除</button></div></div></div>';
+		if(loc[i].disabled==1){
+			assert='<div class="text-justify col-sm-4"><div class="panel panel-'+loc[i].color+'"><div class="panel-heading"><h3 class="panel-title text-center"><s>'+loc[i].name+'</s></h3></div><div class="panel-body text-center row"><img class="tu2 col-md-10 col-md-offset-1 col-sm-12 col-xs-12" src="/img/'+(i-0+1)+'.jpg"></div><div class="panel-footer text-center"><button data-id="'+loc[i].id+'" onclick="showloc(this.dataset.id)" class="btn btn-sm btn-default">编辑</button>&nbsp;<button data-id="'+loc[i].id+'" onclick="delloc(this.dataset.id)" class="btn btn-sm btn-danger">删除</button></div></div></div>';
+		}else{
+    	assert='<div class="text-justify col-sm-4"><div class="panel panel-'+loc[i].color+'"><div class="panel-heading"><h3 class="panel-title text-center"><b>'+loc[i].name+'</b></h3></div><div class="panel-body text-center row"><img class="tu2 col-md-10 col-md-offset-1 col-sm-12 col-xs-12" src="/img/'+(i-0+1)+'.jpg"></div><div class="panel-footer text-center"><button data-id="'+loc[i].id+'" onclick="showloc(this.dataset.id)" class="btn btn-sm btn-default">编辑</button>&nbsp;<button data-id="'+loc[i].id+'" onclick="delloc(this.dataset.id)" class="btn btn-sm btn-danger">删除</button></div></div></div>';
+		}
     $("#puthere")[0].innerHTML+=assert;
   }
   $(".ss").click(function(){showloc(this.href.substr(this.href.length-1));});
@@ -80,7 +84,6 @@ window.onload=function(){
       </div>
       <div class="modal-footer">
         <button type="button" class="btn btn-primary" data-dismiss="modal">&lt; 返回</button>
-        <!--button type="button" class="btn btn-warning" data-dismiss="modal" onclick="/*addtocar()*/" id="btn-car">添加到购物车</button-->
         <button type="button" class="btn btn-success" onclick="verify()">应用 &gt;</button>
         <script>
 			function isChecked(){aa=$("[name='times']");for(ii in aa){if(aa[ii].checked){return true;}}return false;}
@@ -123,6 +126,7 @@ window.onload=function(){
       case "disabled":sth="关闭报名";break;
       case "whydisabled":sth="关闭原因";break;
       case "minintro":sth="简介";break;
+			case "image":sth="图片地址";break;
       case "color":sth="颜色";
 		}
 		return "<th>"+sth+"</th>";
@@ -145,29 +149,29 @@ window.onload=function(){
 			if(i=="works"||i=="times"||i=="comm"){
 				//using tmd instead of innerHTML or browser will add <!--/tr--> automaticly
 				tmd+="<tr>"+th(i);
-				if(i=="times"){
-					tmp='<div class="radio">';
-					for(j=0;j<loc[r][i].length;j++){
-						tmp+='<label style="color:black"><input type="radio" name="times" value="'+j+'">'+loc[r][i][j]+'</label><br>';
-					}
-					tmp+="</div>";
-					times_max=loc[r][i].length;
-				}else{
-					for(j in loc[r][i]){
-						tmp+=loc[r][i][j]+"<br>";
-					}
+				tmp='<div id="'+i+'">';
+				for(j=0;j<loc[r][i].length;j++){
+					tmp+='<input type="text" class="form-control onedit1" value="" data-r="'+r+'" data-i="'+i+'" data-j="'+j+'">';
 				}
+				tmp+="</div>";
+
 				tmd+=td(tmp)+"</tr>";
 				tmp="";
-				tb.innerHTML=tmd;
 			}else if(i=="disabled"){
+				tmd+=tr(th(i)+td("<input type='checkbox' name='isDisabled' "+((loc[r][i])?"checked":"")+">"));
       }else if(i=="color"){
+				colorinfo=['danger','warning','success','info','primary','default'];tmd+="<tr>"+th(i);
+				for(cc in colorinfo){
+					tmp+="<input type='radio' name='color' value='"+colorinfo[cc]+"'><label class='text-"+colorinfo[cc]+"'>"+colorinfo[cc]+"</label><br>";
+				}
+				tmd+=td(tmp+"<p style='color:gray'>提示：前后台风格不同，实际效果上，default为白色，primary为青色，而且所有颜色都要鲜艳的多</p>")+"</tr>";tmp='';
       }else if(i=="whydisabled"||i=="traffic"){
         tmd+=tr(th(i)+td("<textarea class='form-control' style='resize: vertical;'>"+loc[r][i]+"</textarea>"));
       }else{
 				tmd+=tr(th(i)+td("<input type='text' class='form-control onedit1' value='' data-r='"+r+"' data-i='"+i+"'>"));
 			}
 		}
+		tb.innerHTML=tmd;
 	}
 	var current=0;var times_max=0;
 	function showloc(id){
@@ -179,12 +183,17 @@ window.onload=function(){
 		alt('',loc[id-1].name);
 
 		e="onerror=\"this.src=\'/img/noimg.jpg\'\"";
-		$('#msg')[0].innerHTML="<img src='/img/"+id+".jpg' style='width:100%' class='tu text-center' "+e+">";
+		$('#msg')[0].innerHTML="<img src='"+loc[id-1].image+"' style='width:100%' class='tu text-center' "+e+">";
 		$('#msg').append(tb);
     r=$(".onedit1")[0].dataset.r;
     for(i=0;i<$(".onedit1").length;i++){
       console.log(i)
-      $(".onedit1")[i].value=loc[r][$(".onedit1")[i].dataset.i];
+			if($(".onedit1")[i].dataset.j){
+				$(".onedit1")[i].value=loc[r][$(".onedit1")[i].dataset.i][$(".onedit1")[i].dataset.j];
+			}
+			else{
+      	$(".onedit1")[i].value=loc[r][$(".onedit1")[i].dataset.i];
+			}
     }
 	}
 </script>
