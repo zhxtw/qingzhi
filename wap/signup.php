@@ -15,7 +15,7 @@
   if(!isset($_GET['loc_id']) || !isset($_GET['loc_time'])) die();
   $loc_id=$_GET['loc_id'];$loc_time=$_GET['loc_time'];
   if(!is_numeric($loc_id) || !is_numeric($loc_time)) die();
-  if($loc_id<0 || $loc_id>=sizeof($a) || $loc_time>=sizeof($a[$loc_id]->times) || $loc_time<0 || isset($a[$loc_id]->disabled)) die();
+  if($loc_id<0 || $loc_id>=sizeof($a) || $loc_time>=sizeof($a[$loc_id]->times) || $loc_time<0 || $a[$loc_id]->disabled==1) die();
   $loc_name=$a[$loc_id]->name;$loc_time=$a[$loc_id]->times[$loc_time];$times=$loc_time;
 
   if($_POST){
@@ -99,7 +99,7 @@
     if(!isset($_GET['loc_id']) || !isset($_GET['loc_time'])) die();
     $loc_id=$_GET['loc_id'];$loc_time=$_GET['loc_time'];
     if(!is_numeric($loc_id) || !is_numeric($loc_time)) die();
-    if($loc_id<0 || $loc_id>=sizeof($a) || $loc_time>=sizeof($a[$loc_id]->times) || $loc_time<0 || isset($a[$loc_id]->disabled)) die();
+    if($loc_id<0 || $loc_id>=sizeof($a) || $loc_time>=sizeof($a[$loc_id]->times) || $loc_time<0 || $a[$loc_id]->disabled==1) die();
 
 
     include("shownav.php");

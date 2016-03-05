@@ -22,7 +22,7 @@
       }
       mb_substr($out,0,mb_strlen($out,'utf-8')-2,'utf-8');
       $out.="</span><h4>时段</h4><span>";
-      if(@$aa->disabled){
+      if(@$aa->disabled==1){
         @$out.="报名已关闭<br>".$aa->whydisabled."<br>";
       }else{
         for($j=0;$j<sizeof($aa->times);$j++){

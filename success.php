@@ -143,7 +143,7 @@
 			//-1 for array
 			gen(id-1);
 			$("#locname")[0].innerHTML=loc[id-1].name+" "+loc[id-1].times[<?php echo($_SESSION['times']); ?>];
-			$('#locimg')[0].src='/img/'+id+'.jpg';
+			$('#locimg')[0].src=loc[id-1].image;
 			$('#msg').append(tb);
 		}
 	</script>

@@ -1,9 +1,9 @@
 {
-
 	"loc":[
 		{	"id":"1",
 			"disabled":"1",
 			"whydisabled":"由于上学期报名人数太多，未能安排完，故<span style='color:red'><b>这学期不进行报名</b></span>，上学期没有安排到的会在这学期继续安排。",
+			"image":"/img/1.jpg",
 			"color":"info",
 			"name":"广州新图书馆",
 			"minintro":"周边环境优美，馆内凉爽舒适<s>，只是熊孩子有点难管</s>",
@@ -17,6 +17,9 @@
 		},
 		{
 			"id":"2",
+			"disabled":"0",
+			"whydisabled":"",
+			"image":"/img/2.jpg",
 			"color":"danger",
 			"name":"中山图书馆",
 			"minintro":"比广图安静得多",
@@ -30,6 +33,9 @@
 		},
 		{
 			"id":"3",
+			"disabled":"0",
+			"whydisabled":"",
+			"image":"/img/3.jpg",
 			"color":"success",
 			"name":"杨箕地铁站",
 			"minintro":"五号线人太多忍无可忍？！想让它变得井然有序么？",
@@ -43,6 +49,9 @@
 		},
 		{
 			"id":"4",
+			"disabled":"0",
+			"whydisabled":"",
+			"image":"/img/4.jpg",
 			"color":"danger",
 			"name":"华乐街家庭综合服务中心",
 			"minintro":"想锻炼自己的口才为他人讲解垃圾分类知识吗？想辅导小学生的学习吗？…除此之外，还有更多有趣的不定期大型活动噢～",
@@ -56,6 +65,9 @@
 		},
 		{
 			"id":"5",
+			"disabled":"0",
+			"whydisabled":"",
+			"image":"/img/5.jpg",
 			"color":"warning",
 			"name":"广州至灵学校",
 			"minintro":"体验学校风格，帮老师授课，陪小朋友们玩耍！",
@@ -69,6 +81,9 @@
 		},
 		{
 			"id":"6",
+			"disabled":"6",
+			"whydisabled":"",
+			"image":"/img/2.jpg",
 			"color":"info",
 			"name":"东山福利院",
 			"minintro":"展现你的话唠才能~<br>P.S.两周安排一次志愿活动",

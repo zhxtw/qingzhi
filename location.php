@@ -54,7 +54,7 @@
 			echo("选择的时段不合法。");die();
 		}
 		if($a[$loc_id-1]['disabled']==1){
-			die("你的手段很高明，但不要这么无聊好么");
+			die("报名已关闭");
 		}
 		session_start();
 		$_SESSION['loc_id']=$loc_id;$_SESSION['times']=$times;
@@ -103,7 +103,7 @@
 		ljson=eval("("+l.responseText+")");
 		loc=ljson.loc;
 		for(i=0;i<loc.length;i++){
-			if(loc[i].disabled){
+			if(loc[i].disabled==1){
 				assert='<div class="text-justify col-sm-4"><div class="panel panel-disabled"><div class="panel-heading"><h3 style="color:black" class="panel-title text-center"><b>'+loc[i].name+'</b></h3></div><div class="panel-body text-center row"><img class="tu2 col-md-10 col-md-offset-1 col-sm-12 col-xs-12" src="/img/'+(i-0+1)+'.jpg"></div><div class="panel-footer text-center">'+loc[i].whydisabled+'</div></div></div>';
 			}else{
 				assert='<div class="text-justify col-sm-4"><div class="panel panel-'+loc[i].color+'"><div class="panel-heading"><h3 class="panel-title text-center"><b>'+loc[i].name+'</b></h3></div><div class="panel-body text-center row"><img class="tu2 col-md-10 col-md-offset-1 col-sm-12 col-xs-12" src="/img/'+(i-0+1)+'.jpg"></div><div class="panel-footer text-center">'+loc[i].minintro+'<br><button data-id="'+loc[i].id+'" onclick="showloc(this.dataset.id)" class="btn btn-sm btn-'+loc[i].color+'">&gt;点我报名&lt;</button></div></div></div>';
@@ -234,7 +234,7 @@
 		alt('',loc[id-1].name);
 
 		e="onerror=\"this.src=\'/img/noimg.jpg\'\"";
-		$('#msg')[0].innerHTML="<img src='/img/"+id+".jpg' style='width:100%' class='tu text-center' "+e+">";
+		$('#msg')[0].innerHTML="<img src='"+loc[id-1].image+"' style='width:100%' class='tu text-center' "+e+">";
 		$('#msg').append(tb);
 		$.material.init();
 		/*if(isincar(id)){
