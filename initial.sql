@@ -47,7 +47,7 @@ CREATE TABLE IF NOT EXISTS `userpwd` (
 
 
 INSERT INTO `userpwd` (`id`, `certName`, `certSerial`, `username`, `pwd`, `salt`, `img`, `datetime`) VALUES
-(1, '', '', 'admin', '99cc1f12dd54834781acf54efac39a84', 'a95ve', '', '2016-02-13 18:22:40');
+(1, '', '', 'admin', '112165c4e586cbbbe58966d90feb7684', 'j2knn', '', '2016-02-13 18:22:40');
 
 ALTER TABLE `auto_time`
   ADD PRIMARY KEY (`id`);
