@@ -149,20 +149,20 @@ window.onload=function(){
 			if(i=="works"||i=="times"||i=="comm"){
 				//using tmd instead of innerHTML or browser will add <!--/tr--> automaticly
 				tmd+="<tr>"+th(i);
-				tmp='<div id="'+i+'">';
+				tmp='<div id="'+i+'"><input type="hidden" class="'+i+'">';//增加一个隐藏标签来判断位置
 				for(j=0;j<loc[r][i].length;j++){
-					tmp+='<input type="text" class="form-control onedit1" value="" data-r="'+r+'" data-i="'+i+'" data-j="'+j+'">';
+					tmp+='<input type="text" class="form-control onedit1 '+i+'" value="" data-r="'+r+'" data-i="'+i+'" data-j="'+j+'">';
 				}
-				tmp+="</div>";
+				tmp+="<button type='button' class='btn btn-success btn-xs' onclick='addordel(\""+i+"\");'>增</button>&nbsp;<button type='button' class='btn btn-danger btn-xs' onclick='addordel(\""+i+"\",1);'>删</button></div>";
 
 				tmd+=td(tmp)+"</tr>";
 				tmp="";
 			}else if(i=="disabled"){
-				tmd+=tr(th(i)+td("<input type='checkbox' name='isDisabled' "+((loc[r][i])?"checked":"")+">"));
+				tmd+=tr(th(i)+td("<input type='checkbox' name='isDisabled' "+((loc[r][i]==1)?"checked":"")+">"));
       }else if(i=="color"){
 				colorinfo=['danger','warning','success','info','primary','default'];tmd+="<tr>"+th(i);
 				for(cc in colorinfo){
-					tmp+="<input type='radio' name='color' value='"+colorinfo[cc]+"'><label class='text-"+colorinfo[cc]+"'>"+colorinfo[cc]+"</label><br>";
+					tmp+="<input type='radio' name='color' value='"+colorinfo[cc]+"' " + ((loc[r][i]==colorinfo[cc])?"checked":"") + "><label class='text-"+colorinfo[cc]+"'>"+colorinfo[cc]+"</label><br>";
 				}
 				tmd+=td(tmp+"<p style='color:gray'>提示：前后台风格不同，实际效果上，default为白色，primary为青色，而且所有颜色都要鲜艳的多</p>")+"</tr>";tmp='';
       }else if(i=="whydisabled"||i=="traffic"){
@@ -195,6 +195,15 @@ window.onload=function(){
       	$(".onedit1")[i].value=loc[r][$(".onedit1")[i].dataset.i];
 			}
     }
+	}
+	function addordel(elementClass,isdel){
+		allem=$("."+elementClass);
+		if(isdel){
+			if(allem.length<2){return;}
+			allem[allem.length-1].remove();
+		}else{
+			$("<input type='text' class='form-control onedit1 "+elementClass+"' value=''>").insertAfter(allem[allem.length-1]);
+		}
 	}
 </script>
 </body>
