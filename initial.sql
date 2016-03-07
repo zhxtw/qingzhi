@@ -18,6 +18,14 @@ CREATE TABLE IF NOT EXISTS `auto_time` (
   `ip` varchar(80) COLLATE utf8_unicode_ci NOT NULL
 ) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
 
+CREATE TABLE IF NOT EXISTS `feedback` (
+ `id` int(11) NOT NULL AUTO_INCREMENT,
+ `content` varchar(1000) COLLATE utf8_unicode_ci NOT NULL,
+ `datetime` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
+ `ip` varchar(80) COLLATE utf8_unicode_ci NOT NULL,
+ PRIMARY KEY (`id`)
+) ENGINE=InnoDB AUTO_INCREMENT=2 DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
+
 CREATE TABLE IF NOT EXISTS `signup` (
   `no` int(11) NOT NULL,
   `name` varchar(4) COLLATE utf8_unicode_ci NOT NULL,
