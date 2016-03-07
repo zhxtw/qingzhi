@@ -131,12 +131,10 @@ if(isset($_POST['submit']) && $_POST['submit'])
 <script src="js/jquery-1.11.2.min.js"></script>
 <script src="js/bootstrap.js"></script>
 <script src="js/bootstrap-switch.min.js"></script>
-<!--script src="js/cookie.js"></script-->
 <script src="js/material.min.js"></script>
 <script src="js/ripples.js"></script>
 <script>
   window.onload=function(){
-    appendNav();   
     $.getScript("/js/checkSign3.js",function(){
         p="<?php echo($strout); ?>";
         if(p){alt(p,"查询结果");}
