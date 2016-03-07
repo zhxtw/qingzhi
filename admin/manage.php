@@ -173,7 +173,7 @@
 																append+=got[i][j];
 														}
 														append+="\r\n";//审核状态是最后一个
-													}else if(j==="ip"){
+													}else if(j==="ip"||j==='fromwap'){
 														continue;
 													}else if(j==="classno"){
 														append+=got[i][j].substr(0,2)+",";
@@ -274,7 +274,7 @@
 						append+="</span></td>";
 					}else if(j==="no"){
 						append+="<td><input type='checkbox' class='ck' name='ck"+(i-0+1)+"'><span>&nbsp;"+got[i][j]+"</span></td>";
-					}else if(j==="ip"){
+					}else if(j==="ip"||j==="fromwap"){
 						continue;
 					}else if(j==="email"){
 						append+="<td><a href='mailto:"+got[i][j]+"'>"+got[i][j]+"</td>";
