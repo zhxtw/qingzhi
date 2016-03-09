@@ -37,7 +37,15 @@
 ?>
 
 <body style="font-family:Microsoft YaHei">
-<?php include("shownav.php"); ?>
+<?php
+	include("shownav.php");
+	if($_POST){
+		//TODO: Verify values and push into json
+		//var_dump($_POST["comm"]);
+		echo(htmlspecialchars(str_replace(["\u003Cscript\u003E","\u003C/script\u003E"],"",json_encode($_POST, JSON_UNESCAPED_UNICODE|JSON_HEX_APOS|JSON_HEX_QUOT|JSON_HEX_TAG|JSON_UNESCAPED_SLASHES))));
+		die();
+	}
+?>
 
 <h1 class="h1 text-center">地点管理</h1>
 
@@ -62,7 +70,7 @@ window.onload=function(){
   loc=ljson.loc;
   for(i=0;i<loc.length;i++){
 		if(loc[i].disabled==1){
-			assert='<div class="text-justify col-sm-4"><div class="panel panel-'+loc[i].color+'"><div class="panel-heading"><h3 class="panel-title text-center"><s>'+loc[i].name+'</s></h3></div><div class="panel-body text-center row"><img class="tu2 col-md-10 col-md-offset-1 col-sm-12 col-xs-12" src="/img/'+(i-0+1)+'.jpg"></div><div class="panel-footer text-center"><button data-id="'+loc[i].id+'" onclick="showloc(this.dataset.id)" class="btn btn-sm btn-default">编辑</button>&nbsp;<button data-id="'+loc[i].id+'" onclick="delloc(this.dataset.id)" class="btn btn-sm btn-danger">删除</button></div></div></div>';
+			assert='<div class="text-justify col-sm-4"><div class="panel panel-'+loc[i].color+'"><div class="panel-heading"><h3 class="panel-title text-center"><b><s>'+loc[i].name+'</s></b></h3></div><div class="panel-body text-center row"><img class="tu2 col-md-10 col-md-offset-1 col-sm-12 col-xs-12" src="/img/'+(i-0+1)+'.jpg"></div><div class="panel-footer text-center"><button data-id="'+loc[i].id+'" onclick="showloc(this.dataset.id)" class="btn btn-sm btn-default">编辑</button>&nbsp;<button data-id="'+loc[i].id+'" onclick="delloc(this.dataset.id)" class="btn btn-sm btn-danger">删除</button></div></div></div>';
 		}else{
     	assert='<div class="text-justify col-sm-4"><div class="panel panel-'+loc[i].color+'"><div class="panel-heading"><h3 class="panel-title text-center"><b>'+loc[i].name+'</b></h3></div><div class="panel-body text-center row"><img class="tu2 col-md-10 col-md-offset-1 col-sm-12 col-xs-12" src="/img/'+(i-0+1)+'.jpg"></div><div class="panel-footer text-center"><button data-id="'+loc[i].id+'" onclick="showloc(this.dataset.id)" class="btn btn-sm btn-default">编辑</button>&nbsp;<button data-id="'+loc[i].id+'" onclick="delloc(this.dataset.id)" class="btn btn-sm btn-danger">删除</button></div></div></div>';
 		}
@@ -72,7 +80,7 @@ window.onload=function(){
 };
 </script>
 <div class="modal fade" id="myModal">
-  <form action="/location.php" method="post" id="frm">
+  <form method="post" id="frm">
   <div class="modal-dialog">
     <div class="modal-content">
       <div class="modal-header">
@@ -83,7 +91,7 @@ window.onload=function(){
         <p id='msg'></p>
       </div>
       <div class="modal-footer">
-        <button type="button" class="btn btn-primary" data-dismiss="modal">&lt; 返回</button>
+        <button type="button" class="btn btn-primary" onclick="if(confirm('编辑的内容尚未保存，确定离开？')){$('#myModal').modal('hide');}">&lt; 返回</button>
         <button type="button" class="btn btn-success" onclick="verify()">应用 &gt;</button>
         <script>
 			function isChecked(){aa=$("[name='times']");for(ii in aa){if(aa[ii].checked){return true;}}return false;}
@@ -151,7 +159,7 @@ window.onload=function(){
 				tmd+="<tr>"+th(i);
 				tmp='<div id="'+i+'"><input type="hidden" class="'+i+'">';//增加一个隐藏标签来判断位置
 				for(j=0;j<loc[r][i].length;j++){
-					tmp+='<input type="text" class="form-control onedit1 '+i+'" value="" data-r="'+r+'" data-i="'+i+'" data-j="'+j+'">';
+					tmp+='<input type="text" class="form-control onedit1 '+i+'" name="'+i+'[]" value="" data-r="'+r+'" data-i="'+i+'" data-j="'+j+'">';
 				}
 				tmp+="<button type='button' class='btn btn-success btn-xs' onclick='addordel(\""+i+"\");'>增</button>&nbsp;<button type='button' class='btn btn-danger btn-xs' onclick='addordel(\""+i+"\",1);'>删</button></div>";
 
@@ -166,9 +174,9 @@ window.onload=function(){
 				}
 				tmd+=td(tmp+"<p style='color:gray'>提示：前后台风格不同，实际效果上，default为白色，primary为青色，而且所有颜色都要鲜艳的多</p>")+"</tr>";tmp='';
       }else if(i=="whydisabled"||i=="traffic"){
-        tmd+=tr(th(i)+td("<textarea class='form-control' style='resize: vertical;'>"+loc[r][i]+"</textarea>"));
+        tmd+=tr(th(i)+td("<textarea name='"+i+"' class='form-control' style='resize: vertical;'>"+loc[r][i]+"</textarea>"));
       }else{
-				tmd+=tr(th(i)+td("<input type='text' class='form-control onedit1' value='' data-r='"+r+"' data-i='"+i+"'>"));
+				tmd+=tr(th(i)+td("<input name='"+i+"' type='text' class='form-control onedit1' value='' data-r='"+r+"' data-i='"+i+"'>"));
 			}
 		}
 		tb.innerHTML=tmd;
