@@ -91,9 +91,6 @@
 <script src="js/material.min.js"></script>
 <script src="js/ripples.js"></script>
 <script>
-	function rand(to,startfrom0){
-		return startfrom0 ? Math.floor(Math.random()*to) : Math.ceil(Math.random()*to);
-	}
 	window.onload=function(){
 		appendNav();
 		l=$.ajax({async:false,url:"location.json",dataType:"json",type:"GET"});
@@ -104,9 +101,9 @@
 		loc=ljson.loc;
 		for(i=0;i<loc.length;i++){
 			if(loc[i].disabled==1){
-				assert='<div class="text-justify col-sm-4"><div class="panel panel-disabled"><div class="panel-heading"><h3 style="color:black" class="panel-title text-center"><b>'+loc[i].name+'</b></h3></div><div class="panel-body text-center row"><img class="tu2 col-md-10 col-md-offset-1 col-sm-12 col-xs-12" src="/img/'+(i-0+1)+'.jpg"></div><div class="panel-footer text-center">'+loc[i].whydisabled+'</div></div></div>';
+				assert='<div class="text-justify col-sm-4"><div class="panel panel-disabled"><div class="panel-heading"><h3 style="color:black" class="panel-title text-center"><b>'+loc[i].name+'</b></h3></div><div class="panel-body text-center row"><img class="tu2 col-md-10 col-md-offset-1 col-sm-12 col-xs-12" src="'+loc[i].image+'"></div><div class="panel-footer text-center">'+loc[i].whydisabled+'</div></div></div>';
 			}else{
-				assert='<div class="text-justify col-sm-4"><div class="panel panel-'+loc[i].color+'"><div class="panel-heading"><h3 class="panel-title text-center"><b>'+loc[i].name+'</b></h3></div><div class="panel-body text-center row"><img class="tu2 col-md-10 col-md-offset-1 col-sm-12 col-xs-12" src="/img/'+(i-0+1)+'.jpg"></div><div class="panel-footer text-center">'+loc[i].minintro+'<br><button data-id="'+loc[i].id+'" onclick="showloc(this.dataset.id)" class="btn btn-sm btn-'+loc[i].color+'">&gt;点我报名&lt;</button></div></div></div>';
+				assert='<div class="text-justify col-sm-4"><div class="panel panel-'+loc[i].color+'"><div class="panel-heading"><h3 class="panel-title text-center"><b>'+loc[i].name+'</b></h3></div><div class="panel-body text-center row"><img class="tu2 col-md-10 col-md-offset-1 col-sm-12 col-xs-12" src="'+loc[i].image+'"></div><div class="panel-footer text-center">'+loc[i].minintro+'<br><button data-id="'+loc[i].id+'" onclick="showloc(this.dataset.id)" class="btn btn-sm btn-'+loc[i].color+'">&gt;点我报名&lt;</button></div></div></div>';
 			}
 			$("#puthere")[0].innerHTML+=assert;
 
@@ -129,7 +126,6 @@
       </div>
       <div class="modal-footer">
         <button type="button" class="btn btn-primary" data-dismiss="modal">&lt; 了解</button>
-        <!--button type="button" class="btn btn-warning" data-dismiss="modal" onclick="/*addtocar()*/" id="btn-car">添加到购物车</button-->
         <button type="button" class="btn btn-success" onclick="verify()">报名 &gt;</button>
         <script>
 			function isChecked(){aa=$("[name='times']");for(ii in aa){if(aa[ii].checked){return true;}}return false;}
@@ -194,14 +190,6 @@
 				tmd+="<tr>"+th(i);
 				if(i=="times"){
 					tmp='<div class="radio">';
-		/*			<div class="radio">
-            	<label>
-                	<input type="radio" name="tworone" id="tworone1" value="1" checked>奔跑高一
-                </label>
-                <label>
-                	<input type="radio" name="tworone" id="tworone2" value="0">思想高二
-                </label>
-            </div>*/
 					for(j=0;j<loc[r][i].length;j++){
 						tmp+='<label style="color:black"><input type="radio" name="times" value="'+j+'">'+loc[r][i][j]+'</label><br>';
 					}
@@ -217,7 +205,7 @@
 				tb.innerHTML=tmd;
 			}else if(i=="addrE"){
 				tmd+=tr(th(i)+td("<a href='"+loc[r][i]+"' target='view_window'>点此查看</a>"));
-			}else if(i=="color"||i=="minintro"){
+			}else if(i=="color"||i=="minintro"||i=="disabled"||i=="whydisabled"||i=="image"){
 				continue;
 			}else{
 				tmd+=tr(th(i)+td(loc[r][i]));
@@ -226,26 +214,15 @@
 	}
 	var current=0;var times_max=0;
 	function showloc(id){
-		//console.log("arg:"+id+" ins:"+id-1);
 		current=id;
 		//-1 for array
 		gen(id-1);
-		//$("#msg")[0].innerHTML="";
 		alt('',loc[id-1].name);
-
 		e="onerror=\"this.src=\'/img/noimg.jpg\'\"";
 		$('#msg')[0].innerHTML="<img src='"+loc[id-1].image+"' style='width:100%' class='tu text-center' "+e+">";
 		$('#msg').append(tb);
 		$.material.init();
-		/*if(isincar(id)){
-			$('#btn-car')[0].innerHTML="我不想去了";
-			$('#btn-car')[0].setAttribute("onclick","delfromcar(null,true)");
-		}else{
-			$('#btn-car')[0].innerHTML="添加到购物车";
-			$('#btn-car')[0].setAttribute("onclick","addtocar()");
-		}*/
 	}
 </script>
-<script src="/js/cookie.js"></script>
 </body>
 </html>
