@@ -60,7 +60,7 @@
 			</div>
 			<div class="input-group">
 				<span class="input-group-addon">密码<span style="visibility:hidden">空</span></span>
-        <input type="password" class="form-control" placeholder="输入你的密码" id="pwd">
+        <input type="password" class="form-control" placeholder="输入你的密码" id="pwd" onkeyup="if(event.keyCode==13)verify();">
         <span class="input-group-addon" id="forgot">&lt;</span>
       </div>
       <br>
