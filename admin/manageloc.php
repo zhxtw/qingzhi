@@ -39,17 +39,54 @@
 <body style="font-family:Microsoft YaHei">
 <?php
 	include("shownav.php");
+	$written=0;
 	if($_POST){
-		//TODO: Verify values and push into json
-		//var_dump($_POST["comm"]);
-		echo(htmlspecialchars(str_replace(["\u003Cscript\u003E","\u003C/script\u003E"],"",json_encode($_POST, JSON_UNESCAPED_UNICODE|JSON_HEX_APOS|JSON_HEX_QUOT|JSON_HEX_TAG|JSON_UNESCAPED_SLASHES))));
-		die();
+		$id=$disabled=0;/*$whydisabled=$image=$color=$name=$minintro=$area=$addr=$traffic=$addrE='';
+		$works=$times=$comm=$p=array();*/
+		$p=$_POST;
+		if(isset($p['delid'])){
+			//TODO
+		}else{
+			try{
+				//checkbox选中提交on，反之不提交
+				if(isset($_POST['isDisabled'])){$disabled=1;}
+				$id=$p['loc_id']-1;
+		    $all=file_get_contents("../location.json");
+		    $all=json_decode($all);
+		    $a=$all->loc[$id];
+				$a->disabled=$disabled;
+				if(!isset($p['whydisabled'],$p['image'],$p['color'],$p['name'],$p['minintro'],$p['area'],$p['addr'],$p['addrE'],$p['traffic'],
+					$p['works'],$p['times'],$p['comm'])){die("POST的信息不完整。");}
+				$a->whydisabled=$p['whydisabled']; $a->image=$p['image']; $a->color=$p['color']; $a->name=$p['name'];
+				$a->minintro=$p['minintro']; $a->area=$p['area']; $a->addr=$p['addr']; $a->addrE=$p['addrE']; $a->traffic=$p['traffic'];
+				$a->works=$p['works']; $a->times=$p['times']; $a->comm=$p['comm'];
+
+				$all->loc[$id]=$a;
+				//防止json被引号等破坏
+				$put=str_replace(["\u003Cscript\u003E","\u003C/script\u003E","\u003C/body\u003E","\u003C/html\u003E"],"",
+						json_encode($all, JSON_UNESCAPED_UNICODE|JSON_HEX_APOS|JSON_HEX_QUOT|JSON_HEX_TAG|JSON_UNESCAPED_SLASHES));
+
+				$res=file_put_contents("../location.json",$put,LOCK_EX);
+				if($res!==false){
+					$written=1;
+				}else{
+					$written=-1;
+				}
+			} catch(Exception $e){
+				die("POST的信息不完整。<br>".$e->getMessage());
+			}
+		}
 	}
 ?>
 
 <h1 class="h1 text-center">地点管理</h1>
 
 <div class="container">
+	<?php if($written==-1){
+		echo('<hr><div class="alert alert-danger text-center" role="alert">操作失败，文件无法保存！</div>');
+	}elseif($written==1){
+		echo('<hr><div class="alert alert-success text-center" role="alert">成功更新地点信息~</div>');
+	} ?>
   <hr>
   <div class="row" id="puthere">
 
@@ -62,7 +99,7 @@
 <script src="addToken.js" type="text/javascript"></script>
 <script>
 window.onload=function(){
-  l=$.ajax({async:false,url:"/location.json",dataType:"json",type:"GET"});
+  l=$.ajax({async:false,url:"/location.json?"+new Date().getTime(),dataType:"json",type:"GET"});
   if(l.statusText!="OK"){
     alert("志愿服务地点信息加载失败！\n请刷新页面重试。");return 0;
   }
@@ -76,7 +113,6 @@ window.onload=function(){
 		}
     $("#puthere")[0].innerHTML+=assert;
   }
-  $(".ss").click(function(){showloc(this.href.substr(this.href.length-1));});
 };
 </script>
 <div class="modal fade" id="myModal">
@@ -112,6 +148,9 @@ window.onload=function(){
   </div><!-- /.modal-dialog -->
   </form>
 </div><!-- /.modal -->
+<form method="post">
+	<input name="delid" value="" type="hidden">
+</form>
 <script>
 	function alt(msg,title){
 		if(title){$("#loc_name")[0].innerHTML=title;}
@@ -193,6 +232,7 @@ window.onload=function(){
 		e="onerror=\"this.src=\'/img/noimg.jpg\'\"";
 		$('#msg')[0].innerHTML="<img src='"+loc[id-1].image+"' style='width:100%' class='tu text-center' "+e+">";
 		$('#msg').append(tb);
+		$("<p style='color:gray'>* 所有框都支持html标签</p>").insertAfter("#msg");
     r=$(".onedit1")[0].dataset.r;
     for(i=0;i<$(".onedit1").length;i++){
       console.log(i)
@@ -204,13 +244,17 @@ window.onload=function(){
 			}
     }
 	}
+	function delloc(id){
+		if(!confirm("确定要删除"+loc[id-1].name+"吗？\n\n删除后不可恢复！")) return;
+		$("[name=delid]").val(id-1).parent().submit();
+	}
 	function addordel(elementClass,isdel){
 		allem=$("."+elementClass);
 		if(isdel){
 			if(allem.length<2){return;}
 			allem[allem.length-1].remove();
 		}else{
-			$("<input type='text' class='form-control onedit1 "+elementClass+"' value=''>").insertAfter(allem[allem.length-1]);
+			$("<input type='text' class='form-control onedit1 "+elementClass+"' name='"+elementClass+"[]' value=''>").insertAfter(allem[allem.length-1]);
 		}
 	}
 </script>

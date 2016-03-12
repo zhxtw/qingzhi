@@ -93,7 +93,7 @@
 <script>
 	window.onload=function(){
 		appendNav();
-		l=$.ajax({async:false,url:"location.json",dataType:"json",type:"GET"});
+		l=$.ajax({async:false,url:"location.json?"+new Date().getTime(),dataType:"json",type:"GET"});
 		if(l.statusText!="OK"){
 			alert("志愿服务地点信息加载失败！\n请刷新页面重试。");return 0;
 		}
