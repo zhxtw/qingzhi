@@ -94,7 +94,6 @@
 		}
 		function th(sth){
 			switch(sth){
-				case "name":sth="名称";break;
 				case "area":sth="地区";break;
 				case "addr":sth="地址";break;
 				case "traffic":sth="交通";break;
@@ -102,6 +101,7 @@
 				case "times":sth="时段";break;
 				case "comm":sth="备注";break;
 				case "addrE":sth="地图";break;
+				default: return;
 			}
 			return "<th>"+sth+"</th>";
 		}
@@ -116,9 +116,6 @@
 			tb.innerHTML="";
 			var tmd="";var tmp="";
 			for(i in loc[r]){
-				if(i=="id"||i=="minintro"||i=="color"){
-					continue;
-				}
 				if(i=="comm"||i=="works"){
 					//using tmd instead of innerHTML or browser will add <!--/tr--> automaticly
 					tmd+="<tr>"+th(i);
@@ -127,17 +124,16 @@
 					}
 					tmd+=td(tmp)+"</tr>";
 					tmp="";
-					tb.innerHTML=tmd;
 				}else if(i=="addrE"){
 					tmd+=tr(th(i)+td("<a href='"+loc[r][i]+"' target='view_window'>点此查看</a>"));
-				}else if(i=="name"){
-					tmd+=tr(th(i)+td(loc[r].name));
 				}else if(i=="times"){
 					tmd+=tr(th(i)+td(loc[r].times[getCookie("times")]));
-				}else{
-					tmd+=tr(th(i)+td(loc[r][i]));
+				}else{console.log(i);
+					if(!(h=th(i))){continue;}
+					tmd+=tr(h+td(loc[r][i]));console.log(i+":");
 				}
 			}
+			tb.innerHTML=tmd;
 		}
 		function showloc(id){
 			//-1 for array

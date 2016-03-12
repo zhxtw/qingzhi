@@ -167,6 +167,7 @@
 			case "times":sth="时段";break;
 			case "comm":sth="备注";break;
 			case "addrE":sth="地图";break;
+			default: return;
 		}
 		return "<th>"+sth+"</th>";
 	}
@@ -181,9 +182,6 @@
 		tb.innerHTML="";
 		var tmd="";var tmp="";
 		for(i in loc[r]){
-			if(i=="id"||i=="name"){
-				continue;
-			}
 			//XXX: Using isArray?
 			if(i=="works"||i=="times"||i=="comm"){
 				//using tmd instead of innerHTML or browser will add <!--/tr--> automaticly
@@ -205,10 +203,9 @@
 				tb.innerHTML=tmd;
 			}else if(i=="addrE"){
 				tmd+=tr(th(i)+td("<a href='"+loc[r][i]+"' target='view_window'>点此查看</a>"));
-			}else if(i=="color"||i=="minintro"||i=="disabled"||i=="whydisabled"||i=="image"){
-				continue;
 			}else{
-				tmd+=tr(th(i)+td(loc[r][i]));
+				if(!(h=th(i))){continue;}
+				tmd+=tr(h+td(loc[r][i]));
 			}
 		}
 	}
