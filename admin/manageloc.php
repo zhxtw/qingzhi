@@ -38,49 +38,52 @@
 
 <body style="font-family:Microsoft YaHei">
 <?php
+	function removeE($arr,$index){
+		$new=array();$meet=false;
+		for($i=0;$i<sizeof($arr);$i++){
+			if($i==$index){$meet=true;continue;}
+			$new[(($meet)?($i-1):($i))]=$arr[$i];
+		}
+		return $new;
+	}
 	include("shownav.php");
 	$written=0;
 	if($_POST){
-		$id=$disabled=0;/*$whydisabled=$image=$color=$name=$minintro=$area=$addr=$traffic=$addrE='';
-		$works=$times=$comm=$p=array();*/
+		$id=$disabled=0;
 		$p=$_POST;
+		$all=file_get_contents("../location.json");
+		$all=json_decode($all);
 		if(isset($p['delid'])){
-			//TODO
+			$all->loc=removeE($all->loc,$p['delid']);
 		}else{
-			try{
-				//checkbox选中提交on，反之不提交
-				if(isset($_POST['isDisabled'])){$disabled=1;}
-				$id=$p['loc_id']-1;
-		    $all=file_get_contents("../location.json");
-		    $all=json_decode($all);
-		    $a=$all->loc[$id];
-				$a->disabled=$disabled;
-				if(!isset($p['whydisabled'],$p['image'],$p['color'],$p['name'],$p['minintro'],$p['area'],$p['addr'],$p['addrE'],$p['traffic'],
-					$p['works'],$p['times'],$p['comm'])){die("POST的信息不完整。");}
-				$a->whydisabled=$p['whydisabled']; $a->image=$p['image']; $a->color=$p['color']; $a->name=$p['name'];
-				$a->minintro=$p['minintro']; $a->area=$p['area']; $a->addr=$p['addr']; $a->addrE=$p['addrE']; $a->traffic=$p['traffic'];
-				$a->works=$p['works']; $a->times=$p['times']; $a->comm=$p['comm'];
-
-				$all->loc[$id]=$a;
-				//防止json被引号等破坏
-				$put=str_replace(["\u003Cscript\u003E","\u003C/script\u003E","\u003C/body\u003E","\u003C/html\u003E"],"",
-						json_encode($all, JSON_UNESCAPED_UNICODE|JSON_HEX_APOS|JSON_HEX_QUOT|JSON_HEX_TAG|JSON_UNESCAPED_SLASHES));
-
-				$res=file_put_contents("../location.json",$put,LOCK_EX);
-				if($res!==false){
-					$written=1;
-				}else{
-					$written=-1;
-				}
-			} catch(Exception $e){
-				die("POST的信息不完整。<br>".$e->getMessage());
-			}
+			//checkbox选中提交on，反之不提交
+			if(isset($_POST['isDisabled'])){$disabled=1;}
+			$id=$p['loc_id']-1;
+	    $a=$all->loc[$id];
+			$a->disabled=$disabled;
+			if(!isset($p['whydisabled'],$p['image'],$p['color'],$p['name'],$p['minintro'],$p['area'],$p['addr'],$p['addrE'],$p['traffic'],
+				$p['works'],$p['times'],$p['comm'])){die("POST的信息不完整。");}
+			$a->whydisabled=$p['whydisabled']; $a->image=$p['image']; $a->color=$p['color']; $a->name=$p['name'];
+			$a->minintro=$p['minintro']; $a->area=$p['area']; $a->addr=$p['addr']; $a->addrE=$p['addrE']; $a->traffic=$p['traffic'];
+			$a->works=$p['works']; $a->times=$p['times']; $a->comm=$p['comm'];
+			$all->loc[$id]=$a;
+		}
+		//防止json被引号等破坏
+		$put=str_replace(["\u003Cscript\u003E","\u003C/script\u003E","\u003C/body\u003E","\u003C/html\u003E"],"",
+					json_encode($all, JSON_UNESCAPED_UNICODE|JSON_HEX_APOS|JSON_HEX_QUOT|JSON_HEX_TAG|JSON_UNESCAPED_SLASHES));
+		$res=file_put_contents("../location.json",$put,LOCK_EX);
+		if($res!==false){
+			$written=1;
+		}else{
+			$written=-1;
 		}
 	}
 ?>
 
 <h1 class="h1 text-center">地点管理</h1>
-
+<div style="background-color:green;position:fixed;right:5%;bottom:5%;height:48px;width:48px;border-radius:24px;">
+	<center style="width:100%;height:100%;color:white;font-size:31px">+</center>
+</div>
 <div class="container">
 	<?php if($written==-1){
 		echo('<hr><div class="alert alert-danger text-center" role="alert">操作失败，文件无法保存！</div>');

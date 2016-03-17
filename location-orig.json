@@ -1,4 +1,4 @@
-{
+﻿{
 	"loc":[
 		{	"id":"1",
 			"disabled":"1",
@@ -81,7 +81,7 @@
 		},
 		{
 			"id":"6",
-			"disabled":"6",
+			"disabled":"0",
 			"whydisabled":"",
 			"image":"/img/2.jpg",
 			"color":"info",
