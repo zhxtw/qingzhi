@@ -78,7 +78,7 @@ if($_POST){
 		}else{
 			diecho("请输入正确的联系电话，目前支持手机号码和广州市固话，如果没有可以不用输入",1);
 		}
-		if(strlen($_POST['verify_code'])!=4||md5($_POST['verify_code'])!=$_SESSION['verification']){
+		if(strlen($_POST['verify_code'])!=5||$_POST['verify_code']!=$_SESSION['verification']){
 			diecho("请输入正确的验证码！",1);
 		}
 		$mobile=mysqli_real_escape_string($conn,$mobile);
@@ -118,7 +118,7 @@ if($_POST){
 			header("Location: /success.php");
 			die();
 		}else{
-			//session_destroy();
+			session_destroy();
 			diecho("登记失败\\n\\n请与我们联系。",1);
 		}
 	}else{
@@ -233,7 +233,6 @@ if($_POST){
 							$("<span> 我同意以上协议，不在志愿服务地点搞破坏</span>").insertAfter("#agre");
 							$("#agu").remove();
 							$("#agre")[0].id="agree";
-							clicktime=0;
 						}
 					}
 				</script>

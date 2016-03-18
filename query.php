@@ -63,7 +63,7 @@ if($_POST){
 			diecho("请输入正确的验证码！",1);
 		}*/
 		if(isset($_POST['verify_code'])){
-			if(@md5($_POST['verify_code'])!=$_SESSION['verification']){//verification session might be null
+			if(@$_POST['verify_code']!=$_SESSION['verification']){//verification session might be null
 				diecho("输入的验证码有误。请重新输入。",1);
 			}
 		}else if($_POST['auto_verify'] && $_POST['auto_time']){
