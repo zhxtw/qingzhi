@@ -56,14 +56,22 @@
       <div class="input-group">
 				<span class="input-group-addon">用户名</span>
 	      <input type="text" class="form-control" placeholder="输入你的用户名" id="usr">
-	      <span class="input-group-addon" id="forgot">&lt;</span>
+	      <span class="input-group-addon">&lt;</span>
 			</div>
 			<div class="input-group">
 				<span class="input-group-addon">密码<span style="visibility:hidden">空</span></span>
-        <input type="password" class="form-control" placeholder="输入你的密码" id="pwd" onkeyup="if(event.keyCode==13)verify();">
+        <input type="password" class="form-control" placeholder="输入你的密码" id="pwd">
         <span class="input-group-addon" id="forgot">&lt;</span>
       </div>
+			<div class="input-group">
+				<span class="input-group-addon">验证码</span>
+	      <input type="text" class="form-control" placeholder="输入下方的验证码" id="verify_code" autocomplete="off"  onkeyup="if(event.keyCode==13)verify();">
+	      <span class="input-group-addon">&lt;</span>
+			</div>
       <br>
+			<div>
+		  	<img id="vimg" src="/verify.php?<?php echo(microtime(true)); ?>" onclick="this.src='/verify.php?'+new Date().getTime();">
+      </div><hr>
   	  <button type="button" class="btn btn-primary" style="width:100%" onclick="verify()" id="login">登录</button>
 
       <div class="text-right">
@@ -81,6 +89,7 @@
 <script>
 	function verify(){
 		if($("#pwd").val().length<6 || $("#usr").val().length<3){alert("请输入正确的用户名和密码。");return;}
+		if($("#verify_code").val().length!=5){alert("请输入正确位数的验证码！");return;}
 		$("#usr")[0].disabled=1;
 		$("#pwd")[0].disabled=1;
 		$("#login")[0].disabled=1;
@@ -98,11 +107,11 @@
 		for(i=0;i<1000;i++){
 			md5ed=md5(md5ed);
 		}
-		$.ajax({type:"post",url:"/admin/verify.php",data:{username:$("#usr").val(), password:md5ed},
+		$.ajax({type:"post",url:"/admin/verify.php",data:{username:$("#usr").val(), password:md5ed, verify_code:$("#verify_code").val()},
 						success:function(got){posted=1;
 							if(got.substr(0,1)==1){
 								pass=1;token=got.substr(2);
-							}else{pass=0;}
+							}else{pass=got;}
 							if(added==1){checkAgain();}
 						},error:function(e){posted=1;
 							pass=-1;if(added==1){checkAgain();}
@@ -144,10 +153,12 @@
 			return 0;
 		}else if(pass==-1){
 			alert("网络连接失败或者服务器故障。");
+		}else if(pass==2){
+			alert("验证码错误。");
 		}else{
 			alert("用户名或密码错误。");
 		}
-		tid=setInterval("rollBack()",3);
+		tid=setInterval("rollBack()",3);$("#vimg").click();
 	}
 	function rollBack(){
 		if(spTimes>chars*3){window.clearInterval(tid);spTimes=0;restore();return 0;}

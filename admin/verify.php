@@ -1,4 +1,5 @@
 <?php
+	session_start();
 	function random($len) {
    		$srcstr = "1A2B3C4D5E6F7890";
    	 	mt_srand();
@@ -12,8 +13,11 @@
 	if(!$_POST){
 		die();
 	}
-	if(!isset($_POST["password"]) || !isset($_POST['username'])){
+	if(!isset($_POST["password"],$_POST['username'],$_POST['verify_code'])){
 		die();
+	}
+	if(strlen($_POST['verify_code'])!=5 || $_SESSION['verification']!=$_POST['verify_code']){
+		$_SESSION['verification']='';die("2");
 	}
 	$flag=true;
 	require_once("../to_sql.php");
@@ -22,7 +26,7 @@
 	$p=md5($_POST['password']);
 	$query="select pwd,salt from userpwd where username='{$username}'";
 	$result=mysqli_fetch_array(mysqli_query($conn,$query));
-	if(!$result){die('0');}
+	if(!$result){$_SESSION['verification']='';die('0');}
 	$pwd=$result['pwd'];
 	$salt=$result['salt'];
 	$s0=substr($salt,0,1);$s1=substr($salt,1,1);$s2=substr($salt,2,1);$s3=substr($salt,3,1);$s4=substr($salt,4,1);
@@ -32,12 +36,11 @@
 	$l4=substr($p,24,8).$s4;
 	$all=$l1.$l2.$l3.$l4;
 	if(md5($all)==$pwd){
-		session_start();
 		$_SESSION['logged']=true;
 		$_SESSION['adminname']=$username;
 		$token=random(16).';';
 		$_SESSION['token']=$token;
 		die('1|'.$token);
 	}
-	die('0');//<br>Y:'.md5($all)."<br>S:".$pwd."<br>salt:".$salt);
+	$_SESSION['verification']='';die('0');//<br>Y:'.md5($all)."<br>S:".$pwd."<br>salt:".$salt);
 ?>
