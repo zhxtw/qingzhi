@@ -56,17 +56,26 @@
 		if(isset($p['delid'])){
 			$all->loc=removeE($all->loc,$p['delid']);
 		}else{
+			if(!isset($p['whydisabled'],$p['image'],$p['color'],$p['name'],$p['minintro'],$p['area'],$p['addr'],$p['addrE'],$p['traffic'],
+				$p['works'][0],$p['times'][0],$p['comm'][0])){die("检查下有没有东东漏掉哦");}
 			//checkbox选中提交on，反之不提交
 			if(isset($_POST['isDisabled'])){$disabled=1;}
-			$id=$p['loc_id']-1;
-	    $a=$all->loc[$id];
+			$id=$p['loc_id'];
+			if($id=="add"){
+				$a=new stdClass;//$all->loc[sizeof($all->loc)];
+			}else{
+				$a=$all->loc[$id];
+			}
 			$a->disabled=$disabled;
-			if(!isset($p['whydisabled'],$p['image'],$p['color'],$p['name'],$p['minintro'],$p['area'],$p['addr'],$p['addrE'],$p['traffic'],
-				$p['works'],$p['times'],$p['comm'])){die("POST的信息不完整。");}
 			$a->whydisabled=$p['whydisabled']; $a->image=$p['image']; $a->color=$p['color']; $a->name=$p['name'];
 			$a->minintro=$p['minintro']; $a->area=$p['area']; $a->addr=$p['addr']; $a->addrE=$p['addrE']; $a->traffic=$p['traffic'];
 			$a->works=$p['works']; $a->times=$p['times']; $a->comm=$p['comm'];
-			$all->loc[$id]=$a;
+			if($id=="add"){
+				$all->loc[sizeof($all->loc)]=$a;
+			}else{
+				$all->loc[$id]=$a;
+			}
+
 		}
 		//防止json被引号等破坏
 		$put=str_replace(["\u003Cscript\u003E","\u003C/script\u003E","\u003C/body\u003E","\u003C/html\u003E"],"",
@@ -81,7 +90,7 @@
 ?>
 
 <h1 class="h1 text-center">地点管理</h1>
-<div style="background-color:green;position:fixed;right:5%;bottom:5%;height:48px;width:48px;border-radius:24px;">
+<div onclick="showloc(0,1)" style="background-color:green;position:fixed;right:5%;bottom:5%;height:48px;width:48px;border-radius:24px;z-index:10">
 	<center style="width:100%;height:100%;color:white;font-size:31px">+</center>
 </div>
 <div class="container">
@@ -110,9 +119,9 @@ window.onload=function(){
   loc=ljson.loc;
   for(i=0;i<loc.length;i++){
 		if(loc[i].disabled==1){
-			assert='<div class="text-justify col-sm-4"><div class="panel panel-'+loc[i].color+'"><div class="panel-heading"><h3 class="panel-title text-center"><b><s>'+loc[i].name+'</s></b></h3></div><div class="panel-body text-center row"><img class="tu2 col-md-10 col-md-offset-1 col-sm-12 col-xs-12" src="/img/'+(i-0+1)+'.jpg"></div><div class="panel-footer text-center"><button data-id="'+loc[i].id+'" onclick="showloc(this.dataset.id)" class="btn btn-sm btn-default">编辑</button>&nbsp;<button data-id="'+loc[i].id+'" onclick="delloc(this.dataset.id)" class="btn btn-sm btn-danger">删除</button></div></div></div>';
+			assert='<div class="text-justify col-sm-4"><div class="panel panel-'+loc[i].color+'"><div class="panel-heading"><h3 class="panel-title text-center"><b><s>'+loc[i].name+'</s></b></h3></div><div class="panel-body text-center row"><img class="tu2 col-md-10 col-md-offset-1 col-sm-12 col-xs-12" src="'+loc[i].image+'"></div><div class="panel-footer text-center"><button data-id="'+i+'" onclick="showloc(this.dataset.id)" class="btn btn-sm btn-default">编辑</button>&nbsp;<button data-id="'+i+'" onclick="delloc(this.dataset.id)" class="btn btn-sm btn-danger">删除</button></div></div></div>';
 		}else{
-    	assert='<div class="text-justify col-sm-4"><div class="panel panel-'+loc[i].color+'"><div class="panel-heading"><h3 class="panel-title text-center"><b>'+loc[i].name+'</b></h3></div><div class="panel-body text-center row"><img class="tu2 col-md-10 col-md-offset-1 col-sm-12 col-xs-12" src="/img/'+(i-0+1)+'.jpg"></div><div class="panel-footer text-center"><button data-id="'+loc[i].id+'" onclick="showloc(this.dataset.id)" class="btn btn-sm btn-default">编辑</button>&nbsp;<button data-id="'+loc[i].id+'" onclick="delloc(this.dataset.id)" class="btn btn-sm btn-danger">删除</button></div></div></div>';
+    	assert='<div class="text-justify col-sm-4"><div class="panel panel-'+loc[i].color+'"><div class="panel-heading"><h3 class="panel-title text-center"><b>'+loc[i].name+'</b></h3></div><div class="panel-body text-center row"><img class="tu2 col-md-10 col-md-offset-1 col-sm-12 col-xs-12" src="'+loc[i].image+'"></div><div class="panel-footer text-center"><button data-id="'+i+'" onclick="showloc(this.dataset.id)" class="btn btn-sm btn-default">编辑</button>&nbsp;<button data-id="'+i+'" onclick="delloc(this.dataset.id)" class="btn btn-sm btn-danger">删除</button></div></div></div>';
 		}
     $("#puthere")[0].innerHTML+=assert;
   }
@@ -136,7 +145,7 @@ window.onload=function(){
 			function isChecked(){aa=$("[name='times']");for(ii in aa){if(aa[ii].checked){return true;}}return false;}
 			function getSel(){aa=$("[name='times']");for(ii in aa){if(aa[ii].checked){return aa[ii].value;}}}
 			function verify(){
-				if(current<1||current>loc.length){
+				if(current!="add" && (current<0||current>=loc.length)){
 					alert("location id不合法，请检查。");return 0;
 				}
 				t=document.createElement("input");
@@ -216,7 +225,7 @@ window.onload=function(){
 				}
 				tmd+=td(tmp+"<p style='color:gray'>提示：前后台风格不同，实际效果上，default为白色，primary为青色，而且所有颜色都要鲜艳的多</p>")+"</tr>";tmp='';
       }else if(i=="whydisabled"||i=="traffic"){
-        tmd+=tr(th(i)+td("<textarea name='"+i+"' class='form-control' style='resize: vertical;'>"+loc[r][i]+"</textarea>"));
+        tmd+=tr(th(i)+td("<textarea name='"+i+"' class='form-control onedit2' style='resize: vertical;'>"+loc[r][i]+"</textarea>"));
       }else{
 				tmd+=tr(th(i)+td("<input name='"+i+"' type='text' class='form-control onedit1' value='' data-r='"+r+"' data-i='"+i+"'>"));
 			}
@@ -224,32 +233,35 @@ window.onload=function(){
 		tb.innerHTML=tmd;
 	}
 	var current=0;var times_max=0;
-	function showloc(id){
-		//console.log("arg:"+id+" ins:"+id-1);
-		current=id;
-		//-1 for array
-		gen(id-1);
-		//$("#msg")[0].innerHTML="";
-		alt('',loc[id-1].name);
+	function showloc(id,isnew){
+		current=(isnew)?"add":id;
+		gen(id);
+		alt('',loc[id].name);
 
 		e="onerror=\"this.src=\'/img/noimg.jpg\'\"";
-		$('#msg')[0].innerHTML="<img src='"+loc[id-1].image+"' style='width:100%' class='tu text-center' "+e+">";
+		$('#msg')[0].innerHTML="<img "+((isnew)?("src='/img/noimg.jpg'"):("src='"+loc[id].image+"' "+e))+" style='width:100%' class='tu text-center'>";
 		$('#msg').append(tb);
-		$("<p style='color:gray'>* 所有框都支持html标签</p>").insertAfter("#msg");
+		$("#tips").remove();$("<p id='tips' style='color:gray'>* 所有框都支持html标签</p>").insertAfter("#msg");
+
     r=$(".onedit1")[0].dataset.r;
-    for(i=0;i<$(".onedit1").length;i++){
-      console.log(i)
-			if($(".onedit1")[i].dataset.j){
-				$(".onedit1")[i].value=loc[r][$(".onedit1")[i].dataset.i][$(".onedit1")[i].dataset.j];
-			}
-			else{
-      	$(".onedit1")[i].value=loc[r][$(".onedit1")[i].dataset.i];
+    if(isnew){
+			$(".onedit1").val('');$(".onedit2").val('');
+		}else{
+			for(i=0;i<$(".onedit1").length;i++){
+				if($(".onedit1")[i].dataset.j){
+					$(".onedit1")[i].value=loc[r][$(".onedit1")[i].dataset.i][$(".onedit1")[i].dataset.j];
+				}
+				else{
+      		$(".onedit1")[i].value=loc[r][$(".onedit1")[i].dataset.i];
+				}
 			}
     }
+
+
 	}
 	function delloc(id){
-		if(!confirm("确定要删除"+loc[id-1].name+"吗？\n\n删除后不可恢复！")) return;
-		$("[name=delid]").val(id-1).parent().submit();
+		if(!confirm("确定要删除"+loc[id].name+"吗？\n\n删除后不可恢复！")) return;
+		$("[name=delid]").val(id).parent().submit();
 	}
 	function addordel(elementClass,isdel){
 		allem=$("."+elementClass);
