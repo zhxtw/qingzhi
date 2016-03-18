@@ -7,6 +7,7 @@
 <body>
 <?php
   function diecho($msg){
+    $_SESSION['verification']='';
     die("<hr>{$msg}");
   }
   $a=file_get_contents("location.json");
@@ -67,7 +68,7 @@
     		diecho("请填写正确的邮箱，如果没有可以不填");
     	}
 
-      if(strlen($_POST['verify_code'])!=4||md5($_POST['verify_code'])!=$_SESSION['verification']){
+      if(strlen($_POST['verify_code'])!=5||$_POST['verify_code']!=$_SESSION['verification']){
     		diecho("请输入正确的验证码！");
     	}
 
@@ -115,7 +116,7 @@
         <p>电子邮箱 <input name="email" type="text"></p>
       </div>
       <span>如果不方便联系，可以不用填电话或者邮箱</span>
-      <p>验证码 <input name="verify_code" type="text"> <img src="verify.php?<?php echo(microtime(true)); ?>"></p>
+      <p>验证码 <input name="verify_code" type="text"><br><br><img src="verify.php?<?php echo(microtime(true)); ?>"></p>
       <input type="submit" value="提交"> <input type="reset" value="清空">
 
     </form>
