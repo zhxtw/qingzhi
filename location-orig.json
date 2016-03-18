@@ -1,4 +1,4 @@
-﻿{
+{
 	"loc":[
 		{	"id":"1",
 			"disabled":"1",
@@ -83,7 +83,7 @@
 			"id":"6",
 			"disabled":"0",
 			"whydisabled":"",
-			"image":"/img/2.jpg",
+			"image":"/img/6.jpg",
 			"color":"info",
 			"name":"东山福利院",
 			"minintro":"展现你的话唠才能~<br>P.S.两周安排一次志愿活动",
