@@ -28,7 +28,7 @@
 * 安全
 
   ~~网站使用https，网站证书通过Certificate Transparency认证，ssl支持CHACHA20算法，后期考虑2-way ssl，防止数据被中途截获~~
-  
+
   *这是源码，跟网站安全性有个鬼关系！哪天搞了个Injection不就全完了！*
 
 ### 进度
@@ -40,6 +40,8 @@
 * 报名
 
 * 查询
+
+* 意见反馈
 
 ##### 后台
 
@@ -55,6 +57,8 @@
 
 * 邮件系统 `RoundCube` (不包含在代码中)
 
+* 编辑地点
+
 #### 未完成
 
 ##### 前台
@@ -64,8 +68,6 @@
 * 志愿者公布
 
 * 工时查询
-
-* 意见反馈
 
 * 关于
 
@@ -78,8 +80,6 @@
 * 工时
 
 * 调换人/地点
-
-* 编辑地点
 
 * 等等等等
 
@@ -101,11 +101,13 @@
 
 * [toopay](https://github.com/toopay/bootstrap-markdown)的`bootstrap-markdown`，遵循`Apache`协议的2.0版本
 
+* [Gregwar](https://github.com/Gregwar/Captcha)的`Captcha`，遵循`MIT`协议
+
 * [Github](https://github.com)提供的免费代码仓库和`Atom`编辑器
 
 ***
 
-提示：首次使用请执行`initial.sql`，并更改`to_sql.php`中的账号密码，随后便可以使用默认用户admin密码12345678登录
+提示：首次使用请执行`initial.sql`，并更改`to_sql.php`中的本地数据库的账号密码，随后便可以使用默认用户admin密码12345678登录
 
 我们热衷于开源，不希望固步自封，欢迎大家提意见、挑漏洞。
 
