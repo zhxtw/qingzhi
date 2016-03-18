@@ -96,8 +96,8 @@ if($_POST){
 			diecho("请填写正确的邮箱，如果没有可以不填",1);
 		}
 
-		$times=$a[$_SESSION['loc_id']-1]['times'][$_SESSION['times']];
-		$loc_name=$a[$_SESSION['loc_id']-1]['name'];
+		$times=$a[$_SESSION['loc_id']]->times[$_SESSION['times']];
+		$loc_name=$a[$_SESSION['loc_id']]->name;
 
 		//Query whether the man has signed up
 		$query="SELECT * FROM signup where loc_name='{$loc_name}' and name='{$name}' and classno='{$classno}' and tworone='{$tworone}' and (`go`=0 or `go`=1)";
@@ -274,8 +274,8 @@ if($_POST){
 		}
 		ljson=eval("("+l.responseText+")");
 		loc=ljson.loc;
-		$("#location").val(loc[getCookie("loc_id")-1].name);//!!loc_id is not an array value!!
-		$("#times").val(loc[getCookie("loc_id")-1].times[getCookie("times")]);
+		$("#location").val(loc[getCookie("loc_id")].name);
+		$("#times").val(loc[getCookie("loc_id")].times[getCookie("times")]);
 		$(".readonly").parent().removeClass('is-empty');
 
 		t=$("input.form-control").not(".readonly");

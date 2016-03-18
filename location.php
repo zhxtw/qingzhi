@@ -45,15 +45,15 @@
 		}
 		$times=$_POST['times'];$loc_id=$_POST['loc_id'];
 		require("to_json.php");
-		$maxTimes=getMaxTimes($a,$_POST['loc_id']-1);
-		$maxLoc=getMaxLoc($a);
-		if($loc_id>$maxLoc||$loc_id<1||!is_numeric($loc_id)){
-			echo("location id不合法。");die();
+		$maxTimes=sizeof($a[$_POST['loc_id']]->times)-1;
+		$maxLoc=sizeof($a)-1;
+		if($loc_id>$maxLoc||$loc_id<0||!is_numeric($loc_id)){
+			echo("location id不合法。".$maxLoc);die($json);
 		}
-		if(!is_numeric($times)||$times>$maxTimes-1||$times<0){
+		if(!is_numeric($times)||$times>$maxTimes||$times<0){
 			echo("选择的时段不合法。");die();
 		}
-		if($a[$loc_id-1]['disabled']==1){
+		if($a[$loc_id]->disabled==1){
 			die("报名已关闭");
 		}
 		session_start();
@@ -103,7 +103,7 @@
 			if(loc[i].disabled==1){
 				assert='<div class="text-justify col-sm-4"><div class="panel panel-disabled"><div class="panel-heading"><h3 style="color:black" class="panel-title text-center"><b>'+loc[i].name+'</b></h3></div><div class="panel-body text-center row"><img class="tu2 col-md-10 col-md-offset-1 col-sm-12 col-xs-12" src="'+loc[i].image+'"></div><div class="panel-footer text-center">'+loc[i].whydisabled+'</div></div></div>';
 			}else{
-				assert='<div class="text-justify col-sm-4"><div class="panel panel-'+loc[i].color+'"><div class="panel-heading"><h3 class="panel-title text-center"><b>'+loc[i].name+'</b></h3></div><div class="panel-body text-center row"><img class="tu2 col-md-10 col-md-offset-1 col-sm-12 col-xs-12" src="'+loc[i].image+'"></div><div class="panel-footer text-center">'+loc[i].minintro+'<br><button data-id="'+loc[i].id+'" onclick="showloc(this.dataset.id)" class="btn btn-sm btn-'+loc[i].color+'">&gt;点我报名&lt;</button></div></div></div>';
+				assert='<div class="text-justify col-sm-4"><div class="panel panel-'+loc[i].color+'"><div class="panel-heading"><h3 class="panel-title text-center"><b>'+loc[i].name+'</b></h3></div><div class="panel-body text-center row"><img class="tu2 col-md-10 col-md-offset-1 col-sm-12 col-xs-12" src="'+loc[i].image+'"></div><div class="panel-footer text-center">'+loc[i].minintro+'<br><button data-id="'+i+'" onclick="showloc(this.dataset.id)" class="btn btn-sm btn-'+loc[i].color+'">&gt;点我报名&lt;</button></div></div></div>';
 			}
 			$("#puthere")[0].innerHTML+=assert;
 
@@ -131,7 +131,7 @@
 			function isChecked(){aa=$("[name='times']");for(ii in aa){if(aa[ii].checked){return true;}}return false;}
 			function getSel(){aa=$("[name='times']");for(ii in aa){if(aa[ii].checked){return aa[ii].value;}}}
 			function verify(){
-				if(current<1||current>loc.length){
+				if(current<1||current>=loc.length){
 					alert("location id不合法，请检查。");return 0;
 				}
 				if(!isChecked()||getSel()<0||getSel()>times_max){
@@ -213,10 +213,10 @@
 	function showloc(id){
 		current=id;
 		//-1 for array
-		gen(id-1);
-		alt('',loc[id-1].name);
+		gen(id);
+		alt('',loc[id].name);
 		e="onerror=\"this.src=\'/img/noimg.jpg\'\"";
-		$('#msg')[0].innerHTML="<img src='"+loc[id-1].image+"' style='width:100%' class='tu text-center' "+e+">";
+		$('#msg')[0].innerHTML="<img src='"+loc[id].image+"' style='width:100%' class='tu text-center' "+e+">";
 		$('#msg').append(tb);
 		$.material.init();
 	}

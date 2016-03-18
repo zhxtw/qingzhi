@@ -128,18 +128,17 @@
 					tmd+=tr(th(i)+td("<a href='"+loc[r][i]+"' target='view_window'>点此查看</a>"));
 				}else if(i=="times"){
 					tmd+=tr(th(i)+td(loc[r].times[getCookie("times")]));
-				}else{console.log(i);
+				}else{
 					if(!(h=th(i))){continue;}
-					tmd+=tr(h+td(loc[r][i]));console.log(i+":");
+					tmd+=tr(h+td(loc[r][i]));
 				}
 			}
 			tb.innerHTML=tmd;
 		}
 		function showloc(id){
-			//-1 for array
-			gen(id-1);
-			$("#locname")[0].innerHTML=loc[id-1].name+" "+loc[id-1].times[<?php echo($_SESSION['times']); ?>];
-			$('#locimg')[0].src=loc[id-1].image;
+			gen(id);
+			$("#locname")[0].innerHTML=loc[id].name+" "+loc[id].times[<?php echo($_SESSION['times']); ?>];
+			$('#locimg')[0].src=loc[id].image;
 			$('#msg').append(tb);
 		}
 	</script>
