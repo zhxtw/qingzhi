@@ -19,6 +19,9 @@
 		$down=$class*100;$up=($class+1)*100;
 		$query.=" and classno>{$down} and classno<{$up} and tworone='{$grade}'";
 	}
+	if(isset($_POST['assign'])){
+		$query.=" and `go`!=0";
+	}
 	if(isset($_POST['sort'])){
 		$sort=$_POST['sort'];
 		$sort=mysqli_real_escape_string($conn,$sort);

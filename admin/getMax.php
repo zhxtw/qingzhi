@@ -18,6 +18,9 @@
 		$down=$class*100;$up=($class+1)*100;
 		$query.=" and classno>{$down} and classno<{$up} and tworone='{$grade}'";
 	}
+	if(isset($_POST['assign'])){
+		$query.=" and `go`!=0";
+	}
 	$result=mysqli_query($conn,$query);
 	if(!$result){die("-1");}
 	$maxRows=mysqli_num_rows($result);
