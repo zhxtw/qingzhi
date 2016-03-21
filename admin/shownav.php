@@ -17,8 +17,7 @@
         </li>
         <li class="dropdown"><a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false">地点时段管理<span class="caret"></span></a>
           <ul class="dropdown-menu" role="menu">
-            <li><a href="manageloc.php">地点管理</a></li>
-            <li><a href="managetime.php">时段管理</a></li>
+            <li><a href="manageloc.php">地点时段管理</a></li>
           </ul>
         </li>
         <li class="dropdown"><a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false">公告通知管理<span class="caret"></span></a>
