@@ -16,7 +16,7 @@
 	if(!isset($_POST["password"],$_POST['username'],$_POST['verify_code'])){
 		die();
 	}
-	if(strlen($_POST['verify_code'])!=5 || $_SESSION['verification']!=$_POST['verify_code']){
+	if(strlen($_POST['verify_code'])!=5 || $_SESSION['verification']!=strtolower($_POST['verify_code'])){
 		$_SESSION['verification']='';die("2");
 	}
 	$flag=true;

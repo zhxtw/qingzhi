@@ -68,7 +68,7 @@
     		diecho("请填写正确的邮箱，如果没有可以不填");
     	}
 
-      if(strlen($_POST['verify_code'])!=5||$_POST['verify_code']!=$_SESSION['verification']){
+      if(strlen($_POST['verify_code'])!=5||strtolower($_POST['verify_code'])!=$_SESSION['verification']){
     		diecho("请输入正确的验证码！");
     	}
 

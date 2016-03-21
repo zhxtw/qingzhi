@@ -78,7 +78,7 @@ if($_POST){
 		}else{
 			diecho("请输入正确的联系电话，目前支持手机号码和广州市固话，如果没有可以不用输入",1);
 		}
-		if(strlen($_POST['verify_code'])!=5||$_POST['verify_code']!=$_SESSION['verification']){
+		if(strlen($_POST['verify_code'])!=5||$_POST['verify_code']!=strtolower($_SESSION['verification'])){
 			diecho("请输入正确的验证码！",1);
 		}
 		$mobile=mysqli_real_escape_string($conn,$mobile);

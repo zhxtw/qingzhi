@@ -19,7 +19,7 @@ session_start();
 if($_POST){
   if(!isset($_POST['content']) || !isset($_POST['verify_code'])){die();}
   $content=$_POST['content'];
-  $v=$_POST['verify_code'];
+  $v=strtolower($_POST['verify_code']);
   if($v!=$_SESSION['verification']){die("<script>alert('验证码输入错误！');history.go(-1);</script>");}
   $flag=true;require_once("to_sql.php");
   $content=mysqli_real_escape_string($conn,htmlspecialchars($content));
