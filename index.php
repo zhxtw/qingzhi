@@ -1,3 +1,4 @@
+<?php header("Content-Type: text/html; charset=utf-8"); ?>;
 <html>
 <head>
 <title>检测浏览器中</title>
