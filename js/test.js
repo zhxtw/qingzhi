@@ -1,0 +1,1 @@
+onpostmessgae=function(){};

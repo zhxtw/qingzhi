@@ -80,6 +80,7 @@
   </div>
   <hr>
   <div class="row" id="puthere">
+		<center><img src="/img/loading.gif"><br><br>正在加载志愿地点信息，稍安勿躁哦~</center>
   </div>
 </div>
 
@@ -92,26 +93,22 @@
 <script src="js/ripples.js"></script>
 <script>
 	window.onload=function(){
-		appendNav();
-		l=$.ajax({async:false,url:"location.json?"+new Date().getTime(),dataType:"json",type:"GET"});
-		if(l.statusText!="OK"){
-			alert("志愿服务地点信息加载失败！\n请刷新页面重试。");return 0;
-		}
-		ljson=eval("("+l.responseText+")");
-		loc=ljson.loc;
-		for(i=0;i<loc.length;i++){
-			if(loc[i].disabled==1){
-				assert='<div class="text-justify col-sm-4"><div class="panel panel-disabled"><div class="panel-heading"><h3 style="color:black" class="panel-title text-center"><b>'+loc[i].name+'</b></h3></div><div class="panel-body text-center row"><img class="tu2 col-md-10 col-md-offset-1 col-sm-12 col-xs-12" src="'+loc[i].image+'"></div><div class="panel-footer text-center">'+loc[i].whydisabled+'</div></div></div>';
-			}else{
-				assert='<div class="text-justify col-sm-4"><div class="panel panel-'+loc[i].color+'"><div class="panel-heading"><h3 class="panel-title text-center"><b>'+loc[i].name+'</b></h3></div><div class="panel-body text-center row"><img class="tu2 col-md-10 col-md-offset-1 col-sm-12 col-xs-12" src="'+loc[i].image+'"></div><div class="panel-footer text-center">'+loc[i].minintro+'<br><button data-id="'+i+'" onclick="showloc(this.dataset.id)" class="btn btn-sm btn-'+loc[i].color+'">&gt;点我报名&lt;</button></div></div></div>';
+		appendNav();loc=0;
+		$.ajax({url:"location.json?"+new Date().getTime(),dataType:"json",type:"GET",success:function(got){
+			loc=got.loc;$("#puthere").html('');
+			for(i=0;i<loc.length;i++){
+				if(loc[i].disabled==1){
+					assert='<div class="text-justify col-sm-4"><div class="panel panel-disabled"><div class="panel-heading"><h3 style="color:black" class="panel-title text-center"><b>'+loc[i].name+'</b></h3></div><div class="panel-body text-center row"><img class="tu2 col-md-10 col-md-offset-1 col-sm-12 col-xs-12" src="'+loc[i].image+'"></div><div class="panel-footer text-center">'+loc[i].whydisabled+'</div></div></div>';
+				}else{
+					assert='<div class="text-justify col-sm-4"><div class="panel panel-'+loc[i].color+'"><div class="panel-heading"><h3 class="panel-title text-center"><b>'+loc[i].name+'</b></h3></div><div class="panel-body text-center row"><img class="tu2 col-md-10 col-md-offset-1 col-sm-12 col-xs-12" src="'+loc[i].image+'"></div><div class="panel-footer text-center">'+loc[i].minintro+'<br><button data-id="'+i+'" onclick="showloc(this.dataset.id)" class="btn btn-sm btn-'+loc[i].color+'">&gt;点我报名&lt;</button></div></div></div>';
+				}
+				$("#puthere")[0].innerHTML+=assert;
 			}
-			$("#puthere")[0].innerHTML+=assert;
-
-		}
-		$(".ss").click(function(){showloc(this.href.substr(this.href.length-1));});
-		sch=document.body.clientHeight;
+			$(".ss").click(function(){showloc(this.href.substr(this.href.length-1));});
+		},error:function(){
+			alert("志愿服务地点信息加载失败！\n请刷新页面重试。");
+		}});
 	}
-	var sch=0;var showincart="";
 </script>
 <div class="modal fade" id="myModal">
   <form action="/location.php" method="post" id="frm">
