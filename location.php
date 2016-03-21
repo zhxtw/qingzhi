@@ -97,7 +97,9 @@
 		$.ajax({url:"location.json?"+new Date().getTime(),dataType:"json",type:"GET",success:function(got){
 			loc=got.loc;$("#puthere").html('');
 			for(i=0;i<loc.length;i++){
-				if(loc[i].disabled==1){
+				if(got.alldisabled==1){
+					assert='<div class="text-justify col-sm-4"><div class="panel panel-disabled"><div class="panel-heading"><h3 style="color:black" class="panel-title text-center"><b>'+loc[i].name+'</b></h3></div><div class="panel-body text-center row"><img class="tu2 col-md-10 col-md-offset-1 col-sm-12 col-xs-12" src="'+loc[i].image+'"></div><div class="panel-footer text-center">报名期限已过，请耐心等待下一轮哟~</div></div></div>';
+				}else if(loc[i].disabled==1){
 					assert='<div class="text-justify col-sm-4"><div class="panel panel-disabled"><div class="panel-heading"><h3 style="color:black" class="panel-title text-center"><b>'+loc[i].name+'</b></h3></div><div class="panel-body text-center row"><img class="tu2 col-md-10 col-md-offset-1 col-sm-12 col-xs-12" src="'+loc[i].image+'"></div><div class="panel-footer text-center">'+loc[i].whydisabled+'</div></div></div>';
 				}else{
 					assert='<div class="text-justify col-sm-4"><div class="panel panel-'+loc[i].color+'"><div class="panel-heading"><h3 class="panel-title text-center"><b>'+loc[i].name+'</b></h3></div><div class="panel-body text-center row"><img class="tu2 col-md-10 col-md-offset-1 col-sm-12 col-xs-12" src="'+loc[i].image+'"></div><div class="panel-footer text-center">'+loc[i].minintro+'<br><button data-id="'+i+'" onclick="showloc(this.dataset.id)" class="btn btn-sm btn-'+loc[i].color+'">&gt;点我报名&lt;</button></div></div></div>';

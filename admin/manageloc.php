@@ -90,6 +90,24 @@
 ?>
 
 <h1 class="h1 text-center">地点管理</h1>
+<div id='flagbtn' style="background-color:purple;position:fixed;right:5%;bottom:15%;height:48px;width:48px;border-radius:24px;z-index:10">
+	<center style="width:100%;height:100%;color:white;font-size:31px">关</center>
+	<form id="flagf" method="post">
+		<input type='hidden' name="flag" id='flag'>
+	</form>
+</div>
+<script>
+	function doall(dis){
+		if(dis){
+			if(!confirm("确定要关闭所有地点的报名吗？")){retrun;}
+			$("#flag").val("DisableALL");
+		}else{
+			if(!confirm("确定要重新开启被全局禁用的地点吗？\n\n被单独禁用的状态不会改变。")){retrun;}
+			$("#flag").val("EnableALL");
+		}
+		$("#flagf").submit();
+	}
+</script>
 <div onclick="showloc(0,1)" style="background-color:green;position:fixed;right:5%;bottom:5%;height:48px;width:48px;border-radius:24px;z-index:10">
 	<center style="width:100%;height:100%;color:white;font-size:31px">+</center>
 </div>
@@ -116,6 +134,9 @@ window.onload=function(){
     alert("志愿服务地点信息加载失败！\n请刷新页面重试。");return 0;
   }
   ljson=eval("("+l.responseText+")");
+	if(ljson.alldisabled==1){
+		$("#flagbtn").css({"background-color":"blue"}).children()[0].innerHTML="开";
+	}
   loc=ljson.loc;
   for(i=0;i<loc.length;i++){
 		if(loc[i].disabled==1){

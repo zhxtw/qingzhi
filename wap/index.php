@@ -8,7 +8,7 @@
   <?php
     include("shownav.php");
     $a=file_get_contents("location.json");
-    $a=json_decode($a);
+    $a=json_decode($a);$fa=$a->alldisabled;
     $a=$a->loc;
     $out='';
     for($i=0;$i<sizeof($a);$i++){
@@ -22,7 +22,9 @@
       }
       mb_substr($out,0,mb_strlen($out,'utf-8')-2,'utf-8');
       $out.="</span><h4>时段</h4><span>";
-      if(@$aa->disabled==1){
+      if($fa==1){
+        $out.="报名已关闭<br>报名期限已过，请耐心等候下一轮哦~";
+      }elseif(@$aa->disabled==1){
         @$out.="报名已关闭<br>".$aa->whydisabled."<br>";
       }else{
         for($j=0;$j<sizeof($aa->times);$j++){
