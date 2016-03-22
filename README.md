@@ -103,6 +103,8 @@
 
 * [Gregwar](https://github.com/Gregwar/Captcha)的`Captcha`，遵循`MIT`协议
 
+* [Eonasdan](https://github.com/Eonasdan/bootstrap-datetimepicker)的`bootstrap-datetimepicker`，遵循`MIT`协议
+
 * [Github](https://github.com)提供的免费代码仓库和`Atom`编辑器
 
 ***
