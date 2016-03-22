@@ -7,7 +7,8 @@
 <title>青志后台管理</title>
 
 <!-- Bootstrap -->
-<link href="../css/bootstrap.css" rel="stylesheet">
+<link href="/css/bootstrap.css" rel="stylesheet">
+<link href="/css/bootstrap-datetimepicker.min.css" rel="stylesheet">
 
 <!-- HTML5 shim and Respond.js for IE8 support of HTML5 elements and media queries -->
 <!-- WARNING: Respond.js doesn't work if you view the page via file:// -->
@@ -218,10 +219,9 @@
 					}
 				</script>
         <center><br>
-        <button class="btn btn-primary" onclick="updatePageCount()">刷新列表</button>
-        <button class="btn btn-success" onclick="passOrNot('pass')">预通过选定项</button>
-        <button class="btn btn-warning" onclick="passOrNot('undo')">驳回选定项</button>
-        <button class="btn btn-danger" onclick="passOrNot('del')">删除选定项</button>
+        <button class="btn btn-primary" onclick="updatePageCount()"><span class="glyphicon glyphicon-refresh"></span> 刷新列表</button>
+				<button class='btn btn-success'><span class="glyphicon glyphicon-calendar"></span> 分配日期</button>
+
         </center>
         <nav class="text-center">
           <ul class="pagination" id="page1">
@@ -234,10 +234,11 @@
       <hr>
 </div>
 <?php include("showbanner.php"); ?>
-
-<script src="../js/jquery-1.11.2.min.js" type="text/javascript"></script>
-<script src="../js/bootstrap.js" type="text/javascript"></script>
-<script src="addToken.js" type="text/javascript"></script>
+<script src="/js/jquery-1.11.2.min.js"></script>
+<script src="/js/bootstrap.js"></script>
+<script src="/js/moment.js"></script>
+<script src="/js/bootstrap-datetimepicker.min.js"></script>
+<script src="addToken.js"></script>
 <script>
 	limit=10;nowpage=1;allpages=1;sortby="";filtername='';classname='';
 
@@ -262,16 +263,14 @@
 				append+="<tr>";
 				for(j in got[i]){
 					if(j==="go"){
-						append+="<td>";
-						/*append+="<input type='radio' class='assr' id='asa"+i+"' "+((got[i][j]==1)?'checked':'')+"><label style='color:green' for='asa"+i+"'>待分配</label>";
-						append+="<input type='radio' class='assr' id='asb"+i+"' "+((got[i][j]!=1)?'checked':'')+"><input type='text' class='form-control asst' for='asb"+i+"' value='"+got[i][j]+"'>";*/
-						if(got[i][j]==1){
-							append+="<input type='text' class='form-control asst' for='asb' placeholder='待分配'>";
-						}else{
-							append+="<input type='text' class='form-control asst' for='asb"+i+"' value='"+got[i][j]+"'>";
+						append+="<td><span style='color:";
+						switch(got[i][j]){
+							case '1':
+								append+="green'>待分配";break;
+							default:
+								append+="blue'>已安排在"+got[i][j];
 						}
-
-						append+="</td>";
+						append+="</span></td>";
 					}else if(j==="no"){
 						append+="<td><input type='checkbox' class='ck' name='ck"+(i-0+1)+"'><span>&nbsp;"+got[i][j]+"</span></td>";
 					}else if(j==="ip"||j==="fromwap"||j==="datetime"){
@@ -337,7 +336,7 @@
 		console.log(b.toString());
 	}
 	window.onload=function(){
-		updatePageCount();
+		updatePageCount();$('#dtp1').datetimepicker();
 	};
 </script>
 </body>

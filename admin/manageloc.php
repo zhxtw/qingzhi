@@ -135,14 +135,16 @@ window.onload=function(){
   }
   ljson=eval("("+l.responseText+")");
 	if(ljson.alldisabled==1){
-		$("#flagbtn").css({"background-color":"blue"}).children()[0].innerHTML="开";
+		$("#flagbtn").css({"background-color":"blue"}).click(function(){doall();}).children()[0].innerHTML="开";
+	}else{
+		$("#flagbtn").css({"background-color":"purple"}).click(function(){doall(1);}).children()[0].innerHTML="关";
 	}
   loc=ljson.loc;
   for(i=0;i<loc.length;i++){
 		if(loc[i].disabled==1){
-			assert='<div class="text-justify col-sm-4"><div class="panel panel-'+loc[i].color+'"><div class="panel-heading"><h3 class="panel-title text-center"><b><s>'+loc[i].name+'</s></b></h3></div><div class="panel-body text-center row"><img class="tu2 col-md-10 col-md-offset-1 col-sm-12 col-xs-12" src="'+loc[i].image+'"></div><div class="panel-footer text-center"><button data-id="'+i+'" onclick="showloc(this.dataset.id)" class="btn btn-sm btn-default">编辑</button>&nbsp;<button data-id="'+i+'" onclick="delloc(this.dataset.id)" class="btn btn-sm btn-danger">删除</button></div></div></div>';
+			assert='<div class="text-justify col-sm-4"><div class="panel panel-'+loc[i].color+'"><div class="panel-heading"><h3 class="panel-title text-center"><b><s>'+loc[i].name+'</s></b></h3></div><div class="panel-body text-center row"><img class="tu2 col-md-10 col-md-offset-1 col-sm-12 col-xs-12" src="'+loc[i].image+'"></div><div class="panel-footer text-center"><button data-id="'+i+'" onclick="showloc(this.dataset.id)" class="btn btn-sm btn-default"><span class="glyphicon glyphicon-edit"></span> 编辑</button>&nbsp;<button data-id="'+i+'" onclick="delloc(this.dataset.id)" class="btn btn-sm btn-danger"><span class="glyphicon glyphicon-remove"></span> 删除</button></div></div></div>';
 		}else{
-    	assert='<div class="text-justify col-sm-4"><div class="panel panel-'+loc[i].color+'"><div class="panel-heading"><h3 class="panel-title text-center"><b>'+loc[i].name+'</b></h3></div><div class="panel-body text-center row"><img class="tu2 col-md-10 col-md-offset-1 col-sm-12 col-xs-12" src="'+loc[i].image+'"></div><div class="panel-footer text-center"><button data-id="'+i+'" onclick="showloc(this.dataset.id)" class="btn btn-sm btn-default">编辑</button>&nbsp;<button data-id="'+i+'" onclick="delloc(this.dataset.id)" class="btn btn-sm btn-danger">删除</button></div></div></div>';
+    	assert='<div class="text-justify col-sm-4"><div class="panel panel-'+loc[i].color+'"><div class="panel-heading"><h3 class="panel-title text-center"><b>'+loc[i].name+'</b></h3></div><div class="panel-body text-center row"><img class="tu2 col-md-10 col-md-offset-1 col-sm-12 col-xs-12" src="'+loc[i].image+'"></div><div class="panel-footer text-center"><button data-id="'+i+'" onclick="showloc(this.dataset.id)" class="btn btn-sm btn-default"><span class="glyphicon glyphicon-edit"></span> 编辑</button>&nbsp;<button data-id="'+i+'" onclick="delloc(this.dataset.id)" class="btn btn-sm btn-danger"><span class="glyphicon glyphicon-remove"></span> 删除</button></div></div></div>';
 		}
     $("#puthere")[0].innerHTML+=assert;
   }
@@ -233,7 +235,7 @@ window.onload=function(){
 				for(j=0;j<loc[r][i].length;j++){
 					tmp+='<input type="text" class="form-control onedit1 '+i+'" name="'+i+'[]" value="" data-r="'+r+'" data-i="'+i+'" data-j="'+j+'">';
 				}
-				tmp+="<button type='button' class='btn btn-success btn-xs' onclick='addordel(\""+i+"\");'>增</button>&nbsp;<button type='button' class='btn btn-danger btn-xs' onclick='addordel(\""+i+"\",1);'>删</button></div>";
+				tmp+="<br><button type='button' class='btn btn-success btn-xs' onclick='addordel(\""+i+"\");'><span class='glyphicon glyphicon-plus'></span></button>&nbsp;<button type='button' class='btn btn-danger btn-xs' onclick='addordel(\""+i+"\",1);'><span class='glyphicon glyphicon-minus'></span></button></div>";
 
 				tmd+=td(tmp)+"</tr>";
 				tmp="";
@@ -287,7 +289,7 @@ window.onload=function(){
 	function addordel(elementClass,isdel){
 		allem=$("."+elementClass);
 		if(isdel){
-			if(allem.length<2){return;}
+			if(allem.length<3){return;}
 			allem[allem.length-1].remove();
 		}else{
 			$("<input type='text' class='form-control onedit1 "+elementClass+"' name='"+elementClass+"[]' value=''>").insertAfter(allem[allem.length-1]);

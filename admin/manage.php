@@ -218,10 +218,10 @@
 					}
 				</script>
         <center><br>
-        <button class="btn btn-primary" onclick="updatePageCount()">刷新列表</button>
-        <button class="btn btn-success" onclick="passOrNot('pass')">预通过选定项</button>
-        <button class="btn btn-warning" onclick="passOrNot('undo')">驳回选定项</button>
-        <button class="btn btn-danger" onclick="passOrNot('del')">删除选定项</button>
+        <button class="btn btn-primary" onclick="updatePageCount()"><span class="glyphicon glyphicon-refresh"></span> 刷新列表</button>
+        <button class="btn btn-success" onclick="passOrNot('pass')"><span class="glyphicon glyphicon-ok"></span> 预通过选定项</button>
+        <button class="btn btn-warning" onclick="passOrNot('undo')"><span class="glyphicon glyphicon-ban-circle"></span> 驳回选定项</button>
+        <button class="btn btn-danger" onclick="passOrNot('del')"><span class="glyphicon glyphicon-remove"></span> 删除选定项</button>
         </center>
         <nav class="text-center">
           <ul class="pagination" id="page1">
