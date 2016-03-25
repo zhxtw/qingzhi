@@ -1,4 +1,4 @@
-<hr>
+
 <div class="container">
   <div class="row">
     <div class="text-center col-md-6 col-md-offset-3">

@@ -124,7 +124,7 @@
   <div class="row" id="puthere">
 
   </div>
-</div>
+</div><hr>
 <?php include("showbanner.php"); ?>
 
 <script src="../js/jquery-1.11.2.min.js" type="text/javascript"></script>
