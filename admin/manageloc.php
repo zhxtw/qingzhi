@@ -53,7 +53,9 @@
 		$p=$_POST;
 		$all=file_get_contents("../location.json");
 		$all=json_decode($all);
-		if(isset($p['delid'])){
+		if(isset($_POST['flag'])){
+			$all->alldisabled=($_POST['flag']=='EnableALL')?0:1;
+		}elseif(isset($p['delid'])){
 			$all->loc=removeE($all->loc,$p['delid']);
 		}else{
 			if(!isset($p['whydisabled'],$p['image'],$p['color'],$p['name'],$p['minintro'],$p['area'],$p['addr'],$p['addrE'],$p['traffic'],
@@ -90,6 +92,7 @@
 ?>
 
 <h1 class="h1 text-center">地点管理</h1>
+<h5 class="h5 text-center"></h5>
 <div id='flagbtn' style="background-color:purple;position:fixed;right:5%;bottom:15%;height:48px;width:48px;border-radius:24px;z-index:10">
 	<center style="width:100%;height:100%;color:white;font-size:31px">关</center>
 	<form id="flagf" method="post">
@@ -113,9 +116,9 @@
 </div>
 <div class="container">
 	<?php if($written==-1){
-		echo('<hr><div class="alert alert-danger text-center" role="alert">操作失败，文件无法保存！</div>');
+		echo('<hr><div class="alert alert-danger text-center" role="alert"><span class="glyphicon glyphicon-remove"></span> 操作失败，文件无法保存！请检查location.json是否可写</div>');
 	}elseif($written==1){
-		echo('<hr><div class="alert alert-success text-center" role="alert">成功更新地点信息~</div>');
+		echo('<hr><div class="alert alert-success text-center" role="alert"><span class="glyphicon glyphicon-ok"></span> 成功更新地点信息~</div>');
 	} ?>
   <hr>
   <div class="row" id="puthere">
@@ -136,8 +139,10 @@ window.onload=function(){
   ljson=eval("("+l.responseText+")");
 	if(ljson.alldisabled==1){
 		$("#flagbtn").css({"background-color":"blue"}).click(function(){doall();}).children()[0].innerHTML="开";
+		$("h5").html("共 "+ljson.loc.length+" 个，报名已全部关闭");
 	}else{
 		$("#flagbtn").css({"background-color":"purple"}).click(function(){doall(1);}).children()[0].innerHTML="关";
+		$("h5").html("共 "+ljson.loc.length+" 个，报名已全部开启");
 	}
   loc=ljson.loc;
   for(i=0;i<loc.length;i++){
@@ -268,7 +273,7 @@ window.onload=function(){
 
     r=$(".onedit1")[0].dataset.r;
     if(isnew){
-			$(".onedit1").val('');$(".onedit2").val('');
+			$(".onedit1").val('');$(".onedit2").val('');$("#loc_name").html('新增地点');
 		}else{
 			for(i=0;i<$(".onedit1").length;i++){
 				if($(".onedit1")[i].dataset.j){
