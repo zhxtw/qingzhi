@@ -28,6 +28,7 @@
 <h1 class="h1 text-center">报名信息管理</h1>
 
 <div class="row col-md-10 col-md-offset-1">
+	<hr><div id="alert" class="alert alert-info text-center" role="alert"><span id="alertinfo" class="glyphicon glyphicon-home"></span> 欢迎回来！</div>
   <hr>
       	<table class="table table-hover table-striped table-bordered" style="border-radius: 5px; border-collapse: separate;" id="tbSign">
 
@@ -145,7 +146,7 @@
 								processCSV(trs);
 								break;
 							case "选中":
-								if($(".ck:checked").length<1){alert("没有选中任何人哦");break;}
+								if($(".ck:checked").length<1){alt("没有选中任何人哦~","danger","ban-circle");break;}
 								for(i=1;i<trs.length;i++){
 										if(!trs[i].childNodes[0].childNodes[0].checked){trs[i]=undefined;}
 								}
@@ -159,7 +160,7 @@
 										data:"start=0&limit=4096"+((filtername)?"&filter="+filtername:'')+((sortby)?"&sort="+sortby:'')+((nowclass)?"&class="+nowclass:''),
 										success:function(got){
 											console.log(got);
-											if(!got.length) {alert(nowclass+"没有数据，跳过。");return;}
+											if(!got.length) {alt(nowclass+"没有数据，跳过。","warning","forward");return;}
 											console.log("ajax::"+nowclass);
 											append='ID,姓名,班级,年级,手机,Email,地点,时间,修改时间,审核状态\r\n';
 											for(i in got){
@@ -220,7 +221,7 @@
 				</script>
         <center><br>
         <button class="btn btn-primary" onclick="updatePageCount()"><span class="glyphicon glyphicon-refresh"></span> 刷新列表</button>
-				<button class='btn btn-success'><span class="glyphicon glyphicon-calendar"></span> 分配日期</button>
+				<button class='btn btn-success' onclick="assignDate()"><span class="glyphicon glyphicon-calendar"></span> 分配日期</button>
 
         </center>
         <nav class="text-center">
@@ -237,10 +238,16 @@
 <script src="/js/jquery-1.11.2.min.js"></script>
 <script src="/js/bootstrap.js"></script>
 <script src="/js/moment.js"></script>
+<script src="/js/moment-zh-cn.js"></script>
 <script src="/js/bootstrap-datetimepicker.min.js"></script>
 <script src="addToken.js"></script>
 <script>
-	limit=10;nowpage=1;allpages=1;sortby="";filtername='';classname='';
+	limit=10;nowpage=1;allpages=1;sortby="";filtername='';classname='';gotjson={};
+
+	function alt(message,style,icon){
+		$("body").animate({scrollTop:0});
+		$("#alert").html(((icon)?"<span class='glyphicon glyphicon-"+icon+"'></span> ":"")+message).removeClass().addClass('alert text-center '+((style)?("alert-"+style):""));
+	}
 
 	function setPages(howmany){
 		$("#page1").html('<li><a onclick="req(nowpage-1)" aria-label="上一页"><span aria-hidden="true">&laquo;</span></a></li>');
@@ -253,11 +260,11 @@
 
 	function req(page/*start from 1*/){
 		console.log("req::"+filtername);
-		if(page>allpages||page<1){alert("没有了哦~");return 0;}
+		if(page>allpages||page<1){alt("没有了哦~","danger","ban-circle");return 0;}
 		$("#tbSign").html('<tr><th><input type="checkbox" id="ckSelAll" onchange="toggleAll(this)">&nbsp;ID</th><th>姓名</th><th>班级</th><th>年级</th><th>手机</th><th>Email</th><th>地点</th><th>时间</th><th>审核状态</th></tr>');
 		$.post("/admin/getRes.php?token="+TOKEN+";","assign=1&start="+(page-1)*limit+"&limit="+limit
 				+ ((filtername)?"&filter="+filtername:'') + ((sortby)?"&sort="+sortby:'') + ((classname)?"&class="+classname:''),function(got){
-			got=eval("("+got+")");
+			gotjson=got=eval("("+got+")");
 			append='';
 			for(i in got){
 				append+="<tr>";
@@ -301,10 +308,11 @@
 	function updatePageCount(){
 		$("#tbSign").html('');console.log("updatePageCount::"+filtername);
 		$.post("/admin/getMax.php?token="+TOKEN+";","assign=1&every="+limit+((filtername)?"&filter="+filtername:'')+((classname)?"&class="+classname:''),function(got){
-			if(got==-1||got=="0,0"){alert("么都哞~");allpages=0;return;}
+			if(got==-1||got=="0,0"){alt("么都哞~","danger","ban-circle");allpages=0;return;}
 			got=got.split(',');
 			allpages=got[1];
 			setPages(got[1]);//<---include req!
+			alt("欢迎回来~ 共有 "+got[0]+" 条记录哦","info","home");
 		});
 	}
 
@@ -317,7 +325,7 @@
 
 	function passOrNot(flag){
 		b=[];oldpage=nowpage;
-		if(!(s=$(".ck:checked")).length){alert("没有选中任何人哦");return;}
+		if(!(s=$(".ck:checked")).length){alt("没有选中任何人哦~","danger","ban-circle");return;}
 		f=((flag=='pass')?"通过":((flag=='undo')?"驳回":"删除，请谨慎操作"));
 		p="以下同学将会被"+f+"：\n\n";
 		for(i=0;i<s.length;i++){
@@ -327,17 +335,50 @@
 		if(!confirm(p+"\n确认？")){return;}
 		$.post("passOrNot.php?token="+TOKEN+";",
 			"flag="+flag+"&people="+b.toString(),function(got){
-				if(got-0>0){alert("操作成功。\n\n"+got+" 个同学被 "+f);}
-				else{alert("操作失败。\n\n影响的记录数："+got+"，请联系信息部网页组。");}
+				if(got-0>0){alt("操作成功。 "+got+" 个同学被 "+f,"success","ok");}
+				else{alt("操作失败。影响的记录数："+got+"，请联系信息部网页组。","danger","remove");}
 				if(f=='删除'){updatePageCount();}
 				else{req(oldpage);}//req(1);
 			});
 
 		console.log(b.toString());
 	}
+
+	function assignDate(){
+		p='';
+		if(!(s=$(".ck:checked")).length){alt("没有选中任何人哦~","danger","ban-circle");return;}
+		for(i=0;i<s.length;i++){
+			which=gotjson[s[i].name.substr(2)-1];
+			p+=which.name+" "+which.loc_name+" "+which.times+"<br>";
+		}
+		$("#myModal").modal('show');
+		$("#msg").html("<span style='color:gray'>以下"+s.length+"个同学将被分配上述日期：<br><br>"+p+"<br>确认？")
+	}
 	window.onload=function(){
-		updatePageCount();$('#dtp1').datetimepicker();
+		updatePageCount();$('#dtp1').datetimepicker({inline:true,sideBySide:true,locale:'zh-cn',format:"LL"});
 	};
 </script>
+<div class="modal fade" id="myModal">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">×</span><span class="sr-only">Close</span></button>
+        <h3 class="modal-title">分配日期</h3>
+      </div>
+      <div class="modal-body">
+				<div style="overflow:hidden;">
+    			<div class="form-group">
+            <div id="dtp1"></div>
+          </div>
+        </div>
+				<p id="msg"></p>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-primary" data-dismiss="modal">&lt; 取消</button>
+        <button type="button" class="btn btn-success" onclick="givedate()">确定 &gt;</button>
+      </div>
+    </div><!-- /.modal-content -->
+  </div><!-- /.modal-dialog -->
+</div><!-- /.modal -->
 </body>
 </html>

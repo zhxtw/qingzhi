@@ -1,7 +1,7 @@
 <?php
 	require_once("isLoggedIn.php");
 	require_once("recognize.php");
-	if(!isset($_POST['every'])){die('Forbidden');}
+	if(!isset($_POST['every'],$_POST['origin'])){die('Forbidden');}
 	if(!is_numeric($_POST['every'])){die('Forbidden');}
 	$flag=true;
 	$every=$_POST['every'];
@@ -18,8 +18,10 @@
 		$down=$class*100;$up=($class+1)*100;
 		$query.=" and classno>{$down} and classno<{$up} and tworone='{$grade}'";
 	}
-	if(isset($_POST['assign'])){
+	if($_POST['origin']=='assign'){
 		$query.=" and `go`!=0";
+	}elseif($_POST['origin']=='manage'){
+		$query.=" and `go`==0";
 	}
 	$result=mysqli_query($conn,$query);
 	if(!$result){die("-1");}

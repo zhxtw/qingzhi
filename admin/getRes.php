@@ -1,7 +1,7 @@
 <?php
 	require_once("isLoggedIn.php");
 	require_once("recognize.php");
-	if(!isset($_POST['start'])||!isset($_POST['limit'])){die('Forbidden');}
+	if(!isset($_POST['start'],$_POST['limit'],$_POST['origin'])){die('Forbidden');}
 	if(!is_numeric($_POST['start'])||!is_numeric($_POST['limit'])){die('Forbidden');}
 	$flag=true;
 	$start=$_POST['start']-0;
@@ -19,8 +19,10 @@
 		$down=$class*100;$up=($class+1)*100;
 		$query.=" and classno>{$down} and classno<{$up} and tworone='{$grade}'";
 	}
-	if(isset($_POST['assign'])){
+	if($_POST['origin']=='assign'){
 		$query.=" and `go`!=0";
+	}elseif($_POST['origin']=='manage'){
+		$query.=" and `go`==0";
 	}
 	if(isset($_POST['sort'])){
 		$sort=$_POST['sort'];
