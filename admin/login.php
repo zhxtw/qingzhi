@@ -91,7 +91,8 @@
 		if($("#pwd").val().length<6 || $("#usr").val().length<3){alert("请输入正确的用户名和密码。");return;}
 		if($("#verify_code").val().length!=5){alert("请输入正确位数的验证码！");return;}
 		$("#usr")[0].disabled=1;
-		$("#pwd")[0].disabled=1;
+		$("#pwd")[0].disabled=1;		
+                $("#verify_code")[0].disabled=1;
 		$("#login")[0].disabled=1;
 		$("#login").html("验证中");
 		len=$("#pwd").val().length;
