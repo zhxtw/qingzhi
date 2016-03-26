@@ -25,8 +25,8 @@
 <body style="font-family:Microsoft YaHei">
 <?php include("shownav.php"); ?>
 
-<h1 class="h1 text-center">报名信息管理</h1>
-
+<h1 class="h1 text-center">分配时段</h1>
+<h5 class="h5 text-center">当前页数：<span id="pagenum">0</span>，共有<span id="recordnum">0</span>条记录</h5>
 <div class="row col-md-10 col-md-offset-1">
 	<hr><div id="alert" class="alert alert-info text-center" role="alert"><span id="alertinfo" class="glyphicon glyphicon-home"></span> 欢迎回来！</div>
   <hr>
@@ -221,7 +221,8 @@
 				</script>
         <center><br>
         <button class="btn btn-primary" onclick="updatePageCount()"><span class="glyphicon glyphicon-refresh"></span> 刷新列表</button>
-				<button class='btn btn-success' onclick="assignDate()"><span class="glyphicon glyphicon-calendar"></span> 分配日期</button>
+        <button class="btn btn-warning" onclick="passOrNot('undo')"><span class="glyphicon glyphicon-ban-circle"></span> 驳回选定项</button>
+				<button class='btn btn-success' onclick="passOrNot('assign')"><span class="glyphicon glyphicon-calendar"></span> 分配日期</button>
 
         </center>
         <nav class="text-center">
@@ -230,9 +231,8 @@
         </nav>
 				<p style="color:gray" class="text-center">* 如果浏览器提示“页面尝试下载多个文件”，请允许。如果手贱点错请点击浏览器左上角的绿色锁图标重新设置。 *</p>
 				<p style="color:gray" class="text-center">* 由于技术有限，导出的是半excel文件，请先打开并另存为xls等格式再进行调整/合并操作 *</p>
-				<p style="color:gray" class="text-center">* 本页面为预通过页面，如果要分配日期请移步<a href="assign.php">分配时段</a>进行操作（未开通，敬请期待） *</p>
-				<p style="color:gray" class="text-center">* 审核状态为红/绿色的可以自由操作，蓝色的驳回或者删除即为请假/缺席（会计入黑名单中）；如需替换，请移步<a href="change.php">替换人地</a> *</p>
-      <hr>
+				<p style="color:gray" class="text-center">* 本页面为分配时段页面，如果要删除记录请先驳回然后到<a href="manage.php">报名管理</a>进行操作 *</p>
+				<hr>
 </div>
 <?php include("showbanner.php"); ?>
 <script src="/js/jquery-1.11.2.min.js"></script>
@@ -241,119 +241,8 @@
 <script src="/js/moment-zh-cn.js"></script>
 <script src="/js/bootstrap-datetimepicker.min.js"></script>
 <script src="addToken.js"></script>
+<script src="tableutils.js"></script>
 <script>
-	limit=10;nowpage=1;allpages=1;sortby="";filtername='';classname='';gotjson={};
-
-	function alt(message,style,icon){
-		$("body").animate({scrollTop:0});
-		$("#alert").html(((icon)?"<span class='glyphicon glyphicon-"+icon+"'></span> ":"")+message).removeClass().addClass('alert text-center '+((style)?("alert-"+style):""));
-	}
-
-	function setPages(howmany){
-		$("#page1").html('<li><a onclick="req(nowpage-1)" aria-label="上一页"><span aria-hidden="true">&laquo;</span></a></li>');
-		for(i=0;i<howmany;i++){
-			$("#page1")[0].innerHTML+='<li><a class="pageButton" onclick="req('+(i-0+1)+')">'+(i-0+1)+'</a></li>';
-		}
-		$("#page1")[0].innerHTML+='<li><a onclick="req(nowpage+1)" aria-label="下一页"><span aria-hidden="true">&raquo;</span></a></li>';
-		req(1);nowpage=1;
-	}
-
-	function req(page/*start from 1*/){
-		console.log("req::"+filtername);
-		if(page>allpages||page<1){alt("没有了哦~","danger","ban-circle");return 0;}
-		$("#tbSign").html('<tr><th><input type="checkbox" id="ckSelAll" onchange="toggleAll(this)">&nbsp;ID</th><th>姓名</th><th>班级</th><th>年级</th><th>手机</th><th>Email</th><th>地点</th><th>时间</th><th>审核状态</th></tr>');
-		$.post("/admin/getRes.php?token="+TOKEN+";","assign=1&start="+(page-1)*limit+"&limit="+limit
-				+ ((filtername)?"&filter="+filtername:'') + ((sortby)?"&sort="+sortby:'') + ((classname)?"&class="+classname:''),function(got){
-			gotjson=got=eval("("+got+")");
-			append='';
-			for(i in got){
-				append+="<tr>";
-				for(j in got[i]){
-					if(j==="go"){
-						append+="<td><span style='color:";
-						switch(got[i][j]){
-							case '1':
-								append+="green'>待分配";break;
-							default:
-								append+="blue'>已安排在"+got[i][j];
-						}
-						append+="</span></td>";
-					}else if(j==="no"){
-						append+="<td><input type='checkbox' class='ck' name='ck"+(i-0+1)+"'><span>&nbsp;"+got[i][j]+"</span></td>";
-					}else if(j==="ip"||j==="fromwap"||j==="datetime"){
-						continue;
-					}else if(j==="email"){
-						append+="<td><a href='mailto:"+got[i][j]+"'>"+got[i][j]+"</td>";
-					}else if(j==="classno"){
-						append+="<td>"+got[i][j].substr(0,2)+"</td>";
-					}else{
-						append+="<td>"+got[i][j]+"</td>";
-					}
-				}
-				append+="</tr>";
-			}
-			$("#tbSign")[0].innerHTML+=append;
-		});
-		$(".pageButton").css("color","blue");
-		$(".pageButton")[page-1].style.color="red";
-		nowpage=page;
-	}
-
-	function changePerPage(element){
-		piece=element.value-0;
-		limit=piece;
-		updatePageCount();
-	}
-
-	function updatePageCount(){
-		$("#tbSign").html('');console.log("updatePageCount::"+filtername);
-		$.post("/admin/getMax.php?token="+TOKEN+";","assign=1&every="+limit+((filtername)?"&filter="+filtername:'')+((classname)?"&class="+classname:''),function(got){
-			if(got==-1||got=="0,0"){alt("么都哞~","danger","ban-circle");allpages=0;return;}
-			got=got.split(',');
-			allpages=got[1];
-			setPages(got[1]);//<---include req!
-			alt("欢迎回来~ 共有 "+got[0]+" 条记录哦","info","home");
-		});
-	}
-
-	function toggleAll(selector){
-		//Self changed, no need to change again!
-		//selector.checked=!selector.checked;
-		$(".ck").prop("checked",(selector.checked)?true:false);
-		return false;
-	}
-
-	function passOrNot(flag){
-		b=[];oldpage=nowpage;
-		if(!(s=$(".ck:checked")).length){alt("没有选中任何人哦~","danger","ban-circle");return;}
-		f=((flag=='pass')?"通过":((flag=='undo')?"驳回":"删除，请谨慎操作"));
-		p="以下同学将会被"+f+"：\n\n";
-		for(i=0;i<s.length;i++){
-			b[i]=$(s[i]).next().text().replace(/ /g,'').replace(/&nbsp;/g,'').replace(/ /g,'');
-			p+=$(s[i]).parent().next().text()+"\n";
-		}
-		if(!confirm(p+"\n确认？")){return;}
-		$.post("passOrNot.php?token="+TOKEN+";",
-			"flag="+flag+"&people="+b.toString(),function(got){
-				if(got-0>0){alt("操作成功。 "+got+" 个同学被 "+f,"success","ok");}
-				else{alt("操作失败。影响的记录数："+got+"，请联系信息部网页组。","danger","remove");}
-				if(f=='删除'){updatePageCount();}
-				else{req(oldpage);}//req(1);
-			});
-
-		console.log(b.toString());
-	}
-
-	function assignDate(){
-		p='';
-		if(!(s=$(".ck:checked")).length){alt("没有选中任何人哦~","danger","ban-circle");return;}
-		for(i=0;i<s.length;i++){
-			which=gotjson[s[i].name.substr(2)-1];
-			p+=which.name+" "+which.loc_name+" "+which.times+"<br>";
-		}
-		$("#myModal").modal('show');
-		$("#msg").html("<span style='color:gray'>以下"+s.length+"个同学将被分配上述日期：<br><br>"+p+"<br>确认？")
-	}
 	window.onload=function(){
 		updatePageCount();$('#dtp1').datetimepicker({inline:true,sideBySide:true,locale:'zh-cn',format:"LL"});
 	};
@@ -375,7 +264,7 @@
       </div>
       <div class="modal-footer">
         <button type="button" class="btn btn-primary" data-dismiss="modal">&lt; 取消</button>
-        <button type="button" class="btn btn-success" onclick="givedate()">确定 &gt;</button>
+        <button type="button" class="btn btn-success" id='okbtn'>确定 &gt;</button>
       </div>
     </div><!-- /.modal-content -->
   </div><!-- /.modal-dialog -->

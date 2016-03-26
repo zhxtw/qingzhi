@@ -9,7 +9,8 @@
 
 //初始化全局变量，limit为默认每页显示条数，nowpage为当前所在页面，allpages为页面个数
 //filtername和classname用于筛选，gotjson用于选择表格数据，fromwhere用于判断页面的来源
-limit=10;nowpage=1;allpages=1;sortby="";filtername='';classname='';gotjson={};fromwhere='';
+limit=10;nowpage=1;allpages=1;sortby="";filtername='';classname='';gotjson={};
+fromwhere=location.pathname.split('/')[location.pathname.split('/').length-1].split('.php')[0];
 
 /**
 * function alt 网页上方的banner提示，比alert略微好看些
@@ -25,16 +26,21 @@ function alt(message,style,icon){
 /**
 * function setPages 设置显示的页数
 * @param howmany    总共的页数
+* @param oldpage    更新页数后老的页面号
 * 本函数会执行req()，使用时务必留意
 */
-function setPages(howmany){
+function setPages(howmany,oldpage){
   $("#page1").html('<li><a onclick="req(nowpage-1)" aria-label="上一页"><span aria-hidden="true">&laquo;</span></a></li>');
   for(i=0;i<howmany;i++){
     //TODO: 实际使用中，导航条因页数太多而爆掉了...需要有省略号
     $("#page1")[0].innerHTML+='<li><a class="pageButton" onclick="req('+(i-0+1)+')">'+(i-0+1)+'</a></li>';
   }
   $("#page1")[0].innerHTML+='<li><a onclick="req(nowpage+1)" aria-label="下一页"><span aria-hidden="true">&raquo;</span></a></li>';
-  req(1);nowpage=1;
+  if(oldpage){
+    req((nowpage=(oldpage>allpages)?oldpage-1:oldpage));
+  }else{
+    req(1);nowpage=1;
+  }
 }
 
 /**
@@ -47,7 +53,7 @@ function req(page){
   if(fromwhere=='assign'){
     $("#tbSign").html('<tr><th><input type="checkbox" id="ckSelAll" onchange="toggleAll(this)">&nbsp;ID</th><th>姓名</th><th>班级</th><th>年级</th><th>手机</th><th>Email</th><th>地点</th><th>时间</th><th>审核状态</th></tr>');
   }else if(fromwhere=='manage'){
-    $("#tbSign").html('<tr><th><input type="checkbox" id="ckSelAll" onchange="toggleAll(this)">&nbsp;ID</th><th>姓名</th><th>班级</th><th>年级</th><th>手机</th><th>Email</th><th>地点</th><th>时间</th><th>修改时间</th><!--th>IP</th--><th>审核状态</th></tr>');
+    $("#tbSign").html('<tr><th><input type="checkbox" id="ckSelAll" onchange="toggleAll(this)">&nbsp;ID</th><th>姓名</th><th>班级</th><th>年级</th><th>手机</th><th>Email</th><th>地点</th><th>时间</th><th>报名时间</th><!--th>IP</th--><th>审核状态</th></tr>');
   }
   $.post("/admin/getRes.php?token="+TOKEN+";","origin="+fromwhere+"&start="+(page-1)*limit+"&limit="+limit
       + ((filtername)?"&filter="+filtername:'') + ((sortby)?"&sort="+sortby:'') + ((classname)?"&class="+classname:''),function(got){
@@ -90,6 +96,7 @@ function req(page){
   $(".pageButton").css("color","blue");
   $(".pageButton")[page-1].style.color="red";
   nowpage=page;
+  $("#pagenum").html(nowpage+"/"+allpages);
 }
 
 /**
@@ -104,15 +111,16 @@ function changePerPage(element){
 
 /**
 * function updatePageCount 更新页数，通常调用于筛选后
+* @param oldpage  更新页数后要返回的老页面号
 */
-function updatePageCount(){
+function updatePageCount(oldpage){
   $("#tbSign").html('');console.log("updatePageCount::"+filtername);
   $.post("/admin/getMax.php?token="+TOKEN+";","origin="+fromwhere+"&every="+limit+((filtername)?"&filter="+filtername:'')+((classname)?"&class="+classname:''),function(got){
     if(got==-1||got=="0,0"){alt("么都哞~ 试试取消选中下面的筛选选项","danger","ban-circle");allpages=0;return;}
     got=got.split(',');
     allpages=got[1];
-    setPages(got[1]);//<---include req!
-    alt("欢迎回来~ 共有 "+got[0]+" 条记录哦","info","home");
+    setPages(got[1],oldpage);//<---include req!
+    $("#recordnum").html(got[0]);
   });
 }
 
@@ -126,10 +134,9 @@ function toggleAll(selector){
 }
 
 /**
-* function passOrNot 通过/驳回/删除/分配日期函数
-* @param flag    用于判断的标记，可以是pass,undo,del,assign
+* function getSelected  获取选中的人
 */
-function passOrNot(flag){
+function getSelected(){
   /* 老式代码，从表格中强行提取
   b=[];oldpage=nowpage;
   if(!(s=$(".ck:checked")).length){alt("没有选中任何人哦~","danger","ban-circle");return;}
@@ -147,21 +154,57 @@ function passOrNot(flag){
       if(f=='删除'){updatePageCount();}
       else{req(oldpage);}//req(1);
     });
-
   console.log(b.toString());*/
   //新代码，从同时获取到的json中提取，高效便捷
-  p='';
-  if(!(s=$(".ck:checked")).length){alt("没有选中任何人哦~","danger","ban-circle");return;}
+  if(!(s=$(".ck:checked")).length){return null;}//返回null表示未选中
+  p='';b=[];//p为详细信息，b为包含id的数组
   for(i=0;i<s.length;i++){
     which=gotjson[s[i].name.substr(2)-1];//input的name为 ckx，这里把ck去掉再减1，便是json数组中的数据
-    p+=which.name+" "+which.loc_name+" "+which.times+"<br>";
+    p+=which.name+"&#9;"+which.loc_name+"&#9;"+which.times+"<br>";
+    b[i]=which.no;
   }
+  return [b,p,s.length];//0->id, 1->detail, 2->length
+}
+
+/**
+* function sinicize 把flag的标识转为中文
+* @param flag   英文标识，可以是pass,undo,del,assign
+*/
+function sinicize(flag){
+  if(flag=="pass") return "通过";
+  else if(flag=="undo") return "驳回";
+  else if(flag=="del") return "删除，请慎重操作";
+  else if(flag=="assign") return "分配上述时间";
+}
+
+/**
+* function passOrNot 通过/驳回/删除/分配日期，弹出确认框函数
+* @param flag    用于判断的标记，可以是pass,undo,del,assign
+*/
+function passOrNot(flag){
+  if((res=getSelected())===null){alt("没有选中任何人哦~","danger","ban-circle");return;}
   $("#myModal").modal('show');
-  pp="<span style='color:gray'>以下"+s.length+"个同学将被";
-  if(flag=="pass") pp+="欲通过";
-  else if(flag=="undo") pp+="驳回";
-  else if(flag=="del") pp+="删除，请慎重操作";
-  else if(flag=="assign") pp+="分配上述时间";
-  pp+="：<br><br>"+p+"<br>确认？";
-  //TODO
+  if(flag!="assign"){$("#dtp1").hide();}else{$("#dtp1").show();} //若不是分配日期则不显示dtp1
+  pp="<pre>以下"+res[2]+"个同学将被"+sinicize(flag)+"：<br><br>"+res[1]+"<br>确认？";
+  $("#msg").html(pp);eval('$("#okbtn")[0].onclick=function(){passOrNotp("'+flag+'");}');
+}
+
+/**
+* function passOrNotp 通过/驳回/删除/分配日期，处理数据函数
+* @param flag     用于判断的标记，可以是pass,undo,del,assign
+*/
+function passOrNotp(flag){
+  if((res=getSelected())===null){alt("没有选中任何人哦~","danger","ban-circle");return;}
+  oldpage=nowpage;
+  $.post("passOrNot.php?token="+TOKEN+";",
+    "flag="+flag+"&people="+res[0].toString()+
+    ((flag=="assign")?"&assign="+$("#dtp1").data("DateTimePicker").date().format("YYYYMMDD"):""),
+    function(got){
+      $("#myModal").modal("hide");
+      if(got-0>0){alt("操作成功。 "+got+" 个同学被"+sinicize(flag),"success","ok");}
+      else{alt("操作失败。影响的记录数："+got+"，请联系信息部网页组。","danger","remove");}
+      /*if(flag=='del'){updatePageCount();}
+      else{req(oldpage);}//req(1);*/
+      updatePageCount(oldpage);
+    });
 }

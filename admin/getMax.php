@@ -21,7 +21,7 @@
 	if($_POST['origin']=='assign'){
 		$query.=" and `go`!=0";
 	}elseif($_POST['origin']=='manage'){
-		$query.=" and `go`==0";
+		$query.=" and `go`=0";
 	}
 	$result=mysqli_query($conn,$query);
 	if(!$result){die("-1");}
