@@ -20,7 +20,7 @@ if($_POST){
   if(!isset($_POST['content']) || !isset($_POST['verify_code'])){die();}
   $content=$_POST['content'];
   $v=strtolower($_POST['verify_code']);
-  if($v!=$_SESSION['verification']){die("<script>alert('要看清楚验证码哦~这儿的验证码难度堪比12305的验证码啊！');history.go(-1);</script>");}
+  if($v!=$_SESSION['verification']){die("<script>alert('要看清楚验证码哦~这儿的验证码难度堪比12306的验证码啊！');history.go(-1);</script>");}
   $flag=true;require_once("to_sql.php");
   $content=mysqli_real_escape_string($conn,htmlspecialchars($content));
   if(mb_strlen($content,'UTF8')>1000){die("<script>alert('我们很欢迎大家给青志网提出意见，但是请注意不要超过1000字哦~');history.go(-1);</script>");}//先转换符号，再检查字数
@@ -90,7 +90,7 @@ if($_POST){
       alt("我们很欢迎大家给青志网提出意见，但是请注意不要超过1000字哦~");return;
     }
     if($('#verify_code').val().length!=4){
-      alt("要看清楚验证码哦~这儿的验证码难度堪比12305的验证码啊！");return;
+      alt("要看清楚验证码哦~这儿的验证码难度堪比12306的验证码啊！");return;
     }
     $('#frm').submit();
   }
