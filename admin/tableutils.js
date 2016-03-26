@@ -8,8 +8,8 @@
 */
 
 //初始化全局变量，limit为默认每页显示条数，nowpage为当前所在页面，allpages为页面个数
-//filtername和classname用于筛选，gotjson用于选择表格数据，fromwhere用于判断页面的来源
-limit=10;nowpage=1;allpages=1;sortby="";filtername='';classname='';gotjson={};
+//filtername和classname用于筛选，gotjson用于选择表格数据，fromwhere用于判断页面的来源, processing用于判断是否正在处理数据
+limit=10;nowpage=1;allpages=1;sortby="";filtername='';classname='';gotjson={};processing=0;
 fromwhere=location.pathname.split('/')[location.pathname.split('/').length-1].split('.php')[0];
 
 /**
@@ -194,6 +194,8 @@ function passOrNot(flag){
 * @param flag     用于判断的标记，可以是pass,undo,del,assign
 */
 function passOrNotp(flag){
+  if(processing=1){return;}
+  $("#okbtn").addClass("disabled");processing=1;
   if((res=getSelected())===null){alt("没有选中任何人哦~","danger","ban-circle");return;}
   oldpage=nowpage;
   $.post("passOrNot.php?token="+TOKEN+";",
@@ -205,6 +207,6 @@ function passOrNotp(flag){
       else{alt("操作失败。影响的记录数："+got+"，请联系信息部网页组。","danger","remove");}
       /*if(flag=='del'){updatePageCount();}
       else{req(oldpage);}//req(1);*/
-      updatePageCount(oldpage);
+      updatePageCount(oldpage);$("#okbtn").removeClass("disabled");processing=0;
     });
 }
