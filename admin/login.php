@@ -24,24 +24,6 @@
     <![endif]-->
 </head>
 <body style="font-family:Microsoft YaHei">
-<!--nav class="navbar navbar-default">
-  <div class="container-fluid">
-    <!-- Brand and toggle get grouped for better mobile display >
-    <div class="navbar-header">
-      <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#defaultNavbar1"><span class="sr-only">Toggle navigation</span><span class="icon-bar"></span><span class="icon-bar"></span><span class="icon-bar"></span></button>
-      <a class="navbar-brand" href="#">执信团委青志后台管理&nbsp;<span class="label label-danger">Beta</span></a></div>
-    <!-- Collect the nav links, forms, and other content for toggling >
-    <div class="collapse navbar-collapse" id="defaultNavbar1">
-      <ul class="nav navbar-nav">
-        <li class="active"><a href="#">登录<span class="sr-only"></span></a></li>
-      </ul>
-    </div>
-    <!-- /.navbar-collapse >
-  </div>
-  <!-- /.container-fluid >
-</nav-->
-<!--h1 class="h1 text-center">青志后台登录</h1>
-<hr-->
 <br>
 <div class="container text-center">
 <img src="../img/logo.png" style="width:96px;">
