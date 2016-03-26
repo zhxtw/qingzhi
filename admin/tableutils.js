@@ -194,10 +194,9 @@ function passOrNot(flag){
 * @param flag     用于判断的标记，可以是pass,undo,del,assign
 */
 function passOrNotp(flag){
-  if(processing=1){return;}
-  $("#okbtn").addClass("disabled");processing=1;
+  if(processing==1){return;}
   if((res=getSelected())===null){alt("没有选中任何人哦~","danger","ban-circle");return;}
-  oldpage=nowpage;
+  oldpage=nowpage;$("#okbtn").addClass("disabled");processing=1;
   $.post("passOrNot.php?token="+TOKEN+";",
     "flag="+flag+"&people="+res[0].toString()+
     ((flag=="assign")?"&assign="+$("#dtp1").data("DateTimePicker").date().format("YYYYMMDD"):""),
