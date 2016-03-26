@@ -53,7 +53,7 @@
 		if(!is_numeric($times)||$times>$maxTimes||$times<0){
 			echo("选择的时段不合法。");die();
 		}
-		if($a[$loc_id]->disabled==1){
+		if($a[$loc_id]->disabled==1||$alldisabled==1){
 			die("报名已关闭");
 		}
 		session_start();

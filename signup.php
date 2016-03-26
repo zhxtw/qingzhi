@@ -44,9 +44,6 @@ if(@$_SESSION['loc_id']===NULL||@$_SESSION['times']===NULL){
 
 
 if($_POST){
-	if(!isset($_SESSION['postime'])){$_SESSION['postime']=1;}
-	$_SESSION['postime']++;
-	//if($_SESSION['postime']>=10){echo("请不要在24分钟内多次提交，谢谢！");die();}
 	if($_POST['name']&&$_POST['classno']&&/*$_POST['mobile']&&*/$_POST['verify_code']){
 		$name=htmlspecialchars($_POST['name']);
 		$classno=$_POST['classno'];
@@ -98,7 +95,7 @@ if($_POST){
 
 		$times=$a[$_SESSION['loc_id']]->times[$_SESSION['times']];
 		$loc_name=$a[$_SESSION['loc_id']]->name;
-
+		if($alldisabled==1){die();}
 		//Query whether the man has signed up
 		$query="SELECT * FROM signup where loc_name='{$loc_name}' and name='{$name}' and classno='{$classno}' and tworone='{$tworone}' and (`go`=0 or `go`=1)";
 		$result=mysqli_fetch_array(mysqli_query($conn,$query));

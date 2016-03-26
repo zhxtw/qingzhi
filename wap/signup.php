@@ -16,7 +16,7 @@
   if(!isset($_GET['loc_id']) || !isset($_GET['loc_time'])) die();
   $loc_id=$_GET['loc_id'];$loc_time=$_GET['loc_time'];
   if(!is_numeric($loc_id) || !is_numeric($loc_time)) die();
-  if($loc_id<0 || $loc_id>=sizeof($a) || $loc_time>=sizeof($a[$loc_id]->times) || $loc_time<0 || $a[$loc_id]->disabled==1) die();
+  if($loc_id<0 || $loc_id>=sizeof($a) || $loc_time>=sizeof($a[$loc_id]->times) || $loc_time<0 || $a[$loc_id]->disabled==1 || $alldisabled==1) die();
   $loc_name=$a[$loc_id]->name;$loc_time=$a[$loc_id]->times[$loc_time];$times=$loc_time;
 
   if($_POST){
@@ -117,6 +117,7 @@
       </div>
       <span>如果不方便联系，可以不用填电话或者邮箱</span>
       <p>验证码 <input name="verify_code" type="text"><br><br><img src="verify.php?<?php echo(microtime(true)); ?>"></p>
+      <span>若验证码看不清，请刷新页面重试</span>
       <input type="submit" value="提交"> <input type="reset" value="清空">
 
     </form>
