@@ -248,7 +248,7 @@
     <div class="modal-content">
       <div class="modal-header">
         <button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">×</span><span class="sr-only">Close</span></button>
-        <h3 class="modal-title">分配日期</h3>
+        <h3 class="modal-title">提示</h3>
       </div>
       <div class="modal-body">
 				<div style="overflow:hidden;">
