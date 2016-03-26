@@ -102,10 +102,10 @@
 <script>
 	function doall(dis){
 		if(dis){
-			if(!confirm("确定要关闭所有地点的报名吗？")){retrun;}
+			if(!confirm("确定要关闭所有地点的报名吗？")){return;}
 			$("#flag").val("DisableALL");
 		}else{
-			if(!confirm("确定要重新开启被全局禁用的地点吗？\n\n被单独禁用的状态不会改变。")){retrun;}
+			if(!confirm("确定要重新开启被全局禁用的地点吗？\n\n被单独禁用的状态不会改变。")){return;}
 			$("#flag").val("EnableALL");
 		}
 		$("#flagf").submit();
