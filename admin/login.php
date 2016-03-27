@@ -151,6 +151,7 @@
 	function restore(){
 		$("#pwd")[0].disabled=0;
 		$("#usr")[0].disabled=0;
+		$("#verify_code")[0].disabled=0;
 		$("#login")[0].disabled=0;
 		$("#login").html("登录");
 		$("#pwd").val(origpwd);
