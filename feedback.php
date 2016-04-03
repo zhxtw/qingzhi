@@ -16,18 +16,28 @@
 
 <?php
 session_start();
+$flag=true;
+require_once("base_utils.php");
+require_once("to_pdo.php");
+
 if($_POST){
   if(!isset($_POST['content']) || !isset($_POST['verify_code'])){die();}
   $content=$_POST['content'];
   $v=strtolower($_POST['verify_code']);
-  if($v!=$_SESSION['verification']){die("<script>alert('要看清楚验证码哦~这儿的验证码难度堪比12306的验证码啊！');history.go(-1);</script>");}
-  $flag=true;require_once("to_sql.php");
-  $content=mysqli_real_escape_string($conn,htmlspecialchars($content));
-  if(mb_strlen($content,'UTF8')>1000){die("<script>alert('我们很欢迎大家给青志网提出意见，但是请注意不要超过1000字哦~');history.go(-1);</script>");}//先转换符号，再检查字数
-  $ip=mysqli_real_escape_string($conn,htmlspecialchars($_SERVER['REMOTE_ADDR']));
-  $query="INSERT feedback(content,ip) VALUES('{$content}','{$ip}')";
-  $result=mysqli_query($conn,$query);
-  die("<script>alert('谢谢您给青志网提出意见！');location.href='/';</script>");
+  //TODO 返回后输入框空了
+  if($v!=$_SESSION['verification']){diecho("要看清楚验证码哦~这儿的验证码难度堪比12306的验证码啊！",1);}
+
+  $content=htmlspecialchars($content);
+  if(mb_strlen($content,'UTF8')>1000){diecho("我们很欢迎大家给青志网提出意见，但是请注意不要超过1000字哦~",1);}
+  $ip=htmlspecialchars($_SERVER['REMOTE_ADDR']);
+
+  $result=PDOQuery($dbcon, "INSERT INTO feedback SET content = ?, ip = ?", [$content,$ip] , [PDO::PARAM_STR,PDO::PARAM_STR]);
+  if($result[1]==1){
+    diecho("谢谢您给青志网提出意见！",1);
+  }else{
+    diecho("提交失败！",1);
+  }
+
 }
 ?>
 
@@ -89,8 +99,8 @@ if($_POST){
     if($('#content').val().length>1000||$('#content').val().length<1){
       alt("我们很欢迎大家给青志网提出意见，但是请注意不要超过1000字哦~");return;
     }
-    if($('#verify_code').val().length!=4){
-      alt("要看清楚验证码哦~这儿的验证码难度堪比12306的验证码啊！");return;
+    if($('#verify_code').val().length!=5){
+      alt("要看清楚验证码哦~这儿的验证码难度堪比12305的验证码啊！");return;
     }
     $('#frm').submit();
   }
@@ -104,7 +114,7 @@ if($_POST){
     <div class="modal-content">
       <div class="modal-header">
         <button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">×</span><span class="sr-only">关闭</span></button>
-        <h3 class="modal-title">善意的提醒</h4>
+        <h3 class="modal-title">提示</h4>
       </div>
       <div class="modal-body">
       <b>
@@ -112,7 +122,7 @@ if($_POST){
         </b>
       </div>
       <div class="modal-footer">
-        <button type="button" class="btn btn-success" data-dismiss="modal">哦~俺知道了</button>
+        <button type="button" class="btn btn-success" data-dismiss="modal">了解</button>
       </div>
     </div>
   </div>

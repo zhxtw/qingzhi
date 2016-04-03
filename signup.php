@@ -24,19 +24,11 @@
 <!-- Processing area -->
 <?php
 session_start();
-
-function diecho($msg,$isAlert){
-	$_SESSION['verification']='';
-	if(!$isAlert){
-		die($msg);
-	}else{
-		die("<script>alert('".$msg."');window.history.go(-1);</script>");
-	}
-}
-
 $flag=true;//verify to_pdo.php
 require_once("to_pdo.php");
 require_once("to_json.php");
+require_once("base_utils.php");
+
 header("content-type:text/html;charset=utf-8");
 if(@$_SESSION['loc_id']===NULL||@$_SESSION['times']===NULL){
 	echo("看到这条错误信息，请思索您是否做过以下糗事：<br>①未通过正常的途径访问本页面。<br>②在某些页面停留过多时间（>24分钟），Session会自动失效。<br><br>请<a href=\"/\">点此</a>返回首页。<br><br>Session ID: ".session_id());die();
@@ -110,7 +102,7 @@ if($_POST){
 			diecho("您已经报名过这个地点而且还没去哦，换一个吧~",1);
 		}
 
-		$ip=$_SERVER['REMOTE_ADDR'];
+		$ip=htmlspecialchars($_SERVER['REMOTE_ADDR']);
 
 		$result = PDOQuery($dbcon, "INSERT INTO signup ".
 							"SET name = ?, mobile = ?, classno = ?, tworone = ?, loc_name = ?, times = ?, ip = ?, email = ?",

@@ -25,17 +25,9 @@
 <?php
 session_start();
 $strout='';
-function diecho($msg,$isAlert){
-	$_SESSION['verification']='';
-	if($isAlert!=1){
-		die($msg);
-	}else{
-		die("<script>alert('".$msg."');window.history.go(-1);</script>");
-	}
-}
-
-$flag=true;//verify to_sql.php
-
+$flag=true;
+require_once("base_utils.php");
+require_once("to_pdo.php");
 require_once("to_json.php");
 header("content-type:text/html;charset=utf-8");
 if(!isset($_SESSION)){
@@ -44,26 +36,20 @@ if(!isset($_SESSION)){
 
 
 if($_POST){
-	if(!isset($_SESSION['postime'])){$_SESSION['postime']=1;}
-	$_SESSION['postime']++;
-	//if($_SESSION['postime']>=10){echo("请不要在24分钟内多次提交，谢谢！");die();}
 	if($_POST['name']&&$_POST['classno']){
-		$name=htmlspecialchars($_POST['name']);
+		$name=$_POST['name'];
 		$classno=$_POST['classno'];
-		if(mb_strlen($name,'UTF8')<2||mb_strlen($name,'UTF8')>5||!preg_match("/^[\x{4e00}-\x{9fa5}]+$/u",$name)){
+		if(mb_strlen($name,'UTF8')<2||mb_strlen($name,'UTF8')>4||!preg_match("/^[\x{4e00}-\x{9fa5}]+$/u",$name)){
 			diecho("请检查名字，长度应为2~4个中文字符。",1);
 		}
 		if((!is_numeric($classno))||strlen($classno)!=4||substr($classno,0,2)<1||substr($classno,0,2)>17||substr($classno,2,2)<1||substr($classno,2,2)>60){
 			diecho("请检查学号。",1);
 		}
-		require_once("to_sql.php");
-		$name=mysqli_real_escape_string($conn,$name);
-		$classno=mysqli_real_escape_string($conn,$classno);
 		/*if(strlen($_POST['verify_code'])!=4||md5($_POST['verify_code'])!=$_SESSION['verification']){
 			diecho("请输入正确的验证码！",1);
 		}*/
 		if(isset($_POST['verify_code'])){
-			if(@strtolower($_POST['verify_code'])!=$_SESSION['verification']){//verification session might be null
+			if(strtolower($_POST['verify_code'])!=@$_SESSION['verification']){//verification session might be null
 				diecho("输入的验证码有误。请重新输入。",1);
 			}
 		}else if($_POST['auto_verify'] && $_POST['auto_time']){
@@ -72,22 +58,25 @@ if($_POST){
 					md5($_POST['auto_verify'].$_SESSION['srand']),0);
 			}
 
-			$ua=mysqli_real_escape_string($conn,htmlspecialchars($_SERVER['HTTP_USER_AGENT']));
-			$ip=mysqli_real_escape_string($conn,htmlspecialchars($_SERVER['REMOTE_ADDR']));
+			$ua=htmlspecialchars($_SERVER['HTTP_USER_AGENT']);
+			$ip=htmlspecialchars($_SERVER['REMOTE_ADDR']);
 			$wastetime=(int)$_POST['auto_time'];
-			$query="INSERT auto_time(ua,wastetime,ip) VALUES('{$ua}','{$wastetime}','{$ip}')";
-			$result=mysqli_query($conn,$query);
+			$result=PDOQuery($dbcon, "INSERT INTO auto_time SET ua = ?, wastetime = ?, ip = ?", [$ua,$wastetime,$ip], [PDO::PARAM_STR,PDO::PARAM_INT,PDO::PARAM_STR]);
+			//$query="INSERT auto_time(ua,wastetime,ip) VALUES('{$ua}','{$wastetime}','{$ip}')";
+			//$result=mysqli_query($conn,$query);
 
 		}else{
 			diecho("我知道你在搞鬼。",1);
 		}
 
 
-		$query="SELECT * FROM signup where name='{$name}' and classno='{$classno}'";
-		$result=mysqli_query($conn,$query);
+		$result=PDOQuery($dbcon,"SELECT * FROM signup where name=? and classno=?",[$name,$classno],[PDO::PARAM_STR,PDO::PARAM_STR]);
+		if($result[1]==0){
+			$strout="<span style='color:red'>查无此人</span>";session_destroy();die();
+		}
 		//if($result->lengths==NULL){var_dump($result);session_destroy();diecho("查无此人",1);}
 		/*$strout=''; declared before, as global*/
-		$j=0;$hasrecord=false;
+		/*$j=0;
 		while($res=mysqli_fetch_array($result)){
 			$strout.=(++$j).".<br>地点：".$res['loc_name']."<br>时间：".$res['times']."<br>";
 			switch($res['go']){
@@ -100,22 +89,24 @@ if($_POST){
 			}
 			$strout.="<br>";
 			$hasrecord=true;
+		}*/
+		for($i=0;$i<sizeof($result[0]);$i++){
+			$strout.="<br>".($i+1).".<br>地点：".$result[0][$i]['loc_name']."<br>时间：".$result[0][$i]['times']."<br>";
+			switch($result[0][$i]['go']){
+				case '0':
+					$strout.="<span style='color:red'>未审核</span>";break;
+				case "1":
+					$strout.="<span style='color:green'>已通过，待分配时间</span>";break;
+				default:
+					$strout.="<span style='color:blue'>已通过，分配的时间是<br>".$res['go']."</span>";
+			}
+			$strout.="<br>";
 		}
-		if(!$hasrecord){
-			session_destroy();$strout="<span style='color:red'>查无此人</span>";
-		}else{
-			$strout.="<br><br><br>总计：".$j;
-		}
-
-		//echo($strout);
-
-
+		$strout.="<br><br><br>总计：".sizeof($result[0]);
+		session_destroy();
 	}else{
 		diecho("输入的信息不完整，请重试",1);
 	}
-}else{
-//not post
-
 }
 ?>
 
