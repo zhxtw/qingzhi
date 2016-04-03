@@ -34,8 +34,8 @@ function diecho($msg,$isAlert){
 	}
 }
 
-$flag=true;//verify to_sql.php
-
+$flag=true;//verify to_pdo.php
+require_once("to_pdo.php");
 require_once("to_json.php");
 header("content-type:text/html;charset=utf-8");
 if(@$_SESSION['loc_id']===NULL||@$_SESSION['times']===NULL){
@@ -44,20 +44,22 @@ if(@$_SESSION['loc_id']===NULL||@$_SESSION['times']===NULL){
 
 
 if($_POST){
-	if($_POST['name']&&$_POST['classno']&&/*$_POST['mobile']&&*/$_POST['verify_code']){
-		$name=htmlspecialchars($_POST['name']);
-		$classno=$_POST['classno'];
-		$mobile=$_POST['mobile'];
-		if(mb_strlen($name,'UTF8')<2||mb_strlen($name,'UTF8')>5||!preg_match("/^[\x{4e00}-\x{9fa5}]+$/u",$name)){
+	if($_POST['name']&&$_POST['classno']&&$_POST['verify_code']){
+
+		//姓名检查，2~4个中文字符
+		$name=$_POST['name'];
+		if(mb_strlen($name,'UTF8')<2||mb_strlen($name,'UTF8')>4||!preg_match("/^[\x{4e00}-\x{9fa5}]+$/u",$name)){
 			diecho("请检查名字，长度应为2~4个字符。",1);
 		}
-		require_once("to_sql.php");
-		$name=mysqli_real_escape_string($conn,$name);
+
+		//学号检查，前两位1~17，后两位1~60（万一哪天执信理科班多过60人呢
+		$classno=$_POST['classno'];
 		if((!is_numeric($classno))||strlen($classno)!=4||substr($classno,0,2)<1||substr($classno,0,2)>17||substr($classno,2,2)<1||substr($classno,2,2)>60){
 			diecho("请检查学号。",1);
 		}
-		$classno=mysqli_real_escape_string($conn,$classno);
-		$class=substr($classno,0,2);
+
+		//手机号检查
+		$mobile=$_POST['mobile'];
 		if(strlen($mobile)<8||strlen($mobile)>11||(!is_numeric($mobile))){
 			if($mobile!='') diecho("请输入正确的联系电话。",1);
 		}
@@ -75,54 +77,60 @@ if($_POST){
 		}else{
 			diecho("请输入正确的联系电话，目前支持手机号码和广州市固话，如果没有可以不用输入",1);
 		}
+
+		//XXX: 检查验证码，此处可以单独做判断函数，以免像上次一样换一个验证码就大费周章
 		if(strlen($_POST['verify_code'])!=5||$_POST['verify_code']!=strtolower($_SESSION['verification'])){
 			diecho("请输入正确的验证码！",1);
 		}
-		$mobile=mysqli_real_escape_string($conn,$mobile);
-		if(@$_POST['tworone']=="1"){//Grade 1
+
+		//判断年级，tworone为1时是高一
+		if(@$_POST['tworone']=="1"){
 			$tworone="高一";
 		}else{
 			$tworone="高二";
 		}
 
-		$email=mysqli_real_escape_string($conn,htmlspecialchars($_POST['email']));
-		#$emt=explode("@",$email);
-		#if(sizeof($emt)!=2 ^ strlen($email)==0 || (strlen($email)<7 && $email!='') || strlen($email)>40){
+		//检查email
+		$email=$_POST['email'];
 		$emreg = "/^([a-zA-Z0-9]+[_|\_|\.]?)*[a-zA-Z0-9]+@([a-zA-Z0-9]+[_|\_|\.]?)*[a-zA-Z0-9]+\.[a-zA-Z]{2,3}$/";
 		if(preg_match($emreg,$email)===0 && strlen($email)!=0){
 			diecho("请填写正确的邮箱，如果没有可以不填",1);
 		}
 
+		//根据session值获取json中地点信息
 		$times=$a[$_SESSION['loc_id']]->times[$_SESSION['times']];
 		$loc_name=$a[$_SESSION['loc_id']]->name;
-		if($alldisabled==1){die();}
-		//Query whether the man has signed up
-		$query="SELECT * FROM signup where loc_name='{$loc_name}' and name='{$name}' and classno='{$classno}' and tworone='{$tworone}' and (`go`=0 or `go`=1)";
-		$result=mysqli_fetch_array(mysqli_query($conn,$query));
-		if($result!=NULL){session_destroy();echo("<script>alert('您已经报名过这个地点了，换一个吧~');window.location.href='/location.php'</script>");die();}
+		if($alldisabled==1){die('报名已关闭');}
 
+		//检查是否已报名过
+		$result = PDOQuery($dbcon, "SELECT loc_name,name,classno,tworone,go FROM signup ".
+						 "WHERE name = ? and classno = ? and tworone = ? and (`go` = 0 or `go` = 1) and loc_name = ?",
+					 	 [ $name , $classno , $tworone , $loc_name ] , [ PDO::PARAM_STR , PDO::PARAM_STR , PDO::PARAM_STR , PDO::PARAM_STR]);
+		if($result[1]>0){
+			diecho("您已经报名过这个地点而且还没去哦，换一个吧~",1);
+		}
 
-		$ip=mysqli_real_escape_string($conn,htmlspecialchars($_SERVER['REMOTE_ADDR']));
-		$query="INSERT signup(name,mobile,classno,tworone,loc_name,times,ip,email)
-			VALUES('{$name}','{$mobile}','{$classno}','{$tworone}','{$loc_name}','{$times}','{$ip}','{$email}')";
-		$result=mysqli_query($conn,$query);
-		$ver=mysqli_fetch_array(mysqli_query($conn,"SELECT * FROM signup WHERE loc_name='{$loc_name}' and classno='{$classno}' and name='{$name}'"));
-		$ver=mysqli_real_escape_string($conn,$ver['name']);
-		if(mysql_errno()==0&&$ver==$name){
+		$ip=$_SERVER['REMOTE_ADDR'];
+
+		$result = PDOQuery($dbcon, "INSERT INTO signup ".
+							"SET name = ?, mobile = ?, classno = ?, tworone = ?, loc_name = ?, times = ?, ip = ?, email = ?",
+							[ $name , $mobile , $classno , $tworone , $loc_name , $times , $ip , $email ] ,
+							[PDO::PARAM_STR,PDO::PARAM_STR,PDO::PARAM_STR,PDO::PARAM_STR,PDO::PARAM_STR,PDO::PARAM_STR,PDO::PARAM_STR,PDO::PARAM_STR]);
+
+		if($result[1]==1){
 			$_SESSION['name']=$name;$_SESSION['classno']=$classno;
 			$_SESSION['mobile']=$mobile;$_SESSION['tworone']=$tworone;
 			$_SESSION["verification"]='';
 			header("Location: /success.php");
-			die();
+			die("<script>location.href='success.php';</script>");
 		}else{
 			session_destroy();
-			diecho("登记失败\\n\\n请与我们联系。",1);
+			diecho("登记失败\\n\\n请与我们联系。\\n\\nrows: ".$result[1],1);
 		}
 	}else{
 		diecho("输入的信息不完整，请重试",1);
 	}
 }else{
-//not post
 	setcookie("loc_id",$_SESSION['loc_id']);
 	setcookie("times",$_SESSION['times']);
 }
