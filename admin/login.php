@@ -37,17 +37,17 @@
   <div class="col-md-offset-2 col-md-8" style="line-height:12px;">
       <div class="input-group">
 				<span class="input-group-addon">用户名</span>
-	      <input type="text" class="form-control" placeholder="输入你的用户名" id="usr">
+	      <input type="text" class="form-control" placeholder="输入你的用户名" id="usr" onkeyup="if(event.keyCode==13)$('#pwd')[0].focus();">
 	      <span class="input-group-addon">&lt;</span>
 			</div>
 			<div class="input-group">
 				<span class="input-group-addon">密码<span style="visibility:hidden">空</span></span>
-        <input type="password" class="form-control" placeholder="输入你的密码" id="pwd">
+        <input type="password" class="form-control" placeholder="输入你的密码" id="pwd" onkeyup="if(event.keyCode==13)$('#verify_code')[0].focus();">
         <span class="input-group-addon" id="forgot">&lt;</span>
       </div>
 			<div class="input-group">
 				<span class="input-group-addon">验证码</span>
-	      <input type="text" class="form-control" placeholder="输入下方的验证码" id="verify_code" autocomplete="off"  onkeyup="if(event.keyCode==13)verify();">
+	      <input type="text" class="form-control" placeholder="输入下方的验证码" id="verify_code" autocomplete="off" onkeyup="if(event.keyCode==13)verify();">
 	      <span class="input-group-addon">&lt;</span>
 			</div>
       <br>
@@ -73,8 +73,8 @@
 		if($("#pwd").val().length<6 || $("#usr").val().length<3){alert("请输入正确的用户名和密码。");return;}
 		if($("#verify_code").val().length!=5){alert("请输入正确位数的验证码！");return;}
 		$("#usr")[0].disabled=1;
-		$("#pwd")[0].disabled=1;		
-                $("#verify_code")[0].disabled=1;
+		$("#pwd")[0].disabled=1;
+		$("#verify_code")[0].disabled=1;
 		$("#login")[0].disabled=1;
 		$("#login").html("验证中");
 		len=$("#pwd").val().length;
@@ -108,19 +108,6 @@
 		}
 		return ret;
 	}
-	/*function postUp(){
-		$.post("/admin/verify.php","password="+origpwd,function(got){
-			if(got.substr(0,1)==1){//PASS
-				pass=1;token=got.substr(2);
-			}else{//fail
-				pass=0;
-			}
-			checkAgain();
-		}).error(function(xhr,errtext,errtype){
-			pass=-1;
-			checkAgain();
-		});
-	}*/
 	function addSpace(howmany){
 		if(spTimes>howmany*3){window.clearInterval(tid);spTimes=0;added=1;if(posted){checkAgain();}return;}
 		spTimes++;
@@ -138,8 +125,10 @@
 			alert("网络连接失败或者服务器故障。");
 		}else if(pass==2){
 			alert("验证码错误。");
-		}else{
+		}else if(pass==0){
 			alert("用户名或密码错误。");
+		}else{
+			alert(pass);
 		}
 		tid=setInterval("rollBack()",3);$("#vimg").click();
 	}
