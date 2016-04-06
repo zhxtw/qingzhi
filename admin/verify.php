@@ -20,15 +20,16 @@
 		$_SESSION['verification']='';die("2");
 	}
 	$flag=true;
-	require_once("../to_sql.php");
+	require_once("../to_pdo.php");
 	$username=$_POST['username'];
-	$username=mysqli_real_escape_string($conn,$username);
 	$p=md5($_POST['password']);
-	$query="select pwd,salt from userpwd where username='{$username}'";
-	$result=mysqli_fetch_array(mysqli_query($conn,$query));
-	if(!$result){$_SESSION['verification']='';die('0');}
-	$pwd=$result['pwd'];
-	$salt=$result['salt'];
+
+	$result=PDOQuery($dbcon, "SELECT pwd,salt FROM userpwd WHERE username=?", [$username], [PDO::PARAM_STR]);
+	if($result[1]!=1){$_SESSION['verification']='';die('0');}//查不到用户
+
+	//$result[0]：数据库查询结果，$result[0][0]：查询结果的第一条记录
+	$pwd=$result[0][0]['pwd'];
+	$salt=$result[0][0]['salt'];
 	$s0=substr($salt,0,1);$s1=substr($salt,1,1);$s2=substr($salt,2,1);$s3=substr($salt,3,1);$s4=substr($salt,4,1);
 	$l1=$s0.substr($p,0,8).$s1;
 	$l2=substr($p,8,8).$s2;
@@ -42,5 +43,5 @@
 		$_SESSION['token']=$token;
 		die('1|'.$token);
 	}
-	$_SESSION['verification']='';die('0');//<br>Y:'.md5($all)."<br>S:".$pwd."<br>salt:".$salt);
+	$_SESSION['verification']='';die('0');//密码错误
 ?>
