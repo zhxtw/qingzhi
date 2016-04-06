@@ -29,8 +29,8 @@
     	if(mb_strlen($name,'UTF8')<2||mb_strlen($name,'UTF8')>5||!preg_match("/^[\x{4e00}-\x{9fa5}]+$/u",$name)){
     		diecho("请检查名字，长度应为2~4个中文字符。");
     	}
-      $flag=true;
-    	require_once("to_sql.php");
+        $flag=true;
+    	require_once("to_pdo.php");
     	$name=mysqli_real_escape_string($conn,$name);
     	if((!is_numeric($classno))||strlen($classno)!=4||substr($classno,0,2)<1||substr($classno,0,2)>17||substr($classno,2,2)<1||substr($classno,2,2)>60){
     		diecho("请检查学号。");
