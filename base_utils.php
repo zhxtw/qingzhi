@@ -11,14 +11,19 @@
 /**
 * function diecho		实现echo后die的效果
 * @param $msg   	 	要echo的信息
-* @param $isAlert   是否使用js的alert形式
+* @param $isAlert   是否使用js的alert形式，没有值则不alert
+* @param $goto			跳转地址，没有值则不跳转而后退；请与$isAlert搭配使用
 */
-function diecho($msg,$isAlert){
+function diecho($msg,$isAlert=0,$goto=''){
 	$_SESSION['verification']='';
 	if(!$isAlert){
 		die($msg);
 	}else{
-		die("<script>alert('".$msg."');window.history.go(-1);</script>");
+		if($goto=''){
+			die("<script>alert('{$msg}');window.history.go(-1);</script>");
+		}else{
+			die("<script>alert('{$msg}');window.location.href='{$goto}';</script>");
+		}
 	}
 }
 
