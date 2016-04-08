@@ -34,7 +34,6 @@ require_once("../base_utils.php");
     	if((!is_numeric($classno))||strlen($classno)!=4||substr($classno,0,2)<1||substr($classno,0,2)>17||substr($classno,2,2)<1||substr($classno,2,2)>60){
     		diecho("请检查学号。");
     	}
-    	$classno=mysqli_real_escape_string($conn,$classno);
     	$class=substr($classno,0,2);
     	
     	if(strlen($mobile)<8||strlen($mobile)>11||(!is_numeric($mobile))){
@@ -54,8 +53,6 @@ require_once("../base_utils.php");
     	}else{
     		diecho("请输入正确的联系电话，目前支持手机号码和广州市固话，如果没有可以不用输入");
     	}
-    	$mobile=mysqli_real_escape_string($conn,$mobile);
-    	
     	
     	if(@$_POST['tworone']=="1"){//Grade 1
     		$tworone="高一";
@@ -63,7 +60,6 @@ require_once("../base_utils.php");
     		$tworone="高二";
     	}
 
-    	$email=mysqli_real_escape_string($conn,htmlspecialchars($_POST['email']));
     	$emreg = "/^([a-zA-Z0-9]+[_|\_|\.]?)*[a-zA-Z0-9]+@([a-zA-Z0-9]+[_|\_|\.]?)*[a-zA-Z0-9]+\.[a-zA-Z]{2,3}$/";
     	if(preg_match($emreg,$email)===0 && strlen($email)!=0){
     		diecho("请填写正确的邮箱，如果没有可以不填");
@@ -75,9 +71,8 @@ require_once("../base_utils.php");
 
     	//检查是否已报名过
     	//$result[0]：数据库查询结果 
-       //$result[0][0]：查询结果的第一条记录 
-    	$rs=PDOQuery($dbcon,"SELECT loc_name,name,classno,tworone,go FROM signup "."WHERE name = ? and classno = ? and tworone = ? and (`go` = 0 or `go` = 1) and loc_name = ?",
-			[ $name , $classno , $tworone , $loc_name ] , [ PDO::PARAM_STR , PDO::PARAM_STR , PDO::PARAM_STR , PDO::PARAM_STR]);
+        //$result[0][0]：查询结果的第一条记录 
+    	$rs=PDOQuery($dbcon,"SELECT * FROM signup WHERE name = ? and classno = ? and tworone = ? and (`go` = 0 or `go` = 1) and loc_name = ?",[ $name , $classno , $tworone , $loc_name ] , [ PDO::PARAM_STR , PDO::PARAM_STR , PDO::PARAM_STR , PDO::PARAM_STR]);
     	if($rs[1]>0){session_destroy();diecho("您已经报名过这个地点了，请换一个吧~");}
     	
     	//添加新记录至数据库
