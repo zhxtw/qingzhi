@@ -5,11 +5,9 @@
   <title>执信青年志愿者协会 - 老人机版</title>
 </head>
 <body>
+  
 <?php
-  function diecho($msg){
-    $_SESSION['verification']='';
-    die("<hr>{$msg}");
-  }
+require_once("../base_utils.php");
   $a=file_get_contents("location.json");
   $a=json_decode($a);
   $a=$a->loc;
@@ -29,19 +27,21 @@
     	if(mb_strlen($name,'UTF8')<2||mb_strlen($name,'UTF8')>5||!preg_match("/^[\x{4e00}-\x{9fa5}]+$/u",$name)){
     		diecho("请检查名字，长度应为2~4个中文字符。");
     	}
-        $flag=true;
-    	require_once("to_pdo.php");
+    	
+      $flag=true;
+    	require_once("../to_pdo.php");
     	$name=mysqli_real_escape_string($conn,$name);
     	if((!is_numeric($classno))||strlen($classno)!=4||substr($classno,0,2)<1||substr($classno,0,2)>17||substr($classno,2,2)<1||substr($classno,2,2)>60){
     		diecho("请检查学号。");
     	}
     	$classno=mysqli_real_escape_string($conn,$classno);
     	$class=substr($classno,0,2);
+    	
     	if(strlen($mobile)<8||strlen($mobile)>11||(!is_numeric($mobile))){
     		if($mobile!='') diecho("请输入正确的联系电话，没有可以不填");
     	}
-    	$mob=substr($mobile,0,2);
-    	$mo=substr($mobile,0,1);
+    	$mob=substr($mobile,0,2);//输入的手机号码第一位
+    	$mo=substr($mobile,0,1);//输入的固话号码第一位
     	if($mob=="13"||$mob=="15"||$mob=="17"||$mob=="18"){
     		if(strlen($mobile)!=11){
     		diecho("手机号长度不正确。");
@@ -54,8 +54,9 @@
     	}else{
     		diecho("请输入正确的联系电话，目前支持手机号码和广州市固话，如果没有可以不用输入");
     	}
-
     	$mobile=mysqli_real_escape_string($conn,$mobile);
+    	
+    	
     	if(@$_POST['tworone']=="1"){//Grade 1
     		$tworone="高一";
     	}else{
@@ -72,24 +73,28 @@
     		diecho("请输入正确的验证码！");
     	}
 
-    	//Query whether the man has signed up
-    	$query="SELECT * FROM signup where loc_name='{$loc_name}' and name='{$name}' and classno='{$classno}' and tworone='{$tworone}' and (`go`=0 or `go`=1)";
-    	$result=mysqli_fetch_array(mysqli_query($conn,$query));
-    	if($result!=NULL){session_destroy();diecho("您已经报名过这个地点了，换一个吧~");}
-
+    	//检查是否已报名过
+    	//$result[0]：数据库查询结果 
+       //$result[0][0]：查询结果的第一条记录 
+    	$rs=PDOQuery($dbcon,"SELECT loc_name,name,classno,tworone,go FROM signup "."WHERE name = ? and classno = ? and tworone = ? and (`go` = 0 or `go` = 1) and loc_name = ?",
+			[ $name , $classno , $tworone , $loc_name ] , [ PDO::PARAM_STR , PDO::PARAM_STR , PDO::PARAM_STR , PDO::PARAM_STR]);
+    	if($rs[1]>0){session_destroy();diecho("您已经报名过这个地点了，请换一个吧~");}
+    	
+    	//添加新记录至数据库
     	$ip=mysqli_real_escape_string($conn,htmlspecialchars($_SERVER['REMOTE_ADDR']));
     	$query="INSERT signup(name,mobile,classno,tworone,loc_name,times,ip,email,fromwap)
     		VALUES('{$name}','{$mobile}','{$classno}','{$tworone}','{$loc_name}','{$times}','{$ip}','{$email}',true)";
     	$result=mysqli_query($conn,$query);
+    	
     	$ver=mysqli_fetch_array(mysqli_query($conn,"SELECT * FROM signup WHERE loc_name='{$loc_name}' and classno='{$classno}' and name='{$name}'"));
     	$ver=mysqli_real_escape_string($conn,$ver['name']);
-    	if(mysql_errno()==0&&$ver==$name){
+    	if(mysql_errno()==0 && $ver==$name){
     		$_SESSION['name']=$name;$_SESSION['classno']=$classno;
     		$_SESSION['mobile']=$mobile;$_SESSION['tworone']=$tworone;
         $_SESSION['loc_name']=$loc_name;$_SESSION['times']=$times;
         $_SESSION["verification"]='';
     		header("Location: success.php");
-    		die("报名成功，正在跳转....<br>如果没有自动跳转，请点击<a href='success.php'>此处</a>");
+    		die("恭喜您报名成功！正在跳转....<br>如果没有自动跳转，请点击<a href='success.php'>此处</a>");
     	}else{
     		diecho("报名失败。");
     	}
