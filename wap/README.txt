@@ -1,6 +1,6 @@
 在实际环境下需要软链接
 location.json
-to_sql.php
+to_pdo.php
 verify.php
 三个文件到本目录
 Windows服务器请使用mklink

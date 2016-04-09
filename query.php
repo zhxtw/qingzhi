@@ -62,8 +62,6 @@ if($_POST){
 			$ip=htmlspecialchars($_SERVER['REMOTE_ADDR']);
 			$wastetime=(int)$_POST['auto_time'];
 			$result=PDOQuery($dbcon, "INSERT INTO auto_time SET ua = ?, wastetime = ?, ip = ?", [$ua,$wastetime,$ip], [PDO::PARAM_STR,PDO::PARAM_INT,PDO::PARAM_STR]);
-			//$query="INSERT auto_time(ua,wastetime,ip) VALUES('{$ua}','{$wastetime}','{$ip}')";
-			//$result=mysqli_query($conn,$query);
 
 		}else{
 			diecho("我知道你在搞鬼。",1);
@@ -74,22 +72,7 @@ if($_POST){
 		if($result[1]==0){
 			$strout="<span style='color:red'>查无此人</span>";session_destroy();die();
 		}
-		//if($result->lengths==NULL){var_dump($result);session_destroy();diecho("查无此人",1);}
-		/*$strout=''; declared before, as global*/
-		/*$j=0;
-		while($res=mysqli_fetch_array($result)){
-			$strout.=(++$j).".<br>地点：".$res['loc_name']."<br>时间：".$res['times']."<br>";
-			switch($res['go']){
-				case "0":
-					$strout.="<span style='color:red'>未审核</span>";break;
-				case "1":
-					$strout.="<span style='color:green'>已通过，待分配时间</span>";break;
-				default:
-					$strout.="<span style='color:blue'>已通过，分配的时间是<br>".$res['go']."</span>";
-			}
-			$strout.="<br>";
-			$hasrecord=true;
-		}*/
+
 		for($i=0;$i<sizeof($result[0]);$i++){
 			$strout.="<br>".($i+1).".<br>地点：".$result[0][$i]['loc_name']."<br>时间：".$result[0][$i]['times']."<br>";
 			switch($result[0][$i]['go']){
