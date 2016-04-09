@@ -39,6 +39,35 @@
       $dbo->bindParam($i+1,$pararray[$i],$paramtype[$i]);
     }
     $dbo->execute();
-    return [$dbo->fetchAll() , $dbo->rowCount()];
+    return [$dbo->fetchAll(PDO::FETCH_ASSOC) , $dbo->rowCount() , getColNames($dbo)]; //PDO::FETCH_ASSOC选项可以去除返回的基本没用的数字索引
+  }
+
+  /**
+  * function PDOQuery2 PDO自定义过滤查询函数2
+  * @param $dbconn    数据库连接对象
+  * @param $query     要查询的语句，准备传入的值用?表示
+  * @param $paras     要查询的数据和数据类型，以二维数组方式传入，第一个索引为第几个数据，第二个索引中0为数据，1为数据类型
+  */
+  function PDOQuery2($dbconn,$query,$paras){
+    $dbo=$dbconn->prepare($query);
+    for($i=0;$i<sizeof($paras);$i++){
+      //pdo绑定参数从1开始
+      $dbo->bindParam($i+1,$paras[$i][0],$paras[$i][1]);
+    }
+    $dbo->execute();
+    return [$dbo->fetchAll(PDO::FETCH_ASSOC) , $dbo->rowCount() , getColNames($dbo)]; //PDO::FETCH_ASSOC选项可以去除返回的基本没用的数字索引
+  }
+
+  /**
+  * function getColNames 获取PDOStatement中的列名
+  * @param $pdost    传入一个PDOStatement::对象
+  */
+  function getColNames($pdost){
+    $count=$pdost->columnCount();
+    $col=array();
+    for($i=0;$i<$count;$i++){
+      $col[$i]=$pdost->getColumnMeta($i)['name'];
+    }
+    return $col;
   }
 ?>
