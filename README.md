@@ -1,6 +1,6 @@
 # 执信团委 青年志愿者协会
 
-![logo](http://i12.tietuku.com/df3be5ffeab2dae3.png)
+![logo](https://raw.githubusercontent.com/zhxtw/qingzhi/master/logo.png)
 
 ## 简介
 
@@ -27,9 +27,7 @@
 
 * 安全
 
-  ~~网站使用https，网站证书通过Certificate Transparency认证，ssl支持CHACHA20算法，后期考虑2-way ssl，防止数据被中途截获~~
-
-  *这是源码，跟网站安全性有个鬼关系！哪天搞了个Injection不就全完了！*
+  SQL查询全部使用PDO的prepare，理论上防所有注入
 
 ### 进度
 
@@ -58,6 +56,8 @@
 * 邮件系统 `RoundCube` (不包含在代码中)
 
 * 编辑地点
+
+* 分配时间
 
 #### 未完成
 
@@ -109,7 +109,16 @@
 
 ***
 
-提示：首次使用请执行`initial.sql`，并更改`to_sql.php`中的本地数据库的账号密码，随后便可以使用默认用户admin密码12345678登录
+提示：
+
+1. 首次使用请执行`initial.sql`，并更改`to_pdo.php`中的本地数据库的账号密码，随后便可以使用默认用户admin密码12345678登录
+
+2. 使用老人机版本时请参照`wap/README.txt`
+
+3. 实际使用时请打开`admin/addToken.js`和`admin/isLoggedIn.php`，并将里面的`hostnames`数组改为自己的主机，注意仿照格式
+
+
+***
 
 我们热衷于开源，不希望固步自封，欢迎大家提意见、挑漏洞。
 
