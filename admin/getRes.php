@@ -1,4 +1,12 @@
 <?php
+/**
+* -------------------------------------------
+* 执信青年志愿者协会 获取数据库表中的数据
+* Author: @zhangjingye03
+* License: GPLv3
+* Copyright (C) 2016
+* -------------------------------------------
+*/
 	require_once("isLoggedIn.php");
 	require_once("recognize.php");
 	if(!isset($_POST['start'],$_POST['limit'],$_POST['origin'])){die('Forbidden');}
@@ -6,27 +14,34 @@
 	$flag=true;
 	$start=$_POST['start']-0;
 	$limit=$_POST['limit']-0;
-	require_once("../to_sql.php");
-	$query="select * from signup where 1";
+	require_once("../to_pdo.php");
+	$query="SELECT * FROM signup WHERE 1";
+	$q=array(); $qi=0; //给pdo绑定参数判断计数用
+	//地点过滤
 	if(isset($_POST['filter'])){
 		$filter=$_POST['filter'];
-		$filter=mysqli_real_escape_string($conn,$filter);
-		$query.=" and loc_name='{$filter}'";
+		$query.=" and loc_name = ?";
+		$q[$qi++]=[$filter,PDO::PARAM_STR];
 	}
+	//班级过滤
 	if(isset($_POST['class'])){
 		$class=tellme($_POST['class']);
 		$grade=$class[0];$class=$class[1];
 		$down=$class*100;$up=($class+1)*100;
-		$query.=" and classno>{$down} and classno<{$up} and tworone='{$grade}'";
+		$query.=" and classno > ? and classno < ? and tworone = ?";
+		$q[$qi++]=[$down,PDO::PARAM_INT];
+		$q[$qi++]=[$up,PDO::PARAM_INT];
+		$q[$qi++]=[$grade,PDO::PARAM_STR];
 	}
+	//判断页面来源，不同页面显示不同数据
 	if($_POST['origin']=='assign'){
 		$query.=" and `go`!=0";
 	}elseif($_POST['origin']=='manage'){
 		$query.=" and `go`=0";
 	}
+	//sort和limit在sql语句末端
 	if(isset($_POST['sort'])){
 		$sort=$_POST['sort'];
-		$sort=mysqli_real_escape_string($conn,$sort);
 		switch($sort){
 			case "姓名":
 				$willsort="name";break;
@@ -43,30 +58,18 @@
 			case "通过状态":
 				$willsort="go";break;
 		}
-		$query.=" ORDER BY `{$willsort}` ASC";
-	}
-	$query.=" limit ".$start.",".$limit;
-	//echo($query);
-	$result=mysqli_query($conn,$query);
-	if(!$result){	die("{}");}
-	//fields name
-	$i=0;
-	while($res=mysqli_fetch_field($result)){
-		//mysqli_fetch_field return a stdClass. Use ->
-		$fieldName[$i]=$res->name;
-		$i++;
+		//XXX: 添加一个倒叙在页面上，DSC
+		$query.=" ORDER BY ? ASC";
+		$q[$qi++]=[$willsort,PDO::PARAM_STR];
 	}
 
-	$j=0;//for counting
-	$json = array();
-	while($res=mysqli_fetch_array($result)){
-		for($i=0;$i<mysqli_num_fields($result);$i++){
-			//echo("!@#@!".$res[$i]);
-			$json[$j][$fieldName[$i]]=$res[$i];
-		}
-		//echo("\n");
-		$j++;
-	}
-	echo(json_encode($json));
+	$query.=" LIMIT ?,?";
+	$q[$qi++]=[$start,PDO::PARAM_INT];
+	$q[$qi++]=[$limit,PDO::PARAM_INT];
+
+	$result=PDOQuery2($dbcon,$query,$q);
+	if($result[1]==0){	die("{}");}
+
+	echo(json_encode($result[0]));
 
 ?>
