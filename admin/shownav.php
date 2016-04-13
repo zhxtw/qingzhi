@@ -10,7 +10,7 @@
         <li class="dropdown"><a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false">报名信息管理<span class="caret"></span></a>
           <ul class="dropdown-menu" role="menu">
             <li><a href="manage.php">报名管理</a></li>
-						<li><a href="assign.php">分配时段</a></li>
+	     <li><a href="assign.php">分配时段</a></li>
             <li><a href="change.php">调换人地</a></li>
             <li><a href="addmany.php">批量增加</a></li>
           </ul>
@@ -20,17 +20,19 @@
             <li><a href="manageloc.php">地点时段管理</a></li>
           </ul>
         </li>
-        <li class="dropdown"><a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false">公告通知管理<span class="caret"></span></a>
+        <li class="dropdown"><a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false">前台信息管理<span class="caret"></span></a>
           <ul class="dropdown-menu" role="menu">
-            <li><a href="managepost.php">发布公告</a></li>
-            <li><a href="manageblame.php">意见反馈查看</a></li>
+            <li><a href="manageFB.php">意见反馈管理</a></li>
+            <li class="divider"></li>
+            <li><a href="manageNews.php">新闻管理</a></li>
+            <li><a href="PostNews.php">新闻发布中心</a></li>
           </ul>
         </li>
       </ul>
 	  <ul class="nav navbar-nav navbar-right">
 		  <li class="dropdown"><a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false"><img style="width:18px;border-radius:9px;" src="../img/user.png"></a>
           <ul class="dropdown-menu" role="menu">
-          	<li><a href="#"><b><?php echo($_SESSION['adminname']); ?></b></a></li>
+          	<li><a href="#"><b><?php echo $_SESSION['adminname']; ?></b></a></li>
             <li><a href="personal.php">个人信息</a></li>
             <li><a href="toModifyPW.php">修改密码</a></li>
             <li class="divider"></li>
