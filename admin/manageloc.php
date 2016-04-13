@@ -59,7 +59,10 @@
 			$all->loc=removeE($all->loc,$p['delid']);
 		}else{
 			if(!isset($p['whydisabled'],$p['image'],$p['color'],$p['name'],$p['minintro'],$p['area'],$p['addr'],$p['addrE'],$p['traffic'],
-				$p['works'][0],$p['times'][0],$p['comm'][0])){die("检查下有没有东东漏掉哦");}
+				$p['works'][0],$p['times'][0],$p['comm'][0],$p['limit'][0])){die("检查下有没有东东漏掉哦");}
+			for($i=0;$i<sizeof($p['limit']);$i++){
+				if(!is_numeric($p['limit'][$i]) || $p['limit'][$i] <1){ die("人数填写错误。"); }
+			}
 			//checkbox选中提交on，反之不提交
 			if(isset($_POST['isDisabled'])){$disabled=1;}
 			$id=$p['loc_id'];
@@ -71,7 +74,7 @@
 			$a->disabled=$disabled;
 			$a->whydisabled=$p['whydisabled']; $a->image=$p['image']; $a->color=$p['color']; $a->name=$p['name'];
 			$a->minintro=$p['minintro']; $a->area=$p['area']; $a->addr=$p['addr']; $a->addrE=$p['addrE']; $a->traffic=$p['traffic'];
-			$a->works=$p['works']; $a->times=$p['times']; $a->comm=$p['comm'];
+			$a->works=$p['works']; $a->times=$p['times']; $a->comm=$p['comm']; $a->limit=$p['limit'];
 			if($id=="add"){
 				$all->loc[sizeof($all->loc)]=$a;
 			}else{
@@ -176,6 +179,11 @@ window.onload=function(){
 				if(current!="add" && (current<0||current>=loc.length)){
 					alert("location id不合法，请检查。");return 0;
 				}
+				vt=$(" [data-i=limit] ");
+				for(i=0;i<vt.length;i++){
+					if(isNaN(vt[i].value) || vt[i]-0 < 1){ alert("人数填写错误！"); return; }
+					vt[i].value-=0;
+				}
 				t=document.createElement("input");
 				t.type="text";t.name="loc_id";t.hidden=true;t.value=current;t.id="temp";
 				$("#frm").append(t);
@@ -208,6 +216,7 @@ window.onload=function(){
 			case "traffic":sth="交通";break;
 			case "works":sth="工作";break;
 			case "times":sth="时段";break;
+			case "limit":sth="人数限制";break;
 			case "comm":sth="备注";break;
 			case "addrE":sth="地图";break;
       case "disabled":sth="关闭报名";break;
@@ -233,16 +242,22 @@ window.onload=function(){
 				continue;
 			}
 			//XXX: Using isArray?
-			if(i=="works"||i=="times"||i=="comm"){
+			if(i=="works"||i=="times"||i=="limit"||i=="comm"){
 				//using tmd instead of innerHTML or browser will add <!--/tr--> automaticly
 				tmd+="<tr>"+th(i);
 				tmp='<div id="'+i+'"><input type="hidden" class="'+i+'">';//增加一个隐藏标签来判断位置
 				for(j=0;j<loc[r][i].length;j++){
-					tmp+='<input type="text" class="form-control onedit1 '+i+'" name="'+i+'[]" value="" data-r="'+r+'" data-i="'+i+'" data-j="'+j+'">';
+					if(i=="limit"){
+						tmp+="<div class='input-group'><div class='input-group-addon'>"+loc[r]['times'][j]+"</div>"
+						    +'<input type="text" class="form-control onedit1 '+i+'" name="'+i+'[]" value="" data-r="'+r+'" data-i="'+i+'" data-j="'+j+'"></div>';
+					}else{
+						tmp+='<input type="text" class="form-control onedit1 '+i+'" name="'+i+'[]" value="" data-r="'+r+'" data-i="'+i+'" data-j="'+j+'">';
+					}
 				}
 				tmp+="<br><button type='button' class='btn btn-success btn-xs' onclick='addordel(\""+i+"\");'><span class='glyphicon glyphicon-plus'></span></button>&nbsp;<button type='button' class='btn btn-danger btn-xs' onclick='addordel(\""+i+"\",1);'><span class='glyphicon glyphicon-minus'></span></button></div>";
-
-				tmd+=td(tmp)+"</tr>";
+				if(i=="times") tmd+=td(tmp+"<br><p style='color:gray'>* 请在时段内包含周几的字样（比如周六），以便于系统自动判断时间</p>")+"</tr>";
+				else if(i=="limit") tmd+=td(tmp+"<br><p style='color:gray'>* 请填写对应时段可分配的人数，以便于系统自动分配</p>")+"</tr>";
+				else tmd+=td(tmp)+"</tr>";
 				tmp="";
 			}else if(i=="disabled"){
 				tmd+=tr(th(i)+td("<input type='checkbox' name='isDisabled' "+((loc[r][i]==1)?"checked":"")+">"));
@@ -251,7 +266,7 @@ window.onload=function(){
 				for(cc in colorinfo){
 					tmp+="<input type='radio' name='color' value='"+colorinfo[cc]+"' " + ((loc[r][i]==colorinfo[cc])?"checked":"") + "><label class='text-"+colorinfo[cc]+"'>"+colorinfo[cc]+"</label><br>";
 				}
-				tmd+=td(tmp+"<p style='color:gray'>提示：前后台风格不同，实际效果上，default为白色，primary为青色，而且所有颜色都要鲜艳的多</p>")+"</tr>";tmp='';
+				tmd+=td(tmp+"<p style='color:gray'>* 前后台风格不同，实际效果上，default为白色，primary为青色，而且所有颜色都要鲜艳的多</p>")+"</tr>";tmp='';
       }else if(i=="whydisabled"||i=="traffic"){
         tmd+=tr(th(i)+td("<textarea name='"+i+"' class='form-control onedit2' style='resize: vertical;'>"+loc[r][i]+"</textarea>"));
       }else{
