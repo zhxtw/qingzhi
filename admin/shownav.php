@@ -10,7 +10,7 @@
         <li class="dropdown"><a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false">报名信息管理<span class="caret"></span></a>
           <ul class="dropdown-menu" role="menu">
             <li><a href="manage.php">报名管理</a></li>
-	     <li><a href="assign.php">分配时段</a></li>
+					  <li><a href="assign.php">分配时段</a></li>
             <li><a href="change.php">调换人地</a></li>
             <li><a href="addmany.php">批量增加</a></li>
           </ul>

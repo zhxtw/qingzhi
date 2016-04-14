@@ -31,7 +31,7 @@ if($_POST){
   if(mb_strlen($content,'UTF8')>1000){diecho("我们很欢迎大家给青志网提出意见，但是请注意不要超过1000字哦~",1);}
   $ip=htmlspecialchars($_SERVER['REMOTE_ADDR']);
 
-  $result=PDOQuery($dbcon, "INSERT INTO feedback SET content = ?, ip = ?", [$content,$ip] , [PDO::PARAM_STR,PDO::PARAM_STR]);
+  $result=PDOQuery($dbcon, "INSERT INTO feedback SET content = ?, ip = ?, status = ?", [$content,$ip,"未阅读"] , [PDO::PARAM_STR,PDO::PARAM_STR,PDO::PARAM_STR]);
   if($result[1]==1){
     diecho("谢谢您给青志网提出意见！",1);
   }else{
