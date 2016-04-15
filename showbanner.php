@@ -10,7 +10,7 @@
   </div>
   </div>
 <hr>
-<p class="text-center" style="color:gray">代码版本：<a href="#" id="ver" style="font-family:Consolas;color:blue"></a>, Last commited by <a href="#" id="author" style="color:blue"></a></p>
+<p class="text-center" style="color:gray">代码版本：<a href="#" id="ver" style="font-family:Consolas;color:blue" target="_blank"></a>, Last commited by <a href="#" id="author" style="color:blue" target="_blank"></a></p>
 <script>
   $.ajax({type:"GET",url:"https://api.github.com/repos/zhxtw/qingzhi/commits/master",dataType:"json",success:function(got){
     $("#ver").html("git@"+got.sha.substr(0,8));$("#ver")[0].href=got.html_url;
