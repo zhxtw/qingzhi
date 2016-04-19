@@ -157,7 +157,7 @@ eval('$("#okbtn")[0].onclick=function(){$("#myModal").modal("hide");toOperate(a,
 }
 
 function toOperate(id,todo){
-$.post("OperateInfo.php","where=feedback&fbid="+id+"&todo="+CNflag,function(got){
+$.post("OperateInfo.php","type=feedback&fbid="+id+"&todo="+CNflag,function(got){
   $("#myModal").modal('show');
   pp="恭喜您！<br>操作成功！";
   $("#msg").html(pp);
