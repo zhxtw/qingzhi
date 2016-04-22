@@ -9,8 +9,8 @@
 */
 	require_once("isLoggedIn.php");
 	require_once("recognize.php");
-	if(!isset($_POST['start'],$_POST['limit'],$_POST['origin'])){die('Forbidden');}
-	if(!is_numeric($_POST['start'])||!is_numeric($_POST['limit'])){die('Forbidden');}
+	if(!isset($_POST['start'],$_POST['limit'],$_POST['origin'])){die('Forbidden1');}
+	if(!is_numeric($_POST['start'])||!is_numeric($_POST['limit'])){die('Forbidden2');}
 	$flag=true;
 	$start=$_POST['start']-0;
 	$limit=$_POST['limit']-0;
@@ -18,13 +18,13 @@
 	$query="SELECT * FROM signup WHERE 1";
 	$q=array(); $qi=0; //给pdo绑定参数判断计数用
 	//地点过滤
-	if(isset($_POST['filter'])){
+	if(isset($_POST['filter']) && !empty($_POST['filter'])){
 		$filter=$_POST['filter'];
 		$query.=" and loc_name = ?";
 		$q[$qi++]=[$filter,PDO::PARAM_STR];
 	}
 	//班级过滤
-	if(isset($_POST['class'])){
+	if(isset($_POST['class']) && !empty($_POST['class'])){
 		$class=tellme($_POST['class']);
 		$grade=$class[0];$class=$class[1];
 		$down=$class*100;$up=($class+1)*100;
@@ -40,7 +40,7 @@
 		$query.=" and `go`=0";
 	}
 	//sort和limit在sql语句末端
-	if(isset($_POST['sort'])){
+	if(isset($_POST['sort']) && !empty($_POST['sort'])){
 		$sort=$_POST['sort'];
 		switch($sort){
 			case "姓名":
@@ -57,6 +57,8 @@
 				$willsort="datetime";break;
 			case "通过状态":
 				$willsort="go";break;
+			default:
+				$willsort="1";
 		}
 		//XXX: 添加一个倒叙在页面上，DSC
 		$query.=" ORDER BY ? ASC";

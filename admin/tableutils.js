@@ -27,15 +27,33 @@ function alt(message,style,icon){
 * function setPages 设置显示的页数
 * @param howmany    总共的页数
 * @param oldpage    更新页数后老的页面号
-* 本函数会执行req()，使用时务必留意
+* @param onlyset    是否只更新页码栏而不请求最新数据
+* 本函数中若onlyset未设置则会执行req()，使用时务必留意
 */
-function setPages(howmany,oldpage){
+function setPages(howmany,oldpage,onlyset){
   $("#page1").html('<li><a onclick="req(nowpage-1)" aria-label="上一页"><span aria-hidden="true">&laquo;</span></a></li>');
-  for(i=0;i<howmany;i++){
-    //TODO: 实际使用中，导航条因页数太多而爆掉了...需要有省略号
-    $("#page1")[0].innerHTML+='<li><a class="pageButton" onclick="req('+(i-0+1)+')">'+(i-0+1)+'</a></li>';
+  if(!onlyset) nowpage=1;
+  for(i=1;i<=howmany;i++){
+    if(calcEtc(i)){
+      $("#page1")[0].innerHTML+='<li class="unshown" style="display:none"><a class="pageButton" onclick="req('+(i)+')">'+(i)+'</a></li>'
+      if(!calcEtc(i+1)){
+        $("#page1")[0].innerHTML+='<li class="etc"><a id="etc" data-placement="top" data-toggle="popover" data-container="body">...</a></li>';
+      }
+    }else{
+      $("#page1")[0].innerHTML+='<li class="showing"><a class="pageButton" onclick="req('+(i)+')">'+(i)+'</a></li>';
+    }
   }
   $("#page1")[0].innerHTML+='<li><a onclick="req(nowpage+1)" aria-label="下一页"><span aria-hidden="true">&raquo;</span></a></li>';
+  $("#etc").click(function(){
+    console.log(this);
+    $(this).popover({
+      html:"true",
+      content:"<input type='text' placeholder='页码' size='2' class='form-control' onkeyup='if(event.keyCode==13)req(this.value)'>"
+    });
+    $(this).popover('show');
+  });
+
+  if(onlyset){return;}
   if(oldpage){
     req((nowpage=(oldpage>allpages)?oldpage-1:oldpage));
   }else{
@@ -44,58 +62,116 @@ function setPages(howmany,oldpage){
 }
 
 /**
+* function calcEtc 页面表示条的省略号计算
+* @param current   正在初始化css的页面号
+* 返回1即归入省略号
+*/
+function calcEtc(current){
+  hflag=1;
+
+  //当前页码前后2个不能隐藏
+  if(current > nowpage-4 && current < nowpage+3){ hflag=0; }
+  //最开头和最后2个不能隐藏
+  if(current < 3 || current > allpages-2){ hflag=0; }
+
+  return hflag;
+  //}
+}
+
+/**
+* function makeTH 制作表头
+* @param text   传入包含表头文字的数组；第一列（即id）不需传入
+* 传入的表头必须与后端返回的元素先后顺序（目前为数据库中列的顺序）匹配，否则表格错乱。
+*/
+function makeTH(text){
+  r='<tr><th><input type="checkbox" id="ckSelAll" onchange="toggleAll(this)">&nbsp;ID</th>';
+  for(i=0;i<text.length;i++){
+    r+='<th>'+text[i]+'</th>';
+  }
+  return r+'</tr>';
+}
+
+/**
 * function req Ajax请求第n页
 * @param page       请求的页码，从1开始！
 */
 function req(page){
-  console.log("req::"+filtername);
-  if(page>allpages||page<1){alt("没有了哦~","danger","ban-circle");return 0;}
+  //判断请求的页码数，超出的话罢工
+  if(page-0>allpages||page<1){alt("没有了哦~","danger","ban-circle");return 0;}
+
+  //加载动画
+  $("#tbSign").fadeOut("fast", function(){$('#loading').slideDown();} );
+  $("#etc").popover('hide');
+
+  //判断页面起源，并制作相应表头
   if(fromwhere=='assign'){
-    $("#tbSign").html('<tr><th><input type="checkbox" id="ckSelAll" onchange="toggleAll(this)">&nbsp;ID</th><th>姓名</th><th>班级</th><th>年级</th><th>手机</th><th>Email</th><th>地点</th><th>时间</th><th>审核状态</th></tr>');
+    $("#tbSign").html(makeTH(["姓名","班级","年级","手机","Email","地点","时间","分配状态"]));
   }else if(fromwhere=='manage'){
-    $("#tbSign").html('<tr><th><input type="checkbox" id="ckSelAll" onchange="toggleAll(this)">&nbsp;ID</th><th>姓名</th><th>班级</th><th>年级</th><th>手机</th><th>Email</th><th>地点</th><th>时间</th><th>报名时间</th><!--th>IP</th--><th>审核状态</th></tr>');
+    $("#tbSign").html(makeTH(["姓名","班级","年级","手机","Email","地点","时间","报名时间","审核状态"]));
+  }else if(fromwhere=='manageFB'){
+    $("#tbSign").html(makeTH(["时间","意见内容","IP","处理状态","操作"]));
   }
-  $.post("/admin/getRes.php?token="+TOKEN+";","origin="+fromwhere+"&start="+(page-1)*limit+"&limit="+limit
-      + ((filtername)?"&filter="+filtername:'') + ((sortby)?"&sort="+sortby:'') + ((classname)?"&class="+classname:''),function(got){
-    gotjson=got=eval("("+got+")");
-    append='';
-    //json解析后默认不进行排序，所以此处无需纠结哪个数据先哪个数据后的问题，和getRes.php中顺序匹配即可
-    for(i in got){//i：第i个同学的报名信息
-      append+="<tr>";
-      for(j in got[i]){//j：报名信息中的属性
-        if(j==="go"){
-          append+="<td><span style='color:";
-          switch(got[i][j]){
-            case '1':
-              append+="green'>待分配";break;
-            case '0':
-              append+="red'>未通过";break;
-            default:
-              append+="blue'>已安排在"+got[i][j];
+
+  $.ajax({
+    url:"/admin/getRes.php?token="+TOKEN,
+    dataType:"json",
+    type:"POST",
+    data: {
+      "origin": fromwhere,
+      "start": (page-1)*limit,
+      "limit": limit,
+      "filter": filtername,
+      "sort": sortby,
+      "classname": classname
+    },
+    error: function(){ alt("网络连接失败！","danger","ban-circle"); },
+    success: function(got){
+      gotjson=got;//由于指定了dataType为json，jQ自动转义为json，不需再eval
+      append='';
+      //json解析后默认不进行排序，所以此处无需纠结哪个数据先哪个数据后的问题，和getRes.php中顺序匹配即可
+      for(i in got){//i：第i个信息
+        append+="<tr>";
+        for(j in got[i]){//j：信息中的字段名
+          if(j==="go"){
+            append+="<td><span style='color:";
+            switch(got[i][j]){
+              case '1':
+                append+="green'>待分配";break;
+              case '0':
+                append+="red'>未通过";break;
+              default:
+                append+="blue'>已安排在"+got[i][j];
+            }
+            append+="</span></td>";
+          }else if(j==="no"){
+            append+="<td><input type='checkbox' class='ck' name='ck"+(i-0+1)+"'><span>&nbsp;"+got[i][j]+"</span></td>";
+          }else if(j==="ip"||j==="fromwap"){
+            continue;
+          }else if(j==="datetime"){
+            if(fromwhere=="assign") continue;
+            append+="<td>"+got[i][j]+"</td>";
+          }else if(j==="email"){
+            append+="<td><a href='mailto:"+got[i][j]+"'>"+got[i][j]+"</td>";
+          }else if(j==="classno"){
+            append+="<td>"+got[i][j].substr(0,2)+"</td>";
+          }else{
+            append+="<td>"+got[i][j]+"</td>";
           }
-          append+="</span></td>";
-        }else if(j==="no"){
-          append+="<td><input type='checkbox' class='ck' name='ck"+(i-0+1)+"'><span>&nbsp;"+got[i][j]+"</span></td>";
-        }else if(j==="ip"||j==="fromwap"){
-          continue;
-        }else if(j==="datetime"){
-          if(fromwhere=="assign") continue;
-          append+="<td>"+got[i][j]+"</td>";
-        }else if(j==="email"){
-          append+="<td><a href='mailto:"+got[i][j]+"'>"+got[i][j]+"</td>";
-        }else if(j==="classno"){
-          append+="<td>"+got[i][j].substr(0,2)+"</td>";
-        }else{
-          append+="<td>"+got[i][j]+"</td>";
         }
+        append+="</tr>";
       }
-      append+="</tr>";
+      $("#tbSign")[0].innerHTML+=append;
+      $("#tbSign").fadeIn("fast", function(){$('#loading').slideUp();} );
     }
-    $("#tbSign")[0].innerHTML+=append;
   });
+
+  nowpage=page;
+
+  //这里只为了省略号中元素的显示而更新页码导航栏
+  setPages(allpages, null, true);
+
   $(".pageButton").css("color","blue");
   $(".pageButton")[page-1].style.color="red";
-  nowpage=page;
   $("#pagenum").html(nowpage+"/"+allpages);
 }
 
@@ -202,7 +278,7 @@ function passOrNotp(flag){
     ((flag=="assign")?"&assign="+$("#dtp1").data("DateTimePicker").date().format("YYYYMMDD"):""),
     function(got){
       $("#myModal").modal("hide");
-      if(got-0>0){alt("操作成功。 "+got+" 个同学被"+sinicize(flag),"success","ok");}
+      if(got-0>0){alt("操作成功， "+got+" 个同学被"+sinicize(flag),"success","ok");}
       else{alt("操作失败。影响的记录数："+got+"，请联系信息部网页组。","danger","remove");}
       /*if(flag=='del'){updatePageCount();}
       else{req(oldpage);}//req(1);*/

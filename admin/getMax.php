@@ -19,13 +19,13 @@
 	$query="SELECT * FROM signup WHERE 1";
 	$q=array(); $qi=0; //给pdo绑定参数判断计数用
 	//地点过滤
-	if(isset($_POST['filter'])){
+	if(isset($_POST['filter']) && !empty($_POST['filter'])){
 		$filter=$_POST['filter'];
 		$query.=" and loc_name = ?";
 		$q[$qi++]=[$filter,PDO::PARAM_STR];
 	}
 	//班级过滤
-	if(isset($_POST['class'])){
+	if(isset($_POST['class']) && !empty($_POST['class'])){
 		$class=tellme($_POST['class']);
 		$grade=$class[0];$class=$class[1];
 		$down=$class*100;$up=($class+1)*100;

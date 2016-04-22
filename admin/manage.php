@@ -29,6 +29,13 @@
 <div class="row col-md-10 col-md-offset-1">
 	<hr><div id="alert" class="alert alert-info text-center" role="alert"><span id="alertinfo" class="glyphicon glyphicon-home"></span> 欢迎回来！</div>
   <hr>
+	
+	<div class="row" id="loading" style="display:none">
+		<center>
+			<img src="/img/loading.gif"><br><br>正在加载志愿报名信息，稍安勿躁哦~
+		</center>
+	</div>
+
       	<table class="table table-hover table-striped table-bordered" style="border-radius: 5px; border-collapse: separate;" id="tbSign">
 
         </table>
