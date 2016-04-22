@@ -1,9 +1,9 @@
-由于wap和主目录在服务器上不在同一目录下，实际环境下需要软链接
+锘跨敱浜巜ap鍜屼富鐩綍鍦ㄦ湇鍔″櫒涓婁笉鍦ㄥ悓涓�鐩綍涓嬶紝瀹為檯鐜涓嬮渶瑕佽蒋閾炬帴
 location.json
 to_pdo.php
 verify.php
-三个文件到本目录
-Windows服务器请使用mklink
-Linux服务器请使用ln
+涓変釜鏂囦欢鍒版湰鐩綍
+Windows鏈嶅姟鍣ㄨ浣跨敤mklink
+Linux鏈嶅姟鍣ㄨ浣跨敤ln
 
-如果不想这么麻烦可以直接复制过来
+濡傛灉涓嶆兂杩欎箞楹荤儲鍙互鐩存帴澶嶅埗杩囨潵
