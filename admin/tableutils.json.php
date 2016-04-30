@@ -92,7 +92,7 @@ function mkfilters(){
 }
 
 /**
-* functino sortme   排序相关
+* function sortme   排序相关
 * @param val  根据val来排序
 */
 function sortme(val){
@@ -107,7 +107,7 @@ function sortme(val){
 }
 
 /**
-* functino sortme   过滤地点相关
+* function sortme   过滤地点相关
 * @param val  根据val来过滤地点
 */
 function filter(val){
@@ -122,7 +122,7 @@ function filter(val){
 }
 
 /**
-* functino sortme   过滤班级相关
+* function sortme   过滤班级相关
 * @param val  根据val来过滤班级
 */
 function fclass(val){
