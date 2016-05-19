@@ -14,9 +14,17 @@
   title   为过滤器的标题，即显示在按钮上的文字
   choice  为可供过滤的选项，因为有些选项是动态的，所以用php生成，生成的时候注意引号和逗号
   default 为默认选项
-  onclick 为点击后执行的函数
-  showon  为显示的页面
+  onclick 为点击后执行的函数名称
   ignore  为忽略更改（如导出Excel这种半功能半选项的按钮）
+本文件中列出常用且公用的几个filter，如果只有一个页面使用可以在mkfilters()函数运行前加入
+filters[filters.length]=({
+    "id":"xxx",
+    "title":"xxxx",
+    "choice":["a","b","c"],
+    "default":"a",
+    "onclick":"xxxxx()"
+});
+然后在mkfilters中加入此filter的id即可
 */
 filters=(
   [
@@ -25,15 +33,13 @@ filters=(
       "title":"每页显示",
       "choice":[10,15,20,50,100],
       "default":15,
-      "onclick":"changePerPage(this.innerText)",
-      "showon":["manage","assign"]
+      "onclick":"changePerPage"
     },{
       "id":"asc",
       "title":"排序方式",
-      "choice":["ID","姓名","班别","年级","志愿点","时段","报名时间","通过状态"],
+      "choice":["---","姓名","班别","年级","志愿点","时段","报名时间","通过状态"],
       "default":"ID",
-      "onclick":"sortme(this.innerText)",
-      "showon":["manage","assign","manageFB"]
+      "onclick":"sortme"
     },{
       "id":"loc",
       "title":"筛选地点",
@@ -46,29 +52,26 @@ filters=(
         }
       ?> ],
       "default":"---",
-      "onclick":"filter(this.innerText)",
-      "showon":["assign","manage"]
+      "onclick":"floc"
     },{
       "id":"cls",
       "title":"筛选班别",
-      "choice":[ "---", <?php
+      "choice":[ <?php
         for($i=0;$i<2;$i++){
           for($j=1;$j<18;$j++){
             echo('"高'.(($i==0)?"一":"二").(($j<10)?('0'.$j):$j).'班"');
             if(($j<18 && $i==0)||($j<17 && $i==1)) echo ", ";
           }
         }
-      ?> ],
+      ?> , '---'],
       "default":"---",
-      "onclick":"fclass(this.innerText)",
-      "showon":["assign","manage"]
+      "onclick":"fclass"
     },{
       "id":"xls",
       "title":"导出Excel",
       "choice":["选中","本页","自动分班"],
       "default":"---",
-      "onclick":"exportCSV(this.innerText)",
-      "showon":["assign","manage","manageFB"],
+      "onclick":"exportCSV",
       "ignore":1
     }
   ]
@@ -76,15 +79,23 @@ filters=(
 
 /**
 * function mkfilters  根据json生成过滤器按钮
+* @param which  需要生成的过滤器id，传入数组
 */
-function mkfilters(){
+function mkfilters(which){
   mks='<center>';
   for(i=0;i<filters.length;i++){
-    mks += ('<div class="btn-group">' +
-            '<button id="' + filters[i].id +'" type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"> ' +
+		//判断传入参数中是否含有定义好的filter，如没有则跳过
+		has=0;
+    for(q=0;q<which.length;q++){
+        if(which[q]==filters[i].id) has++;
+    }
+		if(!has) continue;
+
+    mks += ('<div class="btn-group dropup">' +
+            '<button id="' + filters[i].id +'" type="button" class="btn btn-default dropdown-toggle" data-idn="' + i + '" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"> ' +
             filters[i].title + ' <span class="caret"></span></button><ul class="dropdown-menu">');
     for(j=0;j<filters[i].choice.length;j++){
-      mks += '<li><a onclick=\"' + filters[i].onclick + '\">' + filters[i].choice[j] + '</a></li>';
+      mks += '<li><a onclick=\"readfilters(this)\">' + filters[i].choice[j] + '</a></li>';
     }
     mks += '</ul></div>&nbsp;';
   }
@@ -92,47 +103,49 @@ function mkfilters(){
 }
 
 /**
-* functino sortme   排序相关
+* function readfilters  读取filter的值并操作style
+* @param dom  传入this
+*/
+function readfilters(dom){
+	$(".btn-group-active").removeClass("btn-group-active");
+	$(dom).addClass("btn-group-active");
+
+	//获取<a>所隶属的btn
+	origbtn=$(dom).parent().parent().prev()[0];
+	//应用颜色
+	if(/*每页显示和导出excel就不用高亮了...*/origbtn.id=='per' || origbtn.id=='xls' || dom.innerText=="---"){
+		$("#"+origbtn.id).removeClass("btn-pink");
+	} else {
+		$("#"+origbtn.id).addClass("btn-pink");
+	}
+	//运行函数
+	eval(filters[origbtn.dataset.idn].onclick + "(\"" + dom.innerText + "\");");
+}
+
+/**
+* function sortme   排序相关
 * @param val  根据val来排序
 */
 function sortme(val){
-  switch(val){
-    case 'ID':
-      sortby=''; $("#asc").removeClass("btn-pink");
-      break;
-    default:
-      sortby=val; $("#asc").addClass("btn-pink");
-  }
+  sortby = (val=='---') ? "" : val ;
   req(1);
 }
 
 /**
-* functino sortme   过滤地点相关
+* function floc   过滤地点相关
 * @param val  根据val来过滤地点
 */
-function filter(val){
-  switch(val){
-    case '---':
-      filtername=''; $("#loc").removeClass("btn-pink");
-      break;
-    default:
-      filtername=val; $("#loc").addClass("btn-pink");
-  }
+function floc(val){
+  filtername = (val=='---') ? "" : val ;
   updatePageCount();
 }
 
 /**
-* functino sortme   过滤班级相关
+* function fclass   过滤班级相关
 * @param val  根据val来过滤班级
 */
 function fclass(val){
-  switch(val){
-    case '---':
-      classname=''; $("#loc").removeClass("btn-pink");
-      break;
-    default:
-      classname=val; $("#loc").addClass("btn-pink");
-  }
+  classname = (val=='---') ? "" : val ;
   updatePageCount();
 }
 

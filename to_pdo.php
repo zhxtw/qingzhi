@@ -39,6 +39,9 @@
       $dbo->bindParam($i+1,$pararray[$i],$paramtype[$i]);
     }
     $dbo->execute();
+		if($dbo->errorCode() != '00000'){
+			print_r($dbo->errorInfo()); die();
+		}
     return [$dbo->fetchAll(PDO::FETCH_ASSOC) , $dbo->rowCount() , getColNames($dbo)]; //PDO::FETCH_ASSOC选项可以去除返回的基本没用的数字索引
   }
 
@@ -55,6 +58,9 @@
       $dbo->bindParam($i+1,$paras[$i][0],$paras[$i][1]);
     }
     $dbo->execute();
+		if($dbo->errorCode() != '00000'){
+			print_r($dbo->errorInfo()); die();
+		}
     return [$dbo->fetchAll(PDO::FETCH_ASSOC) , $dbo->rowCount() , getColNames($dbo)]; //PDO::FETCH_ASSOC选项可以去除返回的基本没用的数字索引
   }
 

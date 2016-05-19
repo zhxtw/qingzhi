@@ -17,9 +17,9 @@
     aLink.dispatchEvent(evt);
   }
 
-  function exportCSV(element){
+  function exportCSV(method){
     trs=$("#tbSign>tbody>tr");
-    switch(element.value){
+    switch(method){
       case '---':
         return;
       case "本页":
@@ -72,7 +72,6 @@
         }
 
     }
-    element.value='---';
   }
 
   function processCSV(trs){

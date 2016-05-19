@@ -19,3 +19,7 @@
 .btn-pink:hover {
   background-color: #FFD2E1;
 }
+
+.btn-group-active {
+	background-color: #eee;
+}

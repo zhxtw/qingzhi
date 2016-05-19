@@ -19,8 +19,11 @@ fromwhere=location.pathname.split('/')[location.pathname.split('/').length-1].sp
 * @param icon       文字左边的图标，参见bootstrap的glyphicon类
 */
 function alt(message,style,icon){
-  $("body").animate({scrollTop:0});
+  $("body").animate({scrollTop:0},"fast",null,function(){
+    $("#alert").css({ "transition":"box-shadow 2s", "box-shadow":""});
+  });
   $("#alert").html(((icon)?"<span class='glyphicon glyphicon-"+icon+"'></span> ":"")+message).removeClass().addClass('alert text-center '+((style)?("alert-"+style):""));
+  $("#alert").css({ "box-shadow":"0px 0px 8px", "transition":""});
 }
 
 /**
@@ -44,11 +47,12 @@ function setPages(howmany,oldpage,onlyset){
     }
   }
   $("#page1")[0].innerHTML+='<li><a onclick="req(nowpage+1)" aria-label="下一页"><span aria-hidden="true">&raquo;</span></a></li>';
-  $("#etc").click(function(){
+  $(".etc").click(function(){
     console.log(this);
     $(this).popover({
+      placement:"top",
       html:"true",
-      content:"<input type='text' placeholder='页码' size='2' class='form-control' onkeyup='if(event.keyCode==13)req(this.value)'>"
+      content:"<input type='text' placeholder='页码' size='2' class='form-control' onkeyup='if(event.keyCode==13)req(this.value-0)'>"
     });
     $(this).popover('show');
   });
@@ -130,7 +134,7 @@ function req(page){
       append='';
       //json解析后默认不进行排序，所以此处无需纠结哪个数据先哪个数据后的问题，和getRes.php中顺序匹配即可
       for(i in got){//i：第i个信息
-        append+="<tr>";
+        append+="<tr class='mytable' onclick='$(\"#ck" + (i-0+1) + "\").click();'>"; //jQ中click可以自动toggle checkbox，此处让点击tr时自动选中
         for(j in got[i]){//j：信息中的字段名
           if(j==="go"){
             append+="<td><span style='color:";
@@ -144,7 +148,7 @@ function req(page){
             }
             append+="</span></td>";
           }else if(j==="no"){
-            append+="<td><input type='checkbox' class='ck' name='ck"+(i-0+1)+"'><span>&nbsp;"+got[i][j]+"</span></td>";
+            append+="<td><input type='checkbox' style='display:none' class='ck' id='ck"+(i-0+1)+"' onclick='toggleColor("+(i-0)+")'><span>&nbsp;"+got[i][j]+"</span></td>";
           }else if(j==="ip"||j==="fromwap"){
             continue;
           }else if(j==="datetime"){
@@ -176,11 +180,24 @@ function req(page){
 }
 
 /**
-* function changePerPage 控制每页显示多少项
-* @param element    包含10、20、50等等option的select元素，this即可
+* function toggleColor 切换选中颜色
+* @param no 第几个tr
 */
-function changePerPage(element){
-  piece=element.value-0;
+function toggleColor(no){
+  console.log(no);
+  trs=$("tr.mytable");
+  if(trs[no].className.indexOf("selected")!=-1){
+    $(trs[no]).removeClass("selected");
+  }else{
+    $(trs[no]).addClass("selected");
+  }
+}
+
+/**
+* function changePerPage 控制每页显示多少项
+* @param piece	每页显示的数量
+*/
+function changePerPage(piece){
   limit=piece;
   updatePageCount();
 }
@@ -206,6 +223,8 @@ function updatePageCount(oldpage){
 */
 function toggleAll(selector){
   $(".ck").prop("checked",(selector.checked)?true:false);
+  if(selector.checked) $(".mytable").addClass("selected");
+  else $(".mytable").removeClass("selected");
   return false;
 }
 
@@ -235,7 +254,7 @@ function getSelected(){
   if(!(s=$(".ck:checked")).length){return null;}//返回null表示未选中
   p='';b=[];//p为详细信息，b为包含id的数组
   for(i=0;i<s.length;i++){
-    which=gotjson[s[i].name.substr(2)-1];//input的name为 ckx，这里把ck去掉再减1，便是json数组中的数据
+    which=gotjson[s[i].id.substr(2)-1];//input的id为 ckx，这里把ck去掉再减1，便是json数组中的数据
     p+=which.name+"&#9;"+which.loc_name+"&#9;"+which.times+"<br>";
     b[i]=which.no;
   }

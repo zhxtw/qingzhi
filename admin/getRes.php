@@ -24,8 +24,8 @@
 		$q[$qi++]=[$filter,PDO::PARAM_STR];
 	}
 	//班级过滤
-	if(isset($_POST['class']) && !empty($_POST['class'])){
-		$class=tellme($_POST['class']);
+	if(isset($_POST['classname']) && !empty($_POST['classname'])){
+		$class=tellme($_POST['classname']);
 		$grade=$class[0];$class=$class[1];
 		$down=$class*100;$up=($class+1)*100;
 		$query.=" and classno > ? and classno < ? and tworone = ?";
@@ -39,13 +39,13 @@
 	}elseif($_POST['origin']=='manage'){
 		$query.=" and `go`=0";
 	}
-	//sort和limit在sql语句末端
+	//order by和limit在sql语句末端
 	if(isset($_POST['sort']) && !empty($_POST['sort'])){
 		$sort=$_POST['sort'];
 		switch($sort){
 			case "姓名":
 				$willsort="name";break;
-			case "学号":
+			case "班别":
 				$willsort="classno";break;
 			case "年级":
 				$willsort="tworone";break;
@@ -61,8 +61,14 @@
 				$willsort="1";
 		}
 		//XXX: 添加一个倒叙在页面上，DSC
-		$query.=" ORDER BY ? ASC";
+		/*$query.=" ORDER BY ? ASC";
 		$q[$qi++]=[$willsort,PDO::PARAM_STR];
+			残留bug解决：
+			PDO的bindParam若用PDO::PARAM_STR时会把整个字符串转义并在两端加上引号
+			而ORDER BY 跟的是字段名 不需要引号！
+			此处已经把传入参数重新对应字段名，不存在注入问题，可以直接查询。
+		*/
+		$query.=" ORDER BY $willsort ASC";
 	}
 
 	$query.=" LIMIT ?,?";
