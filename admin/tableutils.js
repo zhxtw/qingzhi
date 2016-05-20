@@ -169,7 +169,7 @@ function req(page){
 			for(i in got){
 				$("#line"+ (i-0+1)).click(function(event){
 					//阻止事件冒泡，即防止点击某一行内的元素会触发父级元素的事件
-					console.log(event.target.nodeName);asa=this;
+					console.log(event.target.nodeName);
 					if(event.target.nodeName=="TD"){//触发者是下级td才调用
 						$(this.children[0].children[0]).click(); //jQ中click可以自动toggle checkbox，此处让点击td时自动选中
 					}
@@ -189,7 +189,7 @@ function req(page){
   $(".pageButton")[page-1].style.color="red";
   $("#pagenum").html(nowpage+"/"+allpages);
 }
-asa='';
+
 /**
 * function toggleColor 切换选中颜色
 * @param no 第几个tr
