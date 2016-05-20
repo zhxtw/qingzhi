@@ -33,7 +33,8 @@ filters=(
       "title":"每页显示",
       "choice":[10,15,20,50,100],
       "default":15,
-      "onclick":"changePerPage"
+      "onclick":"changePerPage",
+			"ignore":1
     },{
       "id":"asc",
       "title":"排序方式",
