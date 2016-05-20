@@ -134,10 +134,10 @@ function req(page){
       append='';
       //json解析后默认不进行排序，所以此处无需纠结哪个数据先哪个数据后的问题，和getRes.php中顺序匹配即可
       for(i in got){//i：第i个信息
-        append+="<tr class='mytable' onclick='$(\"#ck" + (i-0+1) + "\").click();'>"; //jQ中click可以自动toggle checkbox，此处让点击tr时自动选中
+        append+="<tr class='mytable' id='line" + (i-0+1) + "'>";
         for(j in got[i]){//j：信息中的字段名
           if(j==="go"){
-            append+="<td><span style='color:";
+            append+="<td style='color:";
             switch(got[i][j]){
               case '1':
                 append+="green'>待分配";break;
@@ -146,9 +146,9 @@ function req(page){
               default:
                 append+="blue'>已安排在"+got[i][j];
             }
-            append+="</span></td>";
+            append+="</td>";
           }else if(j==="no"){
-            append+="<td><input type='checkbox' style='display:none' class='ck' id='ck"+(i-0+1)+"' onclick='toggleColor("+(i-0)+")'><span>&nbsp;"+got[i][j]+"</span></td>";
+            append+="<td><input type='checkbox' style='display:none' class='ck' id='ck"+(i-0+1)+"' onclick='toggleColor("+(i-0)+")'>"+got[i][j]+"</td>";
           }else if(j==="ip"||j==="fromwap"){
             continue;
           }else if(j==="datetime"){
@@ -165,6 +165,17 @@ function req(page){
         append+="</tr>";
       }
       $("#tbSign")[0].innerHTML+=append;
+
+			for(i in got){
+				$("#line"+ (i-0+1)).click(function(event){
+					//阻止事件冒泡，即防止点击某一行内的元素会触发父级元素的事件
+					console.log(event.target.nodeName);asa=this;
+					if(event.target.nodeName=="TD"){//触发者是下级td才调用
+						$(this.children[0].children[0]).click(); //jQ中click可以自动toggle checkbox，此处让点击td时自动选中
+					}
+				});
+			}
+
       $("#tbSign").fadeIn("fast", function(){$('#loading').slideUp();} );
     }
   });
@@ -178,7 +189,7 @@ function req(page){
   $(".pageButton")[page-1].style.color="red";
   $("#pagenum").html(nowpage+"/"+allpages);
 }
-
+asa='';
 /**
 * function toggleColor 切换选中颜色
 * @param no 第几个tr

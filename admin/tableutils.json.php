@@ -15,7 +15,7 @@
   choice  为可供过滤的选项，因为有些选项是动态的，所以用php生成，生成的时候注意引号和逗号
   default 为默认选项
   onclick 为点击后执行的函数名称
-  ignore  为忽略更改（如导出Excel这种半功能半选项的按钮）
+  ignore  为忽略更改和变色（如导出Excel这种半功能半选项的按钮）
 本文件中列出常用且公用的几个filter，如果只有一个页面使用可以在mkfilters()函数运行前加入
 filters[filters.length]=({
     "id":"xxx",
@@ -23,7 +23,7 @@ filters[filters.length]=({
     "choice":["a","b","c"],
     "default":"a",
     "onclick":"xxxxx()"
-});
+});//类似于protoType
 然后在mkfilters中加入此filter的id即可
 */
 filters=(
@@ -111,9 +111,9 @@ function readfilters(dom){
 	$(dom).addClass("btn-group-active");
 
 	//获取<a>所隶属的btn
-	origbtn=$(dom).parent().parent().prev()[0];
+	origbtn=$(dom).parent().parent().parent().children()[0]; //prev()在实际使用中出现问题，获取到一个class为dropdown-backdrop的div
 	//应用颜色
-	if(/*每页显示和导出excel就不用高亮了...*/origbtn.id=='per' || origbtn.id=='xls' || dom.innerText=="---"){
+	if(filters[origbtn.dataset.idn].ignore==1 || dom.innerText=="---"){
 		$("#"+origbtn.id).removeClass("btn-pink");
 	} else {
 		$("#"+origbtn.id).addClass("btn-pink");
