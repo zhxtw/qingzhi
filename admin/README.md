@@ -30,7 +30,7 @@
 
 ### 使用方法
 
-常用的filters已经定义在tableutils.json.php中，修改注释已经十分详细
+常用的filters已经定义在tableutils_filters.php中，修改注释已经十分详细
 
 使用对应的filter请在`window.onload`事件中加入
 

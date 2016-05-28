@@ -9,7 +9,7 @@
 
 //初始化全局变量，limit为默认每页显示条数，nowpage为当前所在页面，allpages为页面个数
 //filtername和classname用于筛选，gotjson用于选择表格数据，fromwhere用于判断页面的来源, processing用于判断是否正在处理数据
-limit=10;nowpage=1;allpages=1;sortby="";filtername='';classname='';gotjson={};processing=0;
+limit=15;nowpage=1;allpages=1;sortby="";filtername='';classname='';gotjson={};processing=0;
 fromwhere=location.pathname.split('/')[location.pathname.split('/').length-1].split('.php')[0];
 
 /**
@@ -205,15 +205,6 @@ function toggleColor(no){
 }
 
 /**
-* function changePerPage 控制每页显示多少项
-* @param piece	每页显示的数量
-*/
-function changePerPage(piece){
-  limit=piece;
-  updatePageCount();
-}
-
-/**
 * function updatePageCount 更新页数，通常调用于筛选后
 * @param oldpage  更新页数后要返回的老页面号
 */
@@ -243,25 +234,6 @@ function toggleAll(selector){
 * function getSelected  获取选中的人
 */
 function getSelected(){
-  /* 老式代码，从表格中强行提取
-  b=[];oldpage=nowpage;
-  if(!(s=$(".ck:checked")).length){alt("没有选中任何人哦~","danger","ban-circle");return;}
-  f=((flag=='pass')?"通过":((flag=='undo')?"驳回":"删除，请谨慎操作"));
-  p="以下同学将会被"+f+"：\n\n";
-  for(i=0;i<s.length;i++){
-    b[i]=$(s[i]).next().text().replace(/ /g,'').replace(/&nbsp;/g,'').replace(/ /g,'');
-    p+=$(s[i]).parent().next().text()+"\n";
-  }
-  if(!confirm(p+"\n确认？")){return;}
-  $.post("passOrNot.php?token="+TOKEN+";",
-    "flag="+flag+"&people="+b.toString(),function(got){
-      if(got-0>0){alt("操作成功。 "+got+" 个同学被 "+f,"success","ok");}
-      else{alt("操作失败。影响的记录数："+got+"，请联系信息部网页组。","danger","remove");}
-      if(f=='删除'){updatePageCount();}
-      else{req(oldpage);}//req(1);
-    });
-  console.log(b.toString());*/
-  //新代码，从同时获取到的json中提取，高效便捷
   if(!(s=$(".ck:checked")).length){return null;}//返回null表示未选中
   p='';b=[];//p为详细信息，b为包含id的数组
   for(i=0;i<s.length;i++){
