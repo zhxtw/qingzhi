@@ -23,38 +23,26 @@
       <script src="https://oss.maxcdn.com/respond/1.4.2/respond.min.js"></script>
     <![endif]-->
 </head>
-<body style="font-family:Microsoft YaHei">
+<body style="font-family:Microsoft YaHei; background-color:#f9f9f9">
 <br>
 <div class="container text-center">
 <img src="../img/logo.png" style="width:96px;">
-<h4>输入用户名和密码登录您的团委管理账户</h4>
-<hr>
-<div class="row text-center">
-<div class="well col-md-8 col-md-offset-2 col-sm-10 col-sm-offset-1 text-center col-xs-10 col-xs-offset-1">
-	<img src="../img/back.png" style="position:absolute;width:24px;top:17px;left:5%;cursor:pointer" onclick="history.back()" aria-label="返回" >
-	<img src="../img/user.png" class="headicon">
-  <h3>欢迎回来</h3><br>
-  <div class="col-md-offset-2 col-md-8" style="line-height:12px;">
-      <div class="input-group">
-				<span class="input-group-addon">用户名</span>
-	      <input type="text" class="form-control" placeholder="输入你的用户名" id="usr" onkeyup="if(event.keyCode==13)$('#pwd')[0].focus();">
-	      <span class="input-group-addon">&lt;</span>
-			</div>
-			<div class="input-group">
-				<span class="input-group-addon">密码<span style="visibility:hidden">空</span></span>
-        <input type="password" class="form-control" placeholder="输入你的密码" id="pwd" onkeyup="if(event.keyCode==13)$('#verify_code')[0].focus();">
-        <span class="input-group-addon" id="forgot">&lt;</span>
-      </div>
-			<div class="input-group">
-				<span class="input-group-addon">验证码</span>
-	      <input type="text" class="form-control" placeholder="输入下方的验证码" id="verify_code" autocomplete="off" onkeyup="if(event.keyCode==13)verify();">
-	      <span class="input-group-addon">&lt;</span>
-			</div>
-      <br>
+<h4>执信团委青志管理 · 登录</h4>
+<br><hr>
+<div class="row">
+<div class="well col-md-4 col-md-offset-4 col-sm-10 col-sm-offset-1 text-center col-xs-10 col-xs-offset-1" style="background-color:white">
+  <div class="" style="line-height:12px;">
+			<p id="hid" class="pull-right text-right"><!--该隐藏元素给密码框动画做定位用--></p>
+      <p class="text-left"><br>用户名</p>
+			<input type="text" class="form-control" id="usr" onkeyup="if(event.keyCode==13)$('#pwd')[0].focus();">
+			<p class="text-left"><br>密码</p>
+      <input type="password" class="form-control" id="pwd" onkeyup="if(event.keyCode==13)$('#verify_code')[0].focus();">
 			<div>
-		  	<img id="vimg" src="/verify.php?<?php echo(microtime(true)); ?>" onclick="this.src='/verify.php?'+new Date().getTime();">
+				<p class="text-left"><br>验证码</p>
+	    	<input type="text" class="form-control pull-left" id="verify_code" placeholder="看不清可点右图切换哦" autocomplete="off" onkeyup="if(event.keyCode==13)verify();" style="width:59%;">
+		  	<img id="vimg" src="/verify.php?<?php echo(microtime(true)); ?>" onclick="this.src='/verify.php?'+new Date().getTime();" style="border-radius:5px;width:39%;height:34px">
       </div><hr>
-  	  <button type="button" class="btn btn-primary" style="width:100%" onclick="verify()" id="login">登录</button>
+  	  <button type="button" class="btn btn-success" style="width:100%" onclick="verify()" id="login">登录</button>
 
       <div class="text-right">
       	<br><a onclick="alert('请直接联系信息部网页组');" href="#">忘记密码？</a>
@@ -62,6 +50,7 @@
   </div>
 </div>
 </div>
+<hr><br>
 </div>
 <br>
 <?php include("showbanner.php"); ?>
@@ -79,7 +68,7 @@
 		$("#login").html("验证中");
 		len=$("#pwd").val().length;
 		pwd=$("#pwd").val();
-		left=Math.round($("#pwd").offset().left);right=Math.round($("#forgot").offset().left);
+		left=Math.round($("#pwd").offset().left);right=Math.round($("#hid").offset().left);
 		chars=Math.round((right-left)/10);
 		$("#pwd").val(addHash(len));
 		$("#pwd")[0].type="text";
