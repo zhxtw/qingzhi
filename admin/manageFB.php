@@ -153,7 +153,7 @@ a=b.toString();
 $("#myModal").modal('show');
 pp="<pre>以下序号的意见<br>将会被标记为<b><font color='red'>"+CNflag+"</font></b>：<b><font color='blue'><h4>"+a+"</h4></font></b>确认操作吗？";
 $("#msg").html(pp);
-eval('$("#okbtn")[0].onclick=function(){$("#myModal").modal("hide");toOperate(a,CNflag);}');
+eval('$("#okbtn")[0].onclick=function(){toOperate(a,CNflag);}');
 }
 
 function toOperate(id,todo){
