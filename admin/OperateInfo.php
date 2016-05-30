@@ -12,7 +12,7 @@ else{$base="UPDATE feedback SET status='{$Todo}' where ";}//修改记录
 //Add Where
 for($i=0;$i<sizeof($astr);$i++){
 $base.='id=?'.(($i==sizeof($astr)-1)?"":" or ");
-$q[$qi++]=[$astr[$i],PDO::PARAM_STR];
+$q[$qi++]=[$astr[$i],PDO::PARAM_INT];
 }
 
 //Run
