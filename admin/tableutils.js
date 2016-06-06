@@ -126,6 +126,7 @@ function req(page){
       "limit": limit,
       "filter": filtername,
       "sort": sortby,
+      "dat": datname,
       "classname": classname
     },
     error: function(){ alt("网络连接失败！","danger","ban-circle"); },
@@ -210,12 +211,24 @@ function toggleColor(no){
 */
 function updatePageCount(oldpage){
   $("#tbSign").html('');console.log("updatePageCount::"+filtername);
-  $.post("/admin/getMax.php?token="+TOKEN+";","origin="+fromwhere+"&every="+limit+((filtername)?"&filter="+filtername:'')+((classname)?"&class="+classname:''),function(got){
-    if(got==-1||got=="0,0"){alt("么都哞~ 试试取消选中下面的筛选选项","danger","ban-circle");allpages=0;return;}
-    got=got.split(',');
-    allpages=got[1];
-    setPages(got[1],oldpage);//<---include req!
-    $("#recordnum").html(got[0]);
+  $.ajax({
+    url: "/admin/getMax.php?token="+TOKEN+";",
+    type: "POST",
+    data: {
+      "origin": fromwhere,
+      "every": limit,
+      "filter": filtername,
+      "dat": datname,
+      "class": classname
+    },
+    error: function() { alt("网络连接失败！","danger","ban-circle"); },
+    success: function(got){
+      if(got==-1||got=="0,0"){alt("么都哞~ 试试取消选中下面的筛选选项","danger","ban-circle");allpages=0;return;}
+      got=got.split(',');
+      allpages=got[1];
+      setPages(got[1],oldpage);//<---include req!
+      $("#recordnum").html(got[0]);
+    }
   });
 }
 

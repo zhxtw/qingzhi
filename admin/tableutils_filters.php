@@ -145,6 +145,16 @@ function sortme(val){
 */
 function floc(val){
   filtername = (val=='---') ? "" : val ;
+  datname='';
+  updatePageCount();
+}
+
+/**
+* function fdat   过滤时段相关
+* @param val  根据val来过滤时段
+*/
+function fdat(val){
+  datname = (val=='---') ? "" : val ;
   updatePageCount();
 }
 
