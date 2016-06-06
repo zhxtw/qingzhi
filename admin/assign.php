@@ -63,7 +63,7 @@
 <script src="tableutils.js"></script>
 <script>
 	window.onload=function(){
-		updatePageCount();$('#dtp1').datetimepicker({inline:true,sideBySide:true,locale:'zh-cn',format:"LL"});
+		updatePageCount();$('#dtp1').datetimepicker({inline:true,sideBySide:true,locale:'zh-cn',format:"LL",minDate:new Date()});
 		mkfilters(['per','asc','loc','cls','xls']);
 	};
 </script>

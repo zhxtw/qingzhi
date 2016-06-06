@@ -56,6 +56,12 @@ filters=(
       "default":"---",
       "onclick":"floc"
     },{
+      "id":"dat",
+      "title":"筛选时段",
+      "choice":[ "---" ],
+      "default":"---",
+      "onclick":"fdat"
+    },{
       "id":"cls",
       "title":"筛选班别",
       "choice":[ <?php

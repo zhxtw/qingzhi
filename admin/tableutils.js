@@ -8,8 +8,8 @@
 */
 
 //初始化全局变量，limit为默认每页显示条数，nowpage为当前所在页面，allpages为页面个数
-//filtername和classname用于筛选，gotjson用于选择表格数据，fromwhere用于判断页面的来源, processing用于判断是否正在处理数据
-limit=15;nowpage=1;allpages=1;sortby="";filtername='';classname='';gotjson={};processing=0;
+//filtername, datname和classname用于筛选，gotjson用于选择表格数据，fromwhere用于判断页面的来源, processing用于判断是否正在处理数据
+limit=15;nowpage=1;allpages=1;sortby="";filtername='';datname='';classname='';gotjson={};processing=0;
 fromwhere=location.pathname.split('/')[location.pathname.split('/').length-1].split('.php')[0];
 
 /**

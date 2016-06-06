@@ -24,6 +24,12 @@
 		$query.=" and loc_name = ?";
 		$q[$qi++]=[$filter,PDO::PARAM_STR];
 	}
+	//时段过滤
+	if(isset($_POST['dat']) && !empty($_POST['dat'])){
+		$dat=$_POST['dat'];
+		$query.=" and times = ?";
+		$q[$qi++]=[$dat,PDO::PARAM_STR];
+	}
 	//班级过滤
 	if(isset($_POST['class']) && !empty($_POST['class'])){
 		$class=tellme($_POST['class']);

@@ -166,6 +166,7 @@
 			case "times":sth="时段";break;
 			case "comm":sth="备注";break;
 			case "addrE":sth="地图";break;
+			case "hours":sth="工时";break;
 			default: return;
 		}
 		return "<th>"+sth+"</th>";

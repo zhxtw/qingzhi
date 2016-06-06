@@ -23,6 +23,9 @@
 	.modal-open{
 		overflow:initial !important;
 	}
+	* {
+	  transition: background-color 0.15s;
+	}
 </style>
 <!-- HTML5 shim and Respond.js for IE8 support of HTML5 elements and media queries -->
 <!-- WARNING: Respond.js doesn't work if you view the page via file:// -->
@@ -58,11 +61,12 @@
 		}elseif(isset($p['delid'])){
 			$all->loc=removeE($all->loc,$p['delid']);
 		}else{
-			if(!isset($p['whydisabled'],$p['image'],$p['color'],$p['name'],$p['minintro'],$p['area'],$p['addr'],$p['addrE'],$p['traffic'],
+			if(!isset($p['whydisabled'],$p['image'],$p['color'],$p['name'],$p['minintro'],$p['area'],$p['addr'],$p['addrE'],$p['traffic'],$p['hours'],
 				$p['works'][0],$p['times'][0],$p['comm'][0],$p['limit'][0])){die("检查下有没有东东漏掉哦");}
 			for($i=0;$i<sizeof($p['limit']);$i++){
 				if(!is_numeric($p['limit'][$i]) || $p['limit'][$i] <1){ die("人数填写错误。"); }
 			}
+			if(!is_numeric($p['hours'])) die("工时填写错误。");
 			//checkbox选中提交on，反之不提交
 			if(isset($_POST['isDisabled'])){$disabled=1;}
 			$id=$p['loc_id'];
@@ -74,7 +78,7 @@
 			$a->disabled=$disabled;
 			$a->whydisabled=$p['whydisabled']; $a->image=$p['image']; $a->color=$p['color']; $a->name=$p['name'];
 			$a->minintro=$p['minintro']; $a->area=$p['area']; $a->addr=$p['addr']; $a->addrE=$p['addrE']; $a->traffic=$p['traffic'];
-			$a->works=$p['works']; $a->times=$p['times']; $a->comm=$p['comm']; $a->limit=$p['limit'];
+			$a->works=$p['works']; $a->times=$p['times']; $a->hours=$p['hours']; $a->comm=$p['comm']; $a->limit=$p['limit'];
 			if($id=="add"){
 				$all->loc[sizeof($all->loc)]=$a;
 			}else{
@@ -223,7 +227,8 @@ window.onload=function(){
       case "whydisabled":sth="关闭原因";break;
       case "minintro":sth="简介";break;
 			case "image":sth="图片地址";break;
-      case "color":sth="颜色";
+      case "color":sth="颜色";break;
+			case "hours":sth="一次工时";
 		}
 		return "<th>"+sth+"</th>";
 	}
@@ -250,11 +255,13 @@ window.onload=function(){
 					if(i=="limit"){
 						tmp+="<div class='input-group'><div class='input-group-addon'>"+loc[r]['times'][j]+"</div>"
 						    +'<input type="text" class="form-control onedit1 '+i+'" name="'+i+'[]" value="" data-r="'+r+'" data-i="'+i+'" data-j="'+j+'"></div>';
+					}else if(i=='times'){
+						tmp+='<input type="text" class="form-control onedit1 '+i+'" name="'+i+'[]" value="" data-r="'+r+'" data-i="'+i+'" data-j="'+j+'" onkeyup="bind(this.dataset.j, this.value)">';
 					}else{
 						tmp+='<input type="text" class="form-control onedit1 '+i+'" name="'+i+'[]" value="" data-r="'+r+'" data-i="'+i+'" data-j="'+j+'">';
 					}
 				}
-				tmp+="<br><button type='button' class='btn btn-success btn-xs' onclick='addordel(\""+i+"\");'><span class='glyphicon glyphicon-plus'></span></button>&nbsp;<button type='button' class='btn btn-danger btn-xs' onclick='addordel(\""+i+"\",1);'><span class='glyphicon glyphicon-minus'></span></button></div>";
+				if(i!='limit') tmp+="<br><button type='button' class='btn btn-success btn-xs' onclick='addordel(\""+i+"\");'><span class='glyphicon glyphicon-plus'></span></button>&nbsp;<button type='button' class='btn btn-danger btn-xs' onclick='addordel(\""+i+"\",1);'><span class='glyphicon glyphicon-minus'></span></button></div>";
 				if(i=="times") tmd+=td(tmp+"<br><p style='color:gray'>* 请在时段内包含周几的字样（比如周六），以便于系统自动判断时间</p>")+"</tr>";
 				else if(i=="limit") tmd+=td(tmp+"<br><p style='color:gray'>* 请填写对应时段可分配的人数，以便于系统自动分配</p>")+"</tr>";
 				else tmd+=td(tmp)+"</tr>";
@@ -269,7 +276,10 @@ window.onload=function(){
 				tmd+=td(tmp+"<p style='color:gray'>* 前后台风格不同，实际效果上，default为白色，primary为青色，而且所有颜色都要鲜艳的多</p>")+"</tr>";tmp='';
       }else if(i=="whydisabled"||i=="traffic"){
         tmd+=tr(th(i)+td("<textarea name='"+i+"' class='form-control onedit2' style='resize: vertical;'>"+loc[r][i]+"</textarea>"));
-      }else{
+      }else if(i=="hours"){
+				tmd+=tr(th(i)+td("<input name='"+i+"' type='text' class='form-control onedit1' value='' data-r='"+r+"' data-i='"+i+"'>" +
+													"<br><p style='color:gray'>* 仅限数字，将自动纳入工时计算</p>"));
+			}else {
 				tmd+=tr(th(i)+td("<input name='"+i+"' type='text' class='form-control onedit1' value='' data-r='"+r+"' data-i='"+i+"'>"));
 			}
 		}
@@ -310,10 +320,29 @@ window.onload=function(){
 		allem=$("."+elementClass);
 		if(isdel){
 			if(allem.length<3){return;}
-			allem[allem.length-1].remove();
+			if(elementClass=='limit'){
+				$(allem[allem.length-1]).parent().remove();
+			} else {
+				allem[allem.length-1].remove();
+			}
 		}else{
-			$("<input type='text' class='form-control onedit1 "+elementClass+"' name='"+elementClass+"[]' value=''>").insertAfter(allem[allem.length-1]);
+			dj=allem[allem.length-1].dataset.j - 0 + 1;
+			if(elementClass=='limit'){
+				tmp_times=$(".times");
+				$("<div class='input-group'><div class='input-group-addon'>" + tmp_times[tmp_times.length - 1].value +
+				"</div><input type='text' class='form-control onedit1 limit' name='limit[]' value='' data-j='" + dj + "'></div>").insertAfter($(allem[allem.length-1]).parent());
+			} else if(elementClass=='times'){
+				$("<input type='text' class='form-control onedit1 "+elementClass+"' name='"+elementClass+"[]' value='' data-j='" + dj + "' onkeyup='bind(this.dataset.j, this.value)'>").insertAfter(allem[allem.length-1]);
+			} else {
+				$("<input type='text' class='form-control onedit1 "+elementClass+"' name='"+elementClass+"[]' value='' data-j='" + dj + "'>").insertAfter(allem[allem.length-1]);
+			}
 		}
+		if(elementClass=='times')
+			addordel('limit',isdel);
+	}
+
+	function bind(jn, val){
+		$("[data-j=" + jn + "].limit").prev().html(val);
 	}
 </script>
 </body>
