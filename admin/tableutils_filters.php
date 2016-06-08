@@ -81,6 +81,18 @@ filters=(
       "default":"---",
       "onclick":"exportCSV",
       "ignore":1
+    },{
+      "id":"FBpx",
+      "title":"排序方式",
+      "choice":["---","ID","时间","处理状态"],
+      "default":"---",
+      "onclick":"FBsort"
+    },{
+      "id":"FBsx",
+      "title":"筛选状态",
+      "choice":["---","已阅读","未阅读"],
+      "default":"---",
+      "onclick":"FBfilter"
     }
   ]
 );
@@ -164,6 +176,24 @@ function fdat(val){
 */
 function fclass(val){
   classname = (val=='---') ? "" : val ;
+  updatePageCount();
+}
+
+/**
+* function FBsort   意见反馈排序
+* @param val  根据val排序
+*/
+function FBsort(val){
+  sortby = (val=='---') ? "" : val ;
+  updatePageCount();
+}
+
+/**
+* function FBfilter  意见反馈过滤
+* @param val  根据val过滤
+*/
+function FBfilter(val){
+  filtername = (val=='---') ? "" : val ;
   updatePageCount();
 }
 

@@ -8,9 +8,9 @@
 */
 
 //初始化全局变量，limit为默认每页显示条数，nowpage为当前所在页面，allpages为页面个数
-//filtername, datname和classname用于筛选，gotjson用于选择表格数据，fromwhere用于判断页面的来源, processing用于判断是否正在处理数据
+//filtername, datname和classname用于筛选，gotjson用于选择表格数据，fromwhere用于判断页面的来源, processing用于判断是否正在处理数据,datatype用于判断表格数据的类型
 limit=15;nowpage=1;allpages=1;sortby="";filtername='';datname='';classname='';gotjson={};processing=0;
-fromwhere=location.pathname.split('/')[location.pathname.split('/').length-1].split('.php')[0];
+fromwhere=location.pathname.split('/')[location.pathname.split('/').length-1].split('.php')[0];datatype=0;
 
 /**
 * function alt 网页上方的banner提示，比alert略微好看些
@@ -110,12 +110,19 @@ function req(page){
   //判断页面起源，并制作相应表头
   if(fromwhere=='assign'){
     $("#tbSign").html(makeTH(["姓名","班级","年级","手机","Email","地点","时间","分配状态"]));
+    datatype=1;
   }else if(fromwhere=='manage'){
     $("#tbSign").html(makeTH(["姓名","班级","年级","手机","Email","地点","时间","报名时间","审核状态"]));
-  }else if(fromwhere=='manageFB'){
-    $("#tbSign").html(makeTH(["时间","意见内容","IP","处理状态","操作"]));
+    datatype=1;
+  }else if(fromwhere=='FeedbackList'){
+    $("#tbSign").html(makeTH(["意见内容","时间","IP","处理状态"]));
+    datatype=2;
+  }else if(fromwhere=='NewsList'){
+    $("#tbSign").html(makeTH(["标题","栏目名","摘要","发布时间"]));
+    datatype=3;
   }
 
+  if(datatype==1){
   $.ajax({
     url:"/admin/getRes.php?token="+TOKEN,
     dataType:"json",
@@ -179,10 +186,61 @@ function req(page){
 
       $("#tbSign").fadeIn("fast", function(){$('#loading').slideUp();} );
     }
-  });
+  });//[End] Ajax
+  }//[End] If
 
+  if(datatype==2){
+  $.ajax({
+    url:"/admin/getFeedback.php?token="+TOKEN,
+    dataType:"json",
+    type:"POST",
+    data: {
+      "start": (page-1)*limit,
+      "limit": limit,
+      "filter": filtername,
+      "sort": sortby
+    },
+    error: function(){ alt("网络连接失败！","danger","ban-circle"); },
+    success: function(got){
+      gotjson=got;//由于指定了dataType为json，jQ自动转义为json，不需再eval
+      append='';
+      //json解析后默认不进行排序，所以此处无需纠结哪个数据先哪个数据后的问题，和getRes.php中顺序匹配即可
+      for(i in got){//i：第i个信息
+        append+="<tr class='mytable' id='line" + (i-0+1) + "'>";
+        for(j in got[i]){//j：信息中的字段名
+          if(j==="id"){
+            append+="<td><input type='checkbox' style='display:none' class='ck' id='ck"+(i-0+1)+"' onclick='toggleColor("+(i-0)+")'>"+got[i][j]+"</td>";
+          }else if(j==="content"){
+            append+="<td>"+got[i][j]+"</td>";
+          }else if(j==="datetime"){
+            append+="<td>"+got[i][j]+"</td>";
+          }else if(j==="ip"){
+            append+="<td>"+got[i][j]+"</td>";
+          }else if(j==="status"){
+            append+="<td>"+got[i][j]+"</td>";
+          }else{
+            append+="<td>"+got[i][j]+"</td>";
+          }
+        }
+        append+="</tr>";
+      }
+      $("#tbSign")[0].innerHTML+=append;
+
+      for(i in got){
+        $("#line"+ (i-0+1)).click(function(event){
+          //阻止事件冒泡，即防止点击某一行内的元素会触发父级元素的事件
+         console.log(event.target.nodeName);
+          if(event.target.nodeName=="TD"){//触发者是下级td才调用
+            $(this.children[0].children[0]).click(); //jQ中click可以自动toggle checkbox，此处让点击td时自动选中
+          }
+        });
+      }
+  }//[End] Ajax Successful
+  });//[End] Ajax
+  }//[End] if
+
+  $("#tbSign").fadeIn("fast", function(){$('#loading').slideUp();} );
   nowpage=page;
-
   //这里只为了省略号中元素的显示而更新页码导航栏
   setPages(allpages, null, true);
 
@@ -266,6 +324,8 @@ function sinicize(flag){
   else if(flag=="undo") return "驳回";
   else if(flag=="del") return "删除，请慎重操作";
   else if(flag=="assign") return "分配上述时间";
+  else if(flag=="FBread") return "<b><font color='green'>已阅读</font></b>";
+  else if(flag=="FBundo") return "<b><font color='red'>未阅读</font></b>";
 }
 
 /**
@@ -299,4 +359,34 @@ function passOrNotp(flag){
       else{req(oldpage);}//req(1);*/
       updatePageCount(oldpage);$("#okbtn").removeClass("disabled");processing=0;
     });
+}
+
+
+
+/*---------意见反馈数据处理区---------*/
+
+/**
+* function FBgetSelected  获取选中的人
+*/
+function FBgetSelected(){
+  if(!(s=$(".ck:checked")).length){return null;}//返回null表示未选中
+  p='';b=[];//p为详细信息，b为包含id的数组
+  for(i=0;i<s.length;i++){
+  which=gotjson[s[i].id.substr(2)-1];//input的id为 ckx，这里把ck去掉再减1，便是json数组中的数据
+    p+=which.id+" "+which.content+" "+which.datetime+"<br>";
+    b[i]=which.id;
+  }
+  return [b,p,s.length];//0->id, 1->detail, 2->length
+}
+
+/**
+* function OperateFB 意见反馈状态处理
+* @param flag    用于判断的标记，可以是FBpass,FBundo,del
+*/
+function OperateFB(flag){
+  if((res=FBgetSelected())===null){alt("没有选中任何意见哦~","danger","ban-circle");return;}
+  $("#myModal").modal('show');
+  pp="<pre>以下"+res[2]+"条意见将被标记为"+sinicize(flag)+"状态：<br><br>"+res[1]+"<br>确认？";
+  $("#msg").html(pp);
+  eval('$("#okbtn")[0].onclick=function(){passOrNotp("'+flag+'");}');
 }
