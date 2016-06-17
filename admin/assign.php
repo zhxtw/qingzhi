@@ -65,6 +65,10 @@
 	window.onload=function(){
 		updatePageCount();$('#dtp1').datetimepicker({inline:true,sideBySide:true,locale:'zh-cn',format:"LL",minDate:new Date()});
 		mkfilters(['per','asc','loc','cls','xls']);
+		$.ajax({url:"../location.json?"+new Date().getTime(),dataType:"json",type:"GET",success:function(got){
+				loc=got.loc;
+			}
+		});
 	};
 </script>
 <div class="modal fade" id="myModal">

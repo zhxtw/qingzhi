@@ -61,7 +61,12 @@
 	window.onload=function(){
 		updatePageCount();
 		mkfilters(['per','asc','loc','cls','xls']);
+		$.ajax({url:"../location.json?"+new Date().getTime(),dataType:"json",type:"GET",success:function(got){
+				loc=got.loc;
+			}
+		});
 	};
+	got='';
 </script>
 <div class="modal fade" id="myModal">
   <div class="modal-dialog">

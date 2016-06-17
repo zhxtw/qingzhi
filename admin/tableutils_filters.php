@@ -102,7 +102,7 @@ filters=(
 * @param which  需要生成的过滤器id，传入数组
 */
 function mkfilters(which){
-  mks='<center>';
+  mks='<center id="filters">';
   for(i=0;i<filters.length;i++){
 		//判断传入参数中是否含有定义好的filter，如没有则跳过
 		has=0;
@@ -132,14 +132,26 @@ function readfilters(dom){
 
 	//获取<a>所隶属的btn
 	origbtn=$(dom).parent().parent().parent().children()[0]; //prev()在实际使用中出现问题，获取到一个class为dropdown-backdrop的div
-	//应用颜色
-	if(filters[origbtn.dataset.idn].ignore==1 || dom.innerText=="---"){
-		$("#"+origbtn.id).removeClass("btn-pink");
-	} else {
-		$("#"+origbtn.id).addClass("btn-pink");
-	}
-	//运行函数
-	eval(filters[origbtn.dataset.idn].onclick + "(\"" + dom.innerText + "\");");
+  //如果按钮动态创建则执行动态创建里的函数
+  if(origbtn.dataset.dynamic){
+    //应用颜色
+  	if(dom.innerText=="---"){
+  		$("#"+origbtn.id).removeClass("btn-pink");
+  	} else {
+  		$("#"+origbtn.id).addClass("btn-pink");
+  	}
+    //执行函数
+    eval(origbtn.dataset.dynamic + "(\"" + dom.innerText + "\");");
+  } else {
+  	//应用颜色
+  	if(filters[origbtn.dataset.idn].ignore==1 || dom.innerText=="---"){
+  		$("#"+origbtn.id).removeClass("btn-pink");
+  	} else {
+  		$("#"+origbtn.id).addClass("btn-pink");
+  	}
+  	//运行函数
+  	eval(filters[origbtn.dataset.idn].onclick + "(\"" + dom.innerText + "\");");
+  }
 }
 
 /**
@@ -156,6 +168,23 @@ function sortme(val){
 * @param val  根据val来过滤地点
 */
 function floc(val){
+  $("#dat").parent().remove();
+  if(val!='---') {
+    mks = ('<div class="btn-group dropup">' +
+            '<button id="dat" type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown" data-dynamic="fdat" aria-haspopup="true" aria-expanded="false"> ' +
+            ' 筛选时间 <span class="caret"></span></button><ul class="dropdown-menu">');
+            //这里使用data-dynamic来给readfilters识别
+    for(i in loc){
+      if(loc[i].name==val) {
+        for(j in loc[i].times){
+          mks += '<li><a onclick=\"readfilters(this)\">' + loc[i].times[j] + '</a></li>';
+        }
+        mks += '<li><a onclick=\"readfilters(this)\">---</a></li>'
+      }
+    }
+    mks += '</ul></div>&nbsp;';
+    $(mks).insertAfter($("#loc").parent());
+  }
   filtername = (val=='---') ? "" : val ;
   datname='';
   updatePageCount();
