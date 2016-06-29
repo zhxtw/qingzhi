@@ -1,7 +1,8 @@
 <?php
+	ini_set("session.cookie_httponly", 1);
 	session_start();
-        
-        //在指定字符串抽取字符
+
+	//在指定字符串抽取字符
 	function random($len) {
    		$srcstr = "1A2B3C4D5E6F7890";
    	 	mt_srand();
@@ -11,7 +12,7 @@
   	 	}
    		return $strs;
 	}
-         
+
         //判断是否已经POST
 	if(!$_POST){
 		die();

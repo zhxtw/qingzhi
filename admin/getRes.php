@@ -9,8 +9,8 @@
 */
 	require_once("isLoggedIn.php");
 	require_once("recognize.php");
-	if(!isset($_POST['start'],$_POST['limit'],$_POST['origin'])){die('Forbidden1');}
-	if(!is_numeric($_POST['start'])||!is_numeric($_POST['limit'])){die('Forbidden2');}
+	if(!isset($_POST['start'],$_POST['limit'],$_POST['origin'])){die('Forbidden');}
+	if(!is_numeric($_POST['start'])||!is_numeric($_POST['limit'])){die('Forbidden');}
 	$flag=true;
 	$start=$_POST['start']-0;
 	$limit=$_POST['limit']-0;

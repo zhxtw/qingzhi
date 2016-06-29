@@ -117,6 +117,8 @@
 
 3. 实际使用时请打开`admin/addToken.js`和`admin/isLoggedIn.php`，并将里面的`hostnames`数组改为自己的主机，注意仿照格式
 
+4. 建议在系统的`php.ini`中更改`session.cookie_httponly = true`
+
 
 ***
 
