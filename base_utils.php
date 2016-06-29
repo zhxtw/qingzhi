@@ -19,12 +19,22 @@ function diecho($msg,$isAlert=0,$goto=''){
 	if(!$isAlert){
 		die($msg);
 	}else{
-		if($goto=''){
+		if( $goto == '' ){
 			die("<script>alert('{$msg}');window.history.go(-1);</script>");
 		}else{
 			die("<script>alert('{$msg}');window.location.href='{$goto}';</script>");
 		}
 	}
+}
+
+/**
+* function die403		返回403
+* @param $msg       可选参数，如果定义则返回指定消息
+*/
+function die403($msg=''){
+	header('HTTP/1.1 403 Forbidden');
+	header("status: 403 Forbidden");
+	die( (( $msg == '' ) ? "403 - Forbidden, access is denied." : $msg));
 }
 
 ?>
