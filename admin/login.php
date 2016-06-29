@@ -4,8 +4,6 @@
 <meta charset="utf-8">
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<meta name="theme-color" content="#ffffff">
-<link rel="icon" sizes="180x180" href="../img/logo.png">
 <title>青志后台管理 - 登录</title>
 
 <!-- Bootstrap -->
