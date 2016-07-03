@@ -23,7 +23,7 @@
   if( $stage == "prepare" ) {
     //准备分组阶段, stage prepare
 
-    if( !isset( $_POST['count'] ) ) die403();
+    if( !isset( $_POST['count'] ) || !is_numeric($_POST['count']) ) die403();
     $count = $_POST['count'];
     //提取出所选地点时段的限制人数
     require_once("../to_json.php");
@@ -46,17 +46,21 @@
       die("-3"); //凑不出来
     }
 
+    $count = intval( $count );
     $res = PDOQuery( $dbcon, "SELECT * FROM `signup` WHERE `go`=1 AND `loc_name`=? AND `times`=? LIMIT 0,{$count}",
             [ $loc_name, $times ], [ PDO::PARAM_STR, PDO::PARAM_STR ] );
     if( $res[1] < $limitPerLoc ) {
       die( "-1" ); //达不到人数
     }
-    $teamlen = ceil( sizeof($res[0]) / $limitPerLoc ); //计算可分组数
+    $teamlen = floor( sizeof($res[0]) / $limitPerLoc ); //计算可分组数
     $group = array(); //初始化数组
     for( $i=0; $i<$teamlen; $i++ ){
       $group[$i] = array();
       for( $j=0; $j < $limitPerLoc; $j++ ){
-        $group[$i][$j] = $res[0][ $i * $limitPerLoc + $j ]['id']; //利用i和j遍历所查询数据
+         //利用i和j遍历所查询数据
+        $group[$i][$j] = array();
+        $group[$i][$j][0] = $res[0][ $i * $limitPerLoc + $j ]['no']; //0->id
+        $group[$i][$j][1] = $res[0][ $i * $limitPerLoc + $j ]['name'];
       }
     }
     //交给前端做吧

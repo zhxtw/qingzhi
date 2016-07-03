@@ -42,7 +42,7 @@
         <button class="btn btn-primary" onclick="updatePageCount()"><span class="glyphicon glyphicon-refresh"></span> 刷新列表</button>
         <button class="btn btn-warning" onclick="passOrNot('undo')"><span class="glyphicon glyphicon-ban-circle"></span> 驳回选定项</button>
 				<button class='btn btn-success' onclick="passOrNot('assign')"><span class="glyphicon glyphicon-calendar"></span> 分配日期</button>
-
+				<button class='btn btn-danger' onclick="autoAssign()"><span class="glyphicon glyphicon-thumbs-up"></span> 自动分配</button>
         </center>
         <nav class="text-center">
           <ul class="pagination" id="page1">
@@ -70,6 +70,61 @@
 			}
 		});
 	};
+	function autoAssign() {
+		if ( !datname ) {
+			alt( "请在下面设置好筛选地点和筛选时段后再使用本功能哦~", "danger", "ban-circle" );
+			return 0;
+		}
+		$("#dtp1").hide();
+		limitPerLoc = 0;
+		for( i in loc ){
+       if( loc[i].name == filtername ) {
+				 for ( j in loc[i].times ) {
+					 if( loc[i].times[j] == datname ) {
+						 limitPerLoc = loc[i].limit[j];
+					 }
+				 }
+			 }
+    }
+		if( !limitPerLoc ) {
+			alt( "找不到对应时段的人数限制或人数限制未设置，请刷新重试或手动分配", "danger", "ban-circle" );
+			return 0;
+		}
+		html = '<center>义工地点：<b>' + filtername + '</b>&nbsp; &nbsp; 义工时段：<b>' + datname + '</b></center><br><br><div class="list-group text-center" id="tmpassign">';
+		for( i = 1; i < 6; i++ ) {
+			html += '<a class="list-group-item assign" data-count="' + i * limitPerLoc + '" onclick="autoAssign2(this.dataset.count)">一次分配 ' + i * limitPerLoc + ' 人</a>';
+		}
+		html += "</div>"
+		$("#msg").html(html);
+		$("#myModal").modal('show');
+	}
+	function autoAssign2(count) {
+		$.ajax({
+	    url:"/admin/autoAssign.php?token="+TOKEN,
+	    dataType:"json",
+	    type:"POST",
+	    data: {
+	      "origin": fromwhere,
+	      "loc_name": filtername,
+	      "times": datname,
+				"stage": "prepare",
+				"count": count
+	    },
+	    error: function(){ alt("网络连接失败或服务器错误","danger","ban-circle"); $("#myModal").modal('hide'); },
+	    success: function(got){
+				console.log(got);
+				html = "<pre>";
+				for( i = 0; i < got.length; i++ ) {
+					html += "=====================<br>Team #" + i + "<br>";
+					for ( j = 0; j < got[i].length; j++ ) {
+						html +=  got[i][j][0] + ": " + got[i][j][1] + "<br>";
+					}
+				}
+				//TODO: 日期的计算
+				$("#tmpassign").html(html + "</pre>");
+			}
+		});
+	}
 </script>
 <div class="modal fade" id="myModal">
   <div class="modal-dialog">

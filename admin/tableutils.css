@@ -23,3 +23,8 @@
 .btn-group-active {
 	background-color: #eee;
 }
+
+.assign:hover {
+  color: white;
+  background-color: #337ab7;
+}
