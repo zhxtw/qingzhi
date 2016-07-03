@@ -5,7 +5,7 @@
 </head>
 <body>
 正在检测浏览器，请稍等。如果页面没有自动跳转，请点击<a href="/location.php">此处</a>
-<noscript>您的浏览器不支持JavaScript或者没有打开，请点击<a href="htpp://wap.zhxtw.cn">此处</a>跳转到老人机版本。</noscript>
+<noscript>您的浏览器不支持JavaScript或者没有打开，请点击<a href="http://wap.zhxtw.cn">此处</a>跳转到老人机版本。</noscript>
 <script>
   window.onload=function(){
     try {
