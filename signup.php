@@ -28,6 +28,7 @@ $flag=true;//verify to_pdo.php
 require_once("to_pdo.php");
 require_once("to_json.php");
 require_once("base_utils.php");
+require_once("getSettings.php");
 
 header("content-type:text/html;charset=utf-8");
 if(@$_SESSION['loc_id']===NULL||@$_SESSION['times']===NULL){
@@ -104,10 +105,12 @@ if($_POST){
 
 		$ip=htmlspecialchars($_SERVER['REMOTE_ADDR']);
 
+		//检查是否开启自动审核，若开启则直接设状态为1（通过）
+		$go = getSettings("enableAutoAudit") - 0;
 		$result = PDOQuery($dbcon, "INSERT INTO signup ".
-							"SET name = ?, mobile = ?, classno = ?, tworone = ?, loc_name = ?, times = ?, ip = ?, email = ?",
-							[ $name , $mobile , $classno , $tworone , $loc_name , $times , $ip , $email ] ,
-							[PDO::PARAM_STR,PDO::PARAM_STR,PDO::PARAM_STR,PDO::PARAM_STR,PDO::PARAM_STR,PDO::PARAM_STR,PDO::PARAM_STR,PDO::PARAM_STR]);
+							"SET name = ?, mobile = ?, classno = ?, tworone = ?, loc_name = ?, times = ?, ip = ?, email = ?, `go` = ?",
+							[ $name , $mobile , $classno , $tworone , $loc_name , $times , $ip , $email , $go ] ,
+							[PDO::PARAM_STR,PDO::PARAM_STR,PDO::PARAM_STR,PDO::PARAM_STR,PDO::PARAM_STR,PDO::PARAM_STR,PDO::PARAM_STR,PDO::PARAM_STR,PDO::PARAM_INT]);
 
 		if($result[1]==1){
 			$_SESSION['name']=$name;$_SESSION['classno']=$classno;
