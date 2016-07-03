@@ -10,6 +10,7 @@
   </div>
   </div>
 <hr>
+<p class="text-center" style="color:gray">网站代码版本：<a href="https://github.com/zhxtw/qingzhi/commit/<?php echo(substr(@file_get_contents("../.git_hash.txt"),0,8)); ?>" style="font-family:Consolas;color:blue" target="_blank">git@<?php echo(substr(@file_get_contents("../.git_hash.txt"),0,8)); ?></a></p>
 <p class="text-center" style="color:gray">代码版本：<a href="#" id="ver" style="font-family:Consolas;color:blue" target="_blank"></a>, Last commited by <a href="#" id="author" style="color:blue" target="_blank"></a></p>
 <script>
   $.ajax({type:"GET",url:"https://api.github.com/repos/zhxtw/qingzhi/commits/master",dataType:"json",success:function(got){
