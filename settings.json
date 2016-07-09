@@ -1,4 +1,10 @@
 {
-  "enableAutoAudit":true,
-  "enableAutoAssign":false
+  "enableAutoAudit":  true,
+  "enableAutoAssign": false,
+  "gradeOneName": "奔跑高一",
+  "gradeTwoName": "思想高二",
+  "thisTermStart": "20160910",
+  "thisTermEnd": "20170201",
+  "successTip": "每次志愿服务结束或学期末都会有工时条发到同学们手中，请大家一定要保管好，<b>这是参加志愿服务的唯一证明</b>啦！<br>报名结束后所有名单将会贴在承志楼大堂荧屏下方，请大家走过路过多加留意～<br>若有任何问题或名单缺漏等可找高二5班刘抒欣或高二17班龙盈禧咨询噢:D<br>谢谢你们~",
+  "disabledDates": "20161001-20161007,20170101-20170103"
 }
