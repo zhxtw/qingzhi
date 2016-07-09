@@ -13,20 +13,6 @@ limit=15;nowpage=1;allpages=1;sortby="";filtername='';datname='';classname='';go
 fromwhere=location.pathname.split('/')[location.pathname.split('/').length-1].split('.php')[0];datatype=0;
 
 /**
-* function alt 网页上方的banner提示，比alert略微好看些
-* @param message    要显示的信息
-* @param style      banner的颜色（bootstrap风格，如danger,warning等）
-* @param icon       文字左边的图标，参见bootstrap的glyphicon类
-*/
-function alt(message,style,icon){
-  $("body").animate({scrollTop:0},"fast",null,function(){
-    $("#alert").css({ "transition":"box-shadow 2s", "box-shadow":""});
-  });
-  $("#alert").html(((icon)?"<span class='glyphicon glyphicon-"+icon+"'></span> ":"")+message).removeClass().addClass('alert text-center '+((style)?("alert-"+style):""));
-  $("#alert").css({ "box-shadow":"0px 0px 8px", "transition":""});
-}
-
-/**
 * function setPages 设置显示的页数
 * @param howmany    总共的页数
 * @param oldpage    更新页数后老的页面号
@@ -361,7 +347,22 @@ function passOrNotp(flag){
     });
 }
 
-
+/**
+* function findme 找到array或object中对应数据的元素并返回内容
+* @param arr       传入数组或stdClass
+* @param str 			要在数组或stdClass中查找的字符串
+* @param sub				(可选)数组或者stdClass中的子元素名
+*/
+function findme( arr, str, sub ) {
+  for ( i in arr ) {
+    if ( sub === undefined ) {
+      if ( arr[i] == str ) return arr[i];
+    } else {
+      if ( arr[i][sub] == str ) return arr[i];
+    }
+  }
+  return null;
+}
 
 /*---------意见反馈数据处理区---------*/
 

@@ -28,8 +28,7 @@
 <h1 class="h1 text-center">分配时段</h1>
 <h5 class="h5 text-center">当前页数：<span id="pagenum">0</span>，共有<span id="recordnum">0</span>条记录</h5>
 <div class="row col-md-10 col-md-offset-1">
-	<hr><div id="alert" class="alert alert-info text-center" role="alert"><span id="alertinfo" class="glyphicon glyphicon-home"></span> 欢迎回来！</div>
-  <hr>
+	<hr>
 
 	<div class="row" id="loading" style="display:none">
 		<center>
@@ -53,8 +52,10 @@
 				<p style="color:gray" class="text-center">* 本页面为分配时段页面，如果要删除记录请先驳回然后到<a href="manage.php">报名管理</a>进行操作 *</p>
 				<hr>
 </div>
-<?php include("showbanner.php"); ?>
-<script src="/js/jquery-1.11.2.min.js"></script>
+<?php
+include("showbanner.php");
+include("showalt.php");
+?>
 <script src="/js/bootstrap.js"></script>
 <script src="/js/moment.js"></script>
 <script src="/js/moment-zh-cn.js"></script>
@@ -98,7 +99,27 @@
 		$("#msg").html(html);
 		$("#myModal").modal('show');
 	}
+
+	function checkCount(date) {
+		countAjax = $.ajax({
+	    url:"/admin/autoAssign.php?token="+TOKEN,
+	    dataType:"json",
+	    type:"POST",
+	    data: {
+	      "origin": fromwhere,
+	      "loc_name": filtername,
+	      "times": datname,
+				"date": date
+	    },
+			async: false,
+	    error: function(){ alt("网络连接失败或服务器错误","danger","ban-circle"); }
+		});
+		return countAjax.responseText;
+	}
+
+	globalTeam = [];
 	function autoAssign2(count) {
+		$("#tmpassign").html("<center><img src='/img/loading.gif'>正在查询服务器，请稍后...</center>");
 		$.ajax({
 	    url:"/admin/autoAssign.php?token="+TOKEN,
 	    dataType:"json",
@@ -107,20 +128,26 @@
 	      "origin": fromwhere,
 	      "loc_name": filtername,
 	      "times": datname,
-				"stage": "prepare",
 				"count": count
 	    },
 	    error: function(){ alt("网络连接失败或服务器错误","danger","ban-circle"); $("#myModal").modal('hide'); },
 	    success: function(got){
 				console.log(got);
+				globalTeam = got;
 				html = "<pre>";
-				for( i = 0; i < got.length; i++ ) {
+				/*for( i = 1; i <= got.length; i++ ) { //从1开始，0为日期
 					html += "=====================<br>Team #" + i + "<br>";
 					for ( j = 0; j < got[i].length; j++ ) {
 						html +=  got[i][j][0] + ": " + got[i][j][1] + "<br>";
 					}
-				}
+				}*/
+				tmploc = findme( loc, filtername, "name" );
+				tmptime = findme( tmploc.times, datname );
+				if ( tmptime == null ) alt( "没有定义该时段，请到地点管理中检查。", "danger", "ban-circle" ); return 0;
+				if ( tmptime.substr(0,2) != moment(got[0]).format('ddd') ) alt( "上次分配的日期不匹配定义。请手动检查并分配。", "warning", "alert" );
 				//TODO: 日期的计算
+				date = got[0];
+				moment(date).format("ddd");//周X
 				$("#tmpassign").html(html + "</pre>");
 			}
 		});
