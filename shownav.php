@@ -17,47 +17,30 @@
       <a class="navbar-brand" href="#">执信青年志愿者协会&nbsp;<span class="label label-danger">Beta</span></a></div>
 
     <div class="collapse navbar-collapse" id="defaultNavbar1">
-      <ul class="nav navbar-nav" id="nav1left"></ul>
-      <ul class="nav navbar-nav navbar-right" id="nav1right"></ul>
+			<ul class="nav navbar-nav">
+         <li><a href="/location.php">地点一览</a></li>
+        <li class="dropdown"><a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false">信息播报<span class="caret"></span></a>
+          <ul class="dropdown-menu" role="menu">
+            <li><a href="/pass.php">通过的志愿者名单</a></li>
+            <li><a href="/query.php">志愿者查询</a></li>
+            <li class="divider"></li>
+            <li><a href="/hours.php">工时说明与查询</a></li>
+            <li class="divider"></li>
+            <li><a href="/news.php">新闻大事</a></li>
+          </ul>
+        </li>
+      </ul>
+      <ul class="nav navbar-nav navbar-right">
+        <li><a href="/feedback.php">建议反馈</a></li>
+        <li><a href="/about.php">关于</a></li>
+        <li class="dropdown"><a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false">后台管理<span class="caret"></span></a>
+          <ul class="dropdown-menu" role="menu">
+            <li><a href="/admin/">报名管理</a></li>
+            <li class="divider"></li>
+            <li><a href="https://manager.linode.com/">服务器管理</a></li>
+          </ul>
+        </li>
+      </ul>
     </div>
   </div>
 </nav>
-<script src="js/jquery-1.11.2.min.js"></script>
-<script>
-	l=$.ajax({async:false,url:"nav.json",dataType:"json",type:"GET",
-		success: function(){}
-	});
-	if(l.statusText!="OK"){
-		alert("导航栏信息加载失败！\n请刷新页面重试。");
-	}
-	nav=eval("("+l.responseText+")");
-
-	function retE(ja){
-		if(ja.submenu){
-			tmp='<li class="dropdown"><a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false">' + ja.name + '<span class="caret"></span></a><ul class="dropdown-menu" role="menu">';
-			for(i in ja.submenu){
-				tmp+=retE(ja.submenu[i]);
-			}
-			tmp+='</ul></li>';
-		} else {
-			tmp=(ja.divide ? '<li class="divider"></li>' : '') + '<li' + (isActive(ja) ? ' class="active"' : '') +'><a href="' + ja.href + '">' + ja.name + '</a></li>';
-		}
-		return tmp;
-	}
-	function isActive(ja){
-		if(ja.href=="<?php echo($_SERVER['PHP_SELF']); ?>"){
-			return 1;
-		}
-		return 0;
-	}
-	function appendNav(){
-		for(i in nav){
-			if(nav[i].right){
-				$("#nav1right").append(retE(nav[i]));
-			}else{
-				$("#nav1left").append(retE(nav[i]));
-			}
-		}
-		$.material.init();
-	}
-</script>

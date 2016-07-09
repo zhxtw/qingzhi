@@ -1,19 +1,9 @@
 <!DOCTYPE html>
 <html>
 <head>
-<meta charset="utf-8">
-<meta http-equiv="X-UA-Compatible" content="IE=edge">
-<meta name="viewport" content="width=device-width, initial-scale=1">
-<meta name="theme-color" content="#4caf50">
-<link rel="icon" sizes="180x180" href="logo.png">
+<?php require("showheader.php"); ?>
 <title>执信青志 · 报名</title>
-
-<!-- Bootstrap -->
-<link href="css/bootstrap.css" rel="stylesheet">
-<link href="css/bootstrap-switch.css" rel="stylesheet" type="text/css">
-<link href="css/bootstrap-material-design.min.css" rel="stylesheet" type="text/css">
-<link href="css/ripples.min.css" rel="stylesheet" type="text/css">
-
+<?php require("showcss.php"); ?>
 <!-- HTML5 shim and Respond.js for IE8 support of HTML5 elements and media queries -->
 <!-- WARNING: Respond.js doesn't work if you view the page via file:// -->
 <!--[if lt IE 9]>
@@ -21,7 +11,7 @@
       <script src="https://oss.maxcdn.com/respond/1.4.2/respond.min.js"></script>
     <![endif]-->
 </head>
-<!-- Processing area -->
+
 <?php
 session_start();
 $flag=true;//verify to_pdo.php
@@ -115,7 +105,8 @@ if($_POST){
 		if($result[1]==1){
 			$_SESSION['name']=$name;$_SESSION['classno']=$classno;
 			$_SESSION['mobile']=$mobile;$_SESSION['tworone']=$tworone;
-			$_SESSION["verification"]='';
+			$_SESSION["verification"]='';$_SESSION['loc_name']=$loc_name;
+			$_SESSION['times']=$times;
 			header("Location: /success.php");
 			die("<script>location.href='success.php';</script>");
 		}else{
@@ -125,9 +116,6 @@ if($_POST){
 	}else{
 		diecho("输入的信息不完整，请重试",1);
 	}
-}else{
-	setcookie("loc_id",$_SESSION['loc_id']);
-	setcookie("times",$_SESSION['times']);
 }
 ?>
 
@@ -164,10 +152,10 @@ if($_POST){
           <center>
   			<div class="radio">
             	<label>
-                	<input type="radio" name="tworone" id="tworone1" value="1" checked>奔跑高一
+                	<input type="radio" name="tworone" id="tworone1" value="1" checked><?php echo(getSettings("gradeOneName")); ?>
                 </label>
                 <label>
-                	<input type="radio" name="tworone" id="tworone2" value="0">思想高二
+                	<input type="radio" name="tworone" id="tworone2" value="0"><?php echo(getSettings("gradeTwoName")); ?>
                 </label>
             </div>
            </center>
@@ -186,11 +174,11 @@ if($_POST){
 
        <div class="form-group has-info label-floating">
  			 <label class="control-label" for="location">行动地点</label>
-  			 <input class="form-control readonly" id="location" type="text" placeholder="hhh" disabled>
+  			 <input class="form-control readonly" id="location" type="text" value="<?php echo($a[$_SESSION['loc_id']]->times[$_SESSION['times']]); ?>" disabled>
 		   </div>
 		   <div class="form-group has-info label-floating">
  			 <label class="control-label" for="times">行动时间</label>
-  			 <input class="form-control readonly" id="times" type="text" placeholder="20000000" disabled>
+  			 <input class="form-control readonly" id="times" type="text" value="<?php echo($a[$_SESSION['loc_id']]->name); ?>" disabled>
 		   </div>
        <!--div class="form-group has-info label-floating">
  			 <label class="control-label" for="boss">联系头目</label>
@@ -238,6 +226,7 @@ if($_POST){
 				</script>
     	<br><br>
       	<input type="text" class="input-sm" placeholder="请输入验证码" name="verify_code" id="verify_code" autocomplete="off">
+				<img src="/verify.php?<?php echo(microtime(true)); ?>" style="border-radius:5px" id="code" onclick="getCode()">
 	  <!--img id="code" onClick="getCode()"-->
       </div>
       <br><br>
@@ -249,32 +238,18 @@ if($_POST){
   </div>
   </form>
 
-<?php include("showbanner.php"); ?>
-
-<script src="js/jquery-1.11.2.min.js"></script>
-<script src="js/bootstrap.js"></script>
-<script src="js/bootstrap-switch.min.js"></script>
-<script src="js/cookie.js"></script>
-<script src="js/material.min.js"></script>
-<script src="js/ripples.js"></script>
+<?php
+include("showbanner.php");
+require("showjs.php");
+showjs( ["js/jquery-1.11.2.min.js", "js/bootstrap.min.js", "js/cookie.js", "js/material.min.js", "js/ripples.min.js", "js/checkSign.js"],
+				["defer", "defer", "direct", "defer", "defer", "direct"] );
+?>
 <script>
 	loc="";
 	function getCode(){
 		$("#code")[0].src="/verify.php?"+new Date().getTime();
 	}
 	window.onload=function(){
-		appendNav();
-		$.getScript("/js/checkSign.js");
-		l=$.ajax({async:false,url:"location.json",dataType:"json",type:"GET",
-			success: function(){}
-		});
-		if(l.statusText!="OK"){
-			alert("志愿服务地点信息加载失败！\n请刷新页面重试。");return 0;
-		}
-		ljson=eval("("+l.responseText+")");
-		loc=ljson.loc;
-		$("#location").val(loc[getCookie("loc_id")].name);
-		$("#times").val(loc[getCookie("loc_id")].times[getCookie("times")]);
 		$(".readonly").parent().removeClass('is-empty');
 
 		t=$("input.form-control").not(".readonly");
@@ -286,55 +261,48 @@ if($_POST){
 		$("#tworone2")[0].checked=(getCookie("savedGrade")-0)?false:true;
 		if((q=getCookie("savedMobile"))&&q!=''){t[2].value=q;tt[2]=1;}
 		if((q=getCookie("savedEmail"))&&q!=''){t[3].value=q;tt[3]=1;}
-		for(i=0;i<tt.length;i++){
-			if(tt[i]==0) continue;
-			$(t[i]).parent().removeClass("is-empty");
-			$(t[i]).blur();
-		}
-	};
-	//For auto checking
-	$("input.form-control").not(".readonly").blur(function(what){
-		checkf=0; req=what.target.id; val=$("#" + req).val(); cn=/^[\u4e00-\u9fa5]+$/;
-		switch(what.target.id){
-			case "name":
-				if(val.length<2 || val.length>4 || !isNaN(val) || !cn.test(val) ){
-					checkf=1;
-				}
-				break;
-			case "classno":
-				if(val.length!=4 || isNaN(val) || val.substr(0,2)<1 || val.substr(0,2)>17 || val.substr(2,2)<1 || val.substr(2,2)>60){
-					checkf=1;
-				}
-				break;
-			case "mobile":
-				mob=val.substr(0,2);
-				mo=val.substr(0,1);
-				if(mob=="13" || mob=="15" || mob=="17" || mob=="18"){
-					if(val.length!=11){ checkf=1; }
-				}else if(mo=="8"|| mo=="3" || mo=="6" || mo=="2"){
-					if(val.length!=8){ checkf=1; }
-				}else if(val==''){//PASS
-				}else{
-					checkf=1;
-				}
-				break;
-			case "email":
-				emreg=/^([a-zA-Z0-9]+[_|\_|\.]?)*[a-zA-Z0-9]+@([a-zA-Z0-9]+[_|\_|\.]?)*[a-zA-Z0-9]+\.[a-zA-Z]{2,3}$/;
-				if(!emreg.test(val) && val!='' || val.length>40) checkf=1;
-				break;
-		}
-		$("#"+req).parent().removeClass( (checkf) ? "has-success":"has-error");
-		$("#"+req).parent().addClass( (checkf) ? "has-error":"has-success" );
-		destroyCookie();saveCookie();
-	});
-	$("[name='tworone']").click(function(){
-		destroyCookie();saveCookie();
-	});
 
-	tv=document.createElement('img');
-	tv.src="/verify.php?"+new Date().getTime();
-	tv.id="code";tv.onclick=getCode;
-	$("#codeFather").append(tv);
+		//For auto checking
+		$("input.form-control").not(".readonly").blur(function(what){
+			checkf=0; req=what.target.id; val=$("#" + req).val(); cn=/^[\u4e00-\u9fa5]+$/;
+			switch(what.target.id){
+				case "name":
+					if(val.length<2 || val.length>4 || !isNaN(val) || !cn.test(val) ){
+						checkf=1;
+					}
+					break;
+				case "classno":
+					if(val.length!=4 || isNaN(val) || val.substr(0,2)<1 || val.substr(0,2)>17 || val.substr(2,2)<1 || val.substr(2,2)>60){
+						checkf=1;
+					}
+					break;
+				case "mobile":
+					mob=val.substr(0,2);
+					mo=val.substr(0,1);
+					if(mob=="13" || mob=="15" || mob=="17" || mob=="18"){
+						if(val.length!=11){ checkf=1; }
+					}else if(mo=="8"|| mo=="3" || mo=="6" || mo=="2"){
+						if(val.length!=8){ checkf=1; }
+					}else if(val==''){//PASS
+					}else{
+						checkf=1;
+					}
+					break;
+				case "email":
+					emreg=/^([a-zA-Z0-9]+[_|\_|\.]?)*[a-zA-Z0-9]+@([a-zA-Z0-9]+[_|\_|\.]?)*[a-zA-Z0-9]+\.[a-zA-Z]{2,3}$/;
+					if(!emreg.test(val) && val!='' || val.length>40) checkf=1;
+					break;
+			}
+			$("#"+req).parent().removeClass( (checkf) ? "has-success":"has-error");
+			$("#"+req).parent().addClass( (checkf) ? "has-error":"has-success" );
+			destroyCookie();saveCookie();
+		});
+		$("[name='tworone']").click(function(){
+			destroyCookie();saveCookie();
+		});
+		$.material.init(); $(t).blur();
+	};
+
 	function saveCookie(){
 		t=$("input.form-control").not(".readonly");
 		setCookie("savedName",t[0].value,180);

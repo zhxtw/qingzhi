@@ -1,19 +1,9 @@
 ﻿<!DOCTYPE html>
 <html>
 <head>
-<meta charset="utf-8">
-<meta http-equiv="X-UA-Compatible" content="IE=edge">
-<meta name="viewport" content="width=device-width, initial-scale=1">
-<meta name="theme-color" content="#4caf50">
-<link rel="icon" sizes="180x180" href="logo.png">
-
+<?php require("showheader.php"); ?>
 <title>执信·青志 - 建议反馈</title>
-
-<!-- Bootstrap -->
-<link href="css/bootstrap.css" rel="stylesheet">
-<link href="css/bootstrap-material-design.min.css" rel="stylesheet" type="text/css">
-<link href="css/ripples.min.css" rel="stylesheet" type="text/css">
-
+<?php require("showcss.php"); ?>
 <?php
 session_start();
 $flag=true;
@@ -31,7 +21,7 @@ if($_POST){
   if(mb_strlen($content,'UTF8')>1000){diecho("我们很欢迎大家给青志网提出意见，但是请注意不要超过1000字哦~",1);}
   $ip=htmlspecialchars($_SERVER['REMOTE_ADDR']);
 
-  $result=PDOQuery($dbcon, "INSERT INTO feedback SET content = ?, ip = ?, status = ?", [$content,$ip,"未阅读"] , [PDO::PARAM_STR,PDO::PARAM_STR,PDO::PARAM_STR]);
+  $result=PDOQuery($dbcon, "INSERT INTO feedback SET content = ?, ip = ?, status = '未阅读'", [$content,$ip] , [PDO::PARAM_STR,PDO::PARAM_STR]);
   if($result[1]==1){
     diecho("谢谢您给青志网提出意见！",1);
   }else{
@@ -64,33 +54,35 @@ if($_POST){
   </div>
 </div>
 <div class="row">
-    <div class="col-md-offset-3 text-justify col-md-6 col-sm-offset-1 col-sm-10 col-xs-offset-1 col-xs-10">
-       	<div>
-            <div class="form-group label-floating has-success">
-  			        <label class="control-label" for="content">填入您要提出的建议</label>
-  			        <textarea class="form-control" id="content" name="content" cols="30" rows="10"></textarea>
-  			        <p class="help-block">请注意不要超过1000个字符哦~</p>
-		        </div>
-            <div class="text-center">
-              <input type="text" class="input-sm" placeholder="请输入验证码" name="verify_code" id="verify_code" autocomplete="off">
-              <img src="verify.php?<?php echo(microtime(true)); ?>" onclick="this.src='verify.php?'+new Date().getTime();">
-            </div><hr>
-            <center>
-              <button type="button" class="btn btn-danger btn-raised" onclick="$('#content').val('');">清除重填</button>
-              <button type="button" class="btn btn-success btn-raised" onclick="check()">提交意见</button>
-            </center>
-
-      	</div>
+  <div class="col-md-offset-3 text-justify col-md-6 col-sm-offset-1 col-sm-10 col-xs-offset-1 col-xs-10">
+   	<div>
+      <div class="form-group label-floating has-success">
+        <label class="control-label" for="content">填入您要提出的建议</label>
+        <textarea class="form-control" id="content" name="content" cols="30" rows="10"></textarea>
+        <p class="help-block">请注意不要超过1000个字符哦~</p>
+      </div>
+      <div id="codeFather">
+				<div class="form-group label-floating pull-left" style="width:59%">
+			     <label class="control-label" for="verify_code">敲入右图中的验证码</label>
+			     <input class="form-control" id="verify_code" name="verify_code" type="text">
+			     <p class="help-block">看不清可以点击图片切换哦~</p>
+				 </div>
+				 <br><img id="vimg" src="/verify.php?<?php echo(microtime(true)); ?>" onclick="getCode()" style="border-radius:5px;width:39%;right:0px;position:absolute;height:50px">
+      </div>
     </div>
-</div>
-</form>
-
-<?php include("showbanner.php"); ?>
-<script src="js/jquery-1.11.2.min.js"></script>
-<script src="js/bootstrap.js"></script>
-<script src="js/bootstrap-switch.min.js"></script>
-<script src="js/material.min.js"></script>
-<script src="js/ripples.js"></script>
+  </div>
+</div><br>
+<center>
+  <button type="button" class="btn btn-danger btn-raised" onclick="$('#content').val('');">清除重填</button>
+  <button type="button" class="btn btn-success btn-raised" onclick="check()">提交意见</button>
+</center>
+</form><br><br><br><br>
+<?php
+include("showbanner.php");
+require("showjs.php");
+showjs( ["js/jquery-1.11.2.min.js", "js/bootstrap.min.js", "js/material.min.js", "js/ripples.min.js", "js/checkSign3.js"],
+				["defer", "defer", "defer", "defer", "direct"] );
+?>
 <script>
   function alt(n){
     $("#msg").html(n);$("#myModal").modal('show');
@@ -105,7 +97,7 @@ if($_POST){
     $('#frm').submit();
   }
   window.onload=function(){
-    appendNav();
+    $.material.init();
   };
 </script>
 
