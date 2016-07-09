@@ -9,7 +9,7 @@
 
 TOKEN='';
 //实际使用时请手动更改下方网址为服务器的域名和协议，为调试方便，请用数组指定一个或多个
-hostnames=["https://zhxtw.cn","https://127.0.0.1","http://127.0.0.1","http://localhost"];
+hostnames=["https://www.zhxtw.cn","https://zhxtw.cn","https://qingzhi.zhxtw.cn","https://127.0.0.1","http://127.0.0.1","http://localhost"];
 orig=location.protocol+'//'+location.host+location.pathname+location.search;
 
 /**

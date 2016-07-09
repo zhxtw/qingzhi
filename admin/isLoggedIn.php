@@ -12,7 +12,7 @@
 	require_once("../base_utils.php");
 
 //实际使用时请手动更改下方网址为服务器的域名和协议，为调试方便，请用数组指定一个或多个
-	$hostnames=["https://www.zhxtw.cn/","https://zhxtw.cn/","https://127.0.0.1/","http://127.0.0.1/","http://localhost/"];
+	$hostnames=["https://www.zhxtw.cn/","https://zhxtw.cn/","https://qingzhi.zhxtw.cn/","https://127.0.0.1/","http://127.0.0.1/","http://localhost/"];
 
 //判断是否存在登录状态以及token值
 	if(!isset($_SESSION['adminname'],$_SESSION['logged'],$_SESSION['token'],$_GET['token'])){
