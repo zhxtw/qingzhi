@@ -13,7 +13,7 @@
   require_once("../to_pdo.php");
 
   if( !isset( $_POST['loc_name'], $_POST['times'], $_POST['date'] ) ||
-       empty( $_POST['loc_name'] ) || empty( $_POST['times'] ) || empty( $_POST['date'] ) ) ) {
+       empty( $_POST['loc_name'] ) || empty( $_POST['times'] ) || empty( $_POST['date'] ) ) {
     die403();
   }
   $loc_name = $_POST['loc_name'];
@@ -22,5 +22,5 @@
 
   $res = PDOQuery( $dbcon, "SELECT * FROM `signup` WHERE `go`=? AND `loc_name`=? AND `times`=?",
           [ $date, $loc_name, $times ], [ PDO::PARAM_INT, PDO::PARAM_STR, PDO::PARAM_STR ] );
-  die($res[1]);
+  echo($res[1]);
 ?>

@@ -35,17 +35,17 @@
     }
   }
   if ( $limitPerLoc < 1 ) {
-    die("-2"); //找不到对应时段或者该时段的人数限制为0
+    die("找不到对应时段或者该时段的人数限制为0，请手动分配。");
   }
   //检查人数是否凑够一次分配所能够分配的最大人数
   if ( $count < $limitPerLoc || $count % $limitPerLoc > 0 ) {
-    die("-3"); //凑不出来
+    die("为什么你要提交一些垃圾参数来糊弄我 <%_%>");
   }
   $count = intval( $count );
   $res = PDOQuery( $dbcon, "SELECT * FROM `signup` WHERE `go`=1 AND `loc_name`=? AND `times`=? LIMIT 0,{$count}",
           [ $loc_name, $times ], [ PDO::PARAM_STR, PDO::PARAM_STR ] );
   if( $res[1] < $limitPerLoc ) {
-    die( "-1" ); //达不到人数
+    die( "目前暂时达不到自动分配的人数，请手动分配~" );
   }
   $teamlen = floor( sizeof($res[0]) / $limitPerLoc ); //计算可分组数
   $group = array(); //初始化数组
@@ -56,12 +56,14 @@
       $group[$i][$j] = array();
       $group[$i][$j][0] = $res[0][ ( $i - 1 ) * $limitPerLoc + $j ]['no']; //0->id
       $group[$i][$j][1] = $res[0][ ( $i - 1 ) * $limitPerLoc + $j ]['name'];
+      $group[$i][$j][2] = $res[0][ ( $i - 1 ) * $limitPerLoc + $j ]['tworone'];
+      $group[$i][$j][3] = $res[0][ ( $i - 1 ) * $limitPerLoc + $j ]['classno'];
     }
   }
 
   $res = PDOQuery( $dbcon, "SELECT MAX(`go`) FROM `signup` WHERE `loc_name`=? AND `times`=?",
           [ $loc_name, $times ], [ PDO::PARAM_STR, PDO::PARAM_STR ] );
-  if( $res[1] != 1 ) die( "-4" ); //未知错误
+  if( $res[1] != 1 ) die( "未知错误" );
   $group[0] = $res[0][0];
 
   die( json_encode($group) );

@@ -20,6 +20,7 @@
 
 <?php
 	require_once("isLoggedIn.php");
+	require_once("../getSettings.php");
 ?>
 
 <body style="font-family:Microsoft YaHei">
@@ -70,6 +71,11 @@ include("showalt.php");
 				loc=got.loc;
 			}
 		});
+		/*$("#dtp1").on("dp.change", function (e) {
+			console.log("dtp1:" + e.date.format("YYYYMMDD"));
+			selectedDate = e.date.format("YYYYMMDD");
+			hasmen = checkCount(selectedDate);
+    });*/
 	};
 	function autoAssign() {
 		if ( !datname ) {
@@ -102,8 +108,8 @@ include("showalt.php");
 
 	function checkCount(date) {
 		countAjax = $.ajax({
-	    url:"/admin/autoAssign.php?token="+TOKEN,
-	    dataType:"json",
+			async: false,
+	    url:"/admin/checkCount.php?token="+TOKEN,
 	    type:"POST",
 	    data: {
 	      "origin": fromwhere,
@@ -111,7 +117,6 @@ include("showalt.php");
 	      "times": datname,
 				"date": date
 	    },
-			async: false,
 	    error: function(){ alt("网络连接失败或服务器错误","danger","ban-circle"); }
 		});
 		return countAjax.responseText;
@@ -133,24 +138,92 @@ include("showalt.php");
 	    error: function(){ alt("网络连接失败或服务器错误","danger","ban-circle"); $("#myModal").modal('hide'); },
 	    success: function(got){
 				console.log(got);
+				if( typeof(got) != "object" ) {
+					alt(got, "danger", "ban-circle"); return 0;
+				}
 				globalTeam = got;
-				html = "<pre>";
-				/*for( i = 1; i <= got.length; i++ ) { //从1开始，0为日期
-					html += "=====================<br>Team #" + i + "<br>";
-					for ( j = 0; j < got[i].length; j++ ) {
-						html +=  got[i][j][0] + ": " + got[i][j][1] + "<br>";
-					}
-				}*/
+
 				tmploc = findme( loc, filtername, "name" );
 				tmptime = findme( tmploc.times, datname );
-				if ( tmptime == null ) alt( "没有定义该时段，请到地点管理中检查。", "danger", "ban-circle" ); return 0;
-				if ( tmptime.substr(0,2) != moment(got[0]).format('ddd') ) alt( "上次分配的日期不匹配定义。请手动检查并分配。", "warning", "alert" );
-				//TODO: 日期的计算
-				date = got[0];
-				moment(date).format("ddd");//周X
+				if ( tmptime == null ) { alt( "没有定义该时段，请到地点管理中检查。", "danger", "ban-circle" ); return 0; }
+				if ( tmptime.substr(0,2) != moment(got[0]).format('ddd') ) alt( "上次分配的日期不匹配定义。请手动检查并分配。", "warning", "alert", -1 );
+				/*
+					日期计算
+					1. 以settings.json中的起始和结束日期为基准，跳过disabledDates中的日期区间，跳过所有不属于此时段的days
+					2. 让dtp1自动选择好起始日期后自动查询服务器该日期分配的人数，如果为0则可自动分配，如果不为0则查询下星期，直到结束后提示该学期已满
+					3. 一次分配多组原理同上
+					4. 为重复使用，分配完后推荐clear下dtp
+					XXX：此做法有缺点，如果此时另一个人也登录分配，可能会产生爆人数等后果
+				*/
+				thisTermStart = "<?php echo(getSettings('thisTermStart')); ?>";
+				thisTermEnd = "<?php echo(getSettings('thisTermEnd')); ?>";
+				disabledDates = "<?php echo(getSettings('disabledDates')); ?>".split(",");
+				dayOfWeek = moment().day(tmptime.substr(0,2)).format('d'); //输入周六，返回6
+				disabledDaysOfWeek = [];
+				for ( i in [0,1,2,3,4,5,6] ) {
+					if( i != dayOfWeek) disabledDaysOfWeek[disabledDaysOfWeek.length] = i;
+				}
+				mindate = ( moment(got[0]).add(7, "days").isAfter(thisTermStart) ) ? moment(got[0]).add(7, "days") : moment(thisTermStart);
+				$("#dtp1").data("DateTimePicker").daysOfWeekDisabled( disabledDaysOfWeek ).minDate( mindate ).maxDate( moment(thisTermEnd) );
+				disabledDatesArray = [];
+				for ( i in disabledDates ) {
+					if ( disabledDates[i].indexOf('-') == -1 ) {
+						//不是一段时间
+						disabledDatesArray[disabledDatesArray.length] = moment(disabledDates[i]);
+						console.log("disabled: " + disabledDates[i]);
+					} else {
+						//一段时间
+						stime = disabledDates[i].split("-")[0];
+						etime = disabledDates[i].split("-")[1];
+						for ( j = stime; j <= etime; j++ ) {
+							//XXX: 需要一种更加优雅的方式计算时间段.........()如果起始为0731，结束为0801，那也要计算将近70次)
+							//moment需要传入string；-1和+1是由于moment.js中isBetween无法取闭区间
+							if ( moment(j.toString()).isBetween(moment(stime).subtract(1, "days"), moment(etime).add(1, "days")) ) {
+								disabledDatesArray[disabledDatesArray.length] = moment(j.toString());
+								console.log("disabled: "+j);
+							}
+						}
+					}
+				}
+				$("#dtp1").data("DateTimePicker").disabledDates( disabledDatesArray );
+				$("#dtp1").show();
+
+				html = "<pre>";
+				for( var i = 1; i < Object.keys(got).length; i++ ) { //从1开始，0为日期
+					html += "========================<br>第 " + i + " 批，分配在<b class='assignGroup' data-i='" + i + "'></b><br>";
+					for ( var j = 0; j < Object.keys(got[i]).length; j++ ) {
+						// 0->id 1->name 2->tworone 3->classno
+						html +=  "<b class='assignGroupId' style='display:none' data-i='" + i + "'>" + got[i][j][0] + "</b>"
+						     + got[i][j][2] + got[i][j][3].substr(0,2) + "班，" + got[i][j][1] + "<br>";
+					}
+				}
 				$("#tmpassign").html(html + "</pre>");
+				autoAssign3(); console.info("here");
 			}
 		});
+	}
+	tmploc = ''; tmptime = ''; thisTermEnd = 0; disabledDatesArray = [];
+
+	function autoAssign3() {
+		sel = $("#dtp1").data("DateTimePicker").date().format("YYYYMMDD");
+		for ( var i = 0; i < $(".assignGroup").length; i++ ) {
+			for ( var j = sel; j <= thisTermEnd; j++ ) {
+				if ( moment(j.toString()).format("ddd") != tmptime.substr(0,2) || findSameDate(disabledDatesArray, sel)
+			    || !moment(j.toString()).isBetween(sel - 1, thisTermEnd + 1) ) continue;
+				//if ( moment(j.toString()).isAfter(moment(thisTermEnd)) ) {  }
+				if ( checkCount(j) > 0 ) { console.log(j + " 已经有人占据，跳过。"); continue; }
+				$(".assignGroup")[i].innerHTML = j; sel = moment(j).add(7, "days").format("YYYYMMDD"); break; //下一循环
+			}
+			if( $(".assignGroup")[i].innerHTML == '' ) { alt("该学期已经分配完了哦~ 请手动导出并在下学期导入后继续分配。", "danger", "ban-circle"); return 0; }
+		}
+
+	}
+
+	function findSameDate(arr, val) {
+		for ( var i in arr ) {
+			if ( disabledDatesArray[i].format("YYYYMMDD") == val ) return true;
+		}
+		return false;
 	}
 </script>
 <div class="modal fade" id="myModal">
