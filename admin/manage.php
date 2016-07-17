@@ -27,8 +27,7 @@
 <h1 class="h1 text-center">报名信息管理</h1>
 <h5 class="h5 text-center">当前页数：<span id="pagenum">0</span>，共有<span id="recordnum">0</span>条记录</h5>
 <div class="row col-md-10 col-md-offset-1">
-	<hr><div id="alert" class="alert alert-info text-center" role="alert"><span id="alertinfo" class="glyphicon glyphicon-home"></span> 欢迎回来！</div>
-  <hr>
+	<hr>
 
 	<div class="row" id="loading" style="display:none">
 		<center>
@@ -51,8 +50,10 @@
 				<p style="color:gray" class="text-center">* 本页面为预通过页面，如果要分配日期请移步<a href="assign.php">分配时段</a>进行操作 *</p>
 	      <hr>
 </div>
-<?php include("showbanner.php"); ?>
-
+<?php
+include("showbanner.php");
+include("showalt.php");
+?>
 <script src="../js/jquery-1.11.2.min.js" type="text/javascript"></script>
 <script src="../js/bootstrap.js" type="text/javascript"></script>
 <script src="addToken.js" type="text/javascript"></script>

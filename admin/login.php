@@ -110,9 +110,7 @@
 			$("#login").html("验证成功，即将跳转...");
 			$("#login").removeClass("btn-primary");
 			$("#login").addClass("btn-success");
-			if( goaddr == '' ) {
-				goaddr = "manage.php";
-			}
+			goaddr = (<?php require("../getSettings.php"); echo(getSettings("enableAutoAudit")); ?>) ? "assign.php" : "manage.php";
 			window.location.href = goaddr + "?token="+token;
 			return 0;
 		}else if(pass==-1){
@@ -141,17 +139,6 @@
 		$("#pwd")[0].type="password";
 	}
 	spTimes=0;tid=0;pass=0;chars=0;origpwd='';token='';posted=0;added=0; goaddr='';
-	$.ajax({
-		url : "/settings.json?" + new Date().getTime(),
-		dataType : "json",
-		type : "GET",
-		success : function(got) {
-			goaddr = (got.enableAutoAudit) ? "assign.php" : "manage.php";
-		},
-		error : function() {
-			alert("网络不太顺畅，请刷新页面重试哦~");
-		}
-	});
 </script>
 </body>
 </html>

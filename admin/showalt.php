@@ -16,7 +16,9 @@
 * @param icon       文字左边的图标，参见bootstrap的glyphicon类
 * @param delay      (可选)自动消失时间(单位:ms)，默认为5000ms，为0时永不消失，为-1时不准点击消失
 */
+tid = 0;
 function alt(message,style,icon,delay){
+  window.clearTimeout(tid);
   $("#alertcont").html(((icon)?"<span class='glyphicon glyphicon-"+icon+"'></span> &nbsp; ":"")+message).removeClass()
       .addClass('pull-left text-center').parent().removeClass().addClass( 'text-center alert ' + ((style) ? ( "alert-" + style ) : "") );
   $("#alertbtn").removeClass().addClass( "btn pull-right " + ((style) ? ( "btn-" + style ) : "") );
@@ -35,7 +37,7 @@ $(function(){
 });
 </script>
 
-<div id="alert" class="alert alert-info text-center" role="alert" style="display:none; position:fixed; bottom:0; width:100%; margin-bottom:0; border-radius:0; opacity:0.8">
+<div id="alert" class="alert alert-info text-center" role="alert" style="display:none; position:fixed; bottom:0; width:100%; margin-bottom:0; border-radius:0; opacity:0.8; z-index:65535">
 	<div id="alertcont" class="pull-left text-center" style="font-size: 16px; margin-top: 5px;">
 		<span id="alertinfo" class="glyphicon glyphicon-home"></span> &nbsp; 欢迎回来！
 	</div>
