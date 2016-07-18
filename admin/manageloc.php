@@ -139,27 +139,31 @@
 <script src="addToken.js" type="text/javascript"></script>
 <script>
 window.onload=function(){
-  l=$.ajax({async:false,url:"/location.json?"+new Date().getTime(),dataType:"json",type:"GET"});
-  if(l.statusText!="OK"){
-    alert("志愿服务地点信息加载失败！\n请刷新页面重试。");return 0;
-  }
-  ljson=eval("("+l.responseText+")");
-	if(ljson.alldisabled==1){
-		$("#flagbtn").css({"background-color":"blue"}).click(function(){doall();}).children()[0].innerHTML="开";
-		$("h5").html("共 "+ljson.loc.length+" 个，报名已全部关闭");
-	}else{
-		$("#flagbtn").css({"background-color":"purple"}).click(function(){doall(1);}).children()[0].innerHTML="关";
-		$("h5").html("共 "+ljson.loc.length+" 个，报名已全部开启");
-	}
-  loc=ljson.loc;
-  for(i=0;i<loc.length;i++){
-		if(loc[i].disabled==1){
-			assert='<div class="text-justify col-sm-4"><div class="panel panel-'+loc[i].color+'"><div class="panel-heading"><h3 class="panel-title text-center"><b><s>'+loc[i].name+'</s></b></h3></div><div class="panel-body text-center row"><img class="tu2 col-md-10 col-md-offset-1 col-sm-12 col-xs-12" src="'+loc[i].image+'"></div><div class="panel-footer text-center"><button data-id="'+i+'" onclick="showloc(this.dataset.id)" class="btn btn-sm btn-default"><span class="glyphicon glyphicon-edit"></span> 编辑</button>&nbsp;<button data-id="'+i+'" onclick="delloc(this.dataset.id)" class="btn btn-sm btn-danger"><span class="glyphicon glyphicon-remove"></span> 删除</button></div></div></div>';
-		}else{
-    	assert='<div class="text-justify col-sm-4"><div class="panel panel-'+loc[i].color+'"><div class="panel-heading"><h3 class="panel-title text-center"><b>'+loc[i].name+'</b></h3></div><div class="panel-body text-center row"><img class="tu2 col-md-10 col-md-offset-1 col-sm-12 col-xs-12" src="'+loc[i].image+'"></div><div class="panel-footer text-center"><button data-id="'+i+'" onclick="showloc(this.dataset.id)" class="btn btn-sm btn-default"><span class="glyphicon glyphicon-edit"></span> 编辑</button>&nbsp;<button data-id="'+i+'" onclick="delloc(this.dataset.id)" class="btn btn-sm btn-danger"><span class="glyphicon glyphicon-remove"></span> 删除</button></div></div></div>';
-		}
-    $("#puthere")[0].innerHTML+=assert;
-  }
+  $.ajax({
+		async:false,
+		url:"/location.json?"+new Date().getTime(),
+		dataType:"json",
+		type:"GET",
+		success: function(got) {
+			if(got.alldisabled==1){
+				$("#flagbtn").css({"background-color":"blue"}).click(function(){doall();}).children()[0].innerHTML="开";
+				$("h5").html("共 "+got.loc.length+" 个，报名已全部关闭");
+			}else{
+				$("#flagbtn").css({"background-color":"purple"}).click(function(){doall(1);}).children()[0].innerHTML="关";
+				$("h5").html("共 "+got.loc.length+" 个，报名已全部开启");
+			}
+		  loc=got.loc;
+		  for(i=0;i<loc.length;i++){
+				if(loc[i].disabled==1){
+					assert='<div class="text-justify col-sm-4"><div class="panel panel-'+loc[i].color+'"><div class="panel-heading"><h3 class="panel-title text-center"><b><s>'+loc[i].name+'</s></b></h3></div><div class="panel-body text-center row"><img class="tu2 col-md-10 col-md-offset-1 col-sm-12 col-xs-12" src="'+loc[i].image+'"></div><div class="panel-footer text-center"><button data-id="'+i+'" onclick="showloc(this.dataset.id)" class="btn btn-sm btn-default"><span class="glyphicon glyphicon-edit"></span> 编辑</button>&nbsp;<button data-id="'+i+'" onclick="delloc(this.dataset.id)" class="btn btn-sm btn-danger"><span class="glyphicon glyphicon-remove"></span> 删除</button></div></div></div>';
+				}else{
+		    	assert='<div class="text-justify col-sm-4"><div class="panel panel-'+loc[i].color+'"><div class="panel-heading"><h3 class="panel-title text-center"><b>'+loc[i].name+'</b></h3></div><div class="panel-body text-center row"><img class="tu2 col-md-10 col-md-offset-1 col-sm-12 col-xs-12" src="'+loc[i].image+'"></div><div class="panel-footer text-center"><button data-id="'+i+'" onclick="showloc(this.dataset.id)" class="btn btn-sm btn-default"><span class="glyphicon glyphicon-edit"></span> 编辑</button>&nbsp;<button data-id="'+i+'" onclick="delloc(this.dataset.id)" class="btn btn-sm btn-danger"><span class="glyphicon glyphicon-remove"></span> 删除</button></div></div></div>';
+				}
+		    $("#puthere")[0].innerHTML+=assert;
+		  }
+		},
+		error: function() { alert("志愿地点信息加载失败！请刷新重试。"); }
+	});
 };
 </script>
 <div class="modal fade" id="myModal">
