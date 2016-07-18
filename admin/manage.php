@@ -28,13 +28,6 @@
 <h5 class="h5 text-center">当前页数：<span id="pagenum">0</span>，共有<span id="recordnum">0</span>条记录</h5>
 <div class="row col-md-10 col-md-offset-1">
 	<hr>
-
-	<div class="row" id="loading" style="display:none">
-		<center>
-			<img src="/img/loading.gif"><br><br>
-		</center>
-	</div>
-
       	<?php require_once("mktable.php"); ?>
         <center><br>
         <button class="btn btn-primary" onclick="updatePageCount()"><span class="glyphicon glyphicon-refresh"></span> 刷新列表</button>
@@ -53,6 +46,7 @@
 <?php
 include("showbanner.php");
 include("showalt.php");
+include("showpgr.php");
 ?>
 <script src="../js/jquery-1.11.2.min.js" type="text/javascript"></script>
 <script src="../js/bootstrap.js" type="text/javascript"></script>

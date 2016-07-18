@@ -85,12 +85,15 @@ function makeTH(text){
 * function req Ajax请求第n页
 * @param page       请求的页码，从1开始！
 */
+oldh1 = ''; //存放原先h1内容
 function req(page){
   //判断请求的页码数，超出的话罢工
   if(page-0>allpages||page<1){alt("没有了哦~","danger","ban-circle");return 0;}
 
   //加载动画
-  $("#tbSign").fadeOut("fast", function(){$('#loading').slideDown();} );
+  oldh1 = $("h1").html();
+  $("h1").html("<img src='/img/loading.gif'>&nbsp;加载中...");
+  autopgr(300, 10, 80);
   $("#etc").popover('hide');
 
   //判断页面起源，并制作相应表头
@@ -169,8 +172,8 @@ function req(page){
 					}
 				});
 			}
-
-      $("#tbSign").fadeIn("fast", function(){$('#loading').slideUp();} );
+      //完成动画
+      setpgr( 100 ); $("h1").html( oldh1 );
     }
   });//[End] Ajax
   }//[End] If
@@ -225,7 +228,7 @@ function req(page){
   });//[End] Ajax
   }//[End] if
 
-  $("#tbSign").fadeIn("fast", function(){$('#loading').slideUp();} );
+  //$("#tbSign").fadeIn("fast", function(){$('#loading').fadeOut();} );
   nowpage=page;
   //这里只为了省略号中元素的显示而更新页码导航栏
   setPages(allpages, null, true);
@@ -349,9 +352,9 @@ function passOrNotp(flag){
 
 /**
 * function findme 找到array或object中对应数据的元素并返回内容
-* @param arr       传入数组或stdClass
-* @param str 			要在数组或stdClass中查找的字符串
-* @param sub				(可选)数组或者stdClass中的子元素名
+* @param arr      传入array或object
+* @param str      要在array或object中查找的字符串
+* @param sub      (可选)array或者object中的子元素名
 */
 function findme( arr, str, sub ) {
   for ( i in arr ) {

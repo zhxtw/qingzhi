@@ -1,6 +1,6 @@
 {
-  "enableAutoAudit":  true,
-  "enableAutoAssign": false,
+  "enableAutoAudit":  1,
+  "enableAutoAssign": 0,
   "gradeOneName": "奔跑高一",
   "gradeTwoName": "思想高二",
   "thisTermStart": "20160910",
