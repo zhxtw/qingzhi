@@ -2,26 +2,8 @@
 <html>
 <head>
 <?php require("showheader.php"); ?>
-
 <title>执信·青志 - 地点一览</title>
-
-<!-- Bootstrap -->
-<link href="css/bootstrap.min.css" rel="stylesheet">
-<link href="css/bootstrap-material-design.min.css" rel="stylesheet" type="text/css">
-<link href="css/ripples.min.css" rel="stylesheet" type="text/css">
-<style type="text/css">
-	.tu{
-		border-radius: 5px;
-		-webkit-border-radius: 5px;
-		-moz-border-radius: 5px;
-	}
-	.tu2{
-		border-radius: 20px;
-		-webkit-border-radius: 20px;
-		-moz-border-radius: 20px;
-		height:80%;
-	}
-</style>
+<?php require("showcss.php"); ?>
 <!-- HTML5 shim and Respond.js for IE8 support of HTML5 elements and media queries -->
 <!-- WARNING: Respond.js doesn't work if you view the page via file:// -->
 <!--[if lt IE 9]>

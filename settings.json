@@ -1,6 +1,7 @@
 {
   "enableAutoAudit":  1,
   "enableAutoAssign": 0,
+  "enableQuery": 1,
   "gradeOneName": "奔跑高一",
   "gradeTwoName": "思想高二",
   "thisTermStart": "20160910",

@@ -1,15 +1,3 @@
-<style type="text/css">
-	hr {
-		border-top-color:#ddd;
-	}
-	.navbar-nav .open .dropdown-menu > li > a {
-    	font-size: 14px;
-  }
-	.h1, .h2, .h3, .h4, body, h1, h2, h3, h4, h5, h6 {
-    font-family: Microsoft YaHei,Roboto,Helvetica,Arial,sans-serif !important;
-    font-weight: 500 !important;
-	}
-</style>
 <nav class="navbar navbar-success">
   <div class="container-fluid">
     <div class="navbar-header">

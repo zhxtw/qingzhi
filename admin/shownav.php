@@ -30,6 +30,7 @@
         </li>
       </ul>
 	  <ul class="nav navbar-nav navbar-right">
+      <li><a href="#">帮助</a></li><!--可用popover实现-->
 		  <li class="dropdown"><a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false"><img style="width:18px;border-radius:9px;" src="../img/user.png"></a>
           <ul class="dropdown-menu" role="menu">
           	<li><a href="#"><b><?php echo $_SESSION['adminname']; ?></b></a></li>

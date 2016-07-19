@@ -19,10 +19,14 @@ $flag=true;
 require_once("base_utils.php");
 require_once("to_pdo.php");
 require_once("to_json.php");
+require_once("getSettings.php");
 if(!isset($_SESSION)){
 	echo("看到这条错误信息，请思索您是否做过以下糗事：<br>未开启cookie。本站需要开启cookie才能访问，且cookie不会用做其它用途。<br><br>请<a href=\"/\">点此</a>返回首页。<br><br>Session ID: ".session_id());die();
 }
 
+if( getSettings("enableQuery") == 0 ) {
+	die403("<center><h1>网站数据维护中</h1><br>暂时不允许查询，感谢您的配合，请<a href='/location.php'>点此</a>返回主页。<hr><h4>共青团广州市执信中学委员会</h4><p>Copyright © 2015-2016 · All rights reserved</p><p>执信团委信息部</p></cetner>");
+}
 
 if($_POST){
 	if( isset( $_POST['name'], $_POST['classno'], $_POST['verify_code']) ) {
@@ -52,7 +56,7 @@ if($_POST){
 				case "1":
 					$strout.="<span style='color:green'>已通过，待分配时间</span>";break;
 				default:
-					$strout.="<span style='color:blue'>已通过，分配的时间是<br>".$res['go']."</span>";
+					$strout.="<span style='color:blue'>已通过，分配的时间是<br>".$result[0][$i]['go']."</span>";
 			}
 			$strout.="<br>";
 		}
@@ -126,7 +130,7 @@ showjs( ["js/jquery-1.11.2.min.js", "js/bootstrap.min.js", "js/material.min.js",
 ?>
 <script>
 	function getCode(){
-		$("#code")[0].src="/verify.php?"+new Date().getTime();
+		$("#verify_code")[0].src="/verify.php?"+new Date().getTime();
 	}
 	window.onload=function(){
 		$.material.init();
