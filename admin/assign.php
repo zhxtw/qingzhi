@@ -65,12 +65,17 @@ include("showpgr.php");
 				loc=got.loc;
 			}
 		});
-		/*$("#dtp1").on("dp.change", function (e) {
+		$("#dtp1").on("dp.change", function (e) {
 			console.log("dtp1:" + e.date.format("YYYYMMDD"));
-			selectedDate = e.date.format("YYYYMMDD");
-			hasmen = checkCount(selectedDate);
-    });*/
+			if (isManualAssign) {
+				console.info("Manual assigning detected...");
+			} else {
+				console.info("Auto assigning detected...");
+				autoAssign3();
+			}
+    });
 	};
+	isManualAssign = false;
 	function autoAssign() {
 		if ( !datname ) {
 			alt( "请在下面设置好筛选地点和筛选时段后再使用本功能哦~", "danger", "ban-circle" );
@@ -91,13 +96,15 @@ include("showpgr.php");
 			alt( "找不到对应时段的人数限制或人数限制未设置，请刷新重试或手动分配", "danger", "ban-circle" );
 			return 0;
 		}
-		html = '<center>义工地点：<b>' + filtername + '</b>&nbsp; &nbsp; 义工时段：<b>' + datname + '</b></center><br><br><div class="list-group text-center" id="tmpassign">';
+		html = '<center>义工地点：<b>' + filtername + '</b>&nbsp; &nbsp; 义工时段：<b>' + datname + '</b><br>温馨提示：切勿猛击此页面的日期框</center><br><div class="list-group text-center" id="tmpassign">';
 		for( i = 1; i < 6; i++ ) {
 			html += '<a class="list-group-item assign" data-count="' + i * limitPerLoc + '" onclick="autoAssign2(this.dataset.count)">一次分配 ' + i * limitPerLoc + ' 人</a>';
 		}
 		html += "</div>"
 		$("#msg").html(html);
 		$("#myModal").modal('show');
+		isManualAssign = false;
+		$("#okbtn")[0].disabled = true;
 	}
 
 	function checkCount(date) {
@@ -129,7 +136,14 @@ include("showpgr.php");
 	      "times": datname,
 				"count": count
 	    },
-	    error: function(){ alt("网络连接失败或服务器错误","danger","ban-circle"); $("#myModal").modal('hide'); },
+	    error: function(e){
+				//若数据格式不是json也会触发error
+				if ( e.readyState == 4 ) {
+					alt ( e.responseText, "danger", "ban-circle" ); $("#myModal").modal('hide');
+				} else {
+					alt("网络连接失败或服务器错误","danger","ban-circle"); $("#myModal").modal('hide');
+				}
+			},
 	    success: function(got){
 				console.log(got);
 				if( typeof(got) != "object" ) {
@@ -137,10 +151,13 @@ include("showpgr.php");
 				}
 				globalTeam = got;
 
+				//此处got[0]（即日期）也为Object形式，需要转为String，硬塞给moment会出现各种其妙场景...
+				got[0] = got[0][Object.keys(got[0])[0]];
+
 				tmploc = findme( loc, filtername, "name" );
 				tmptime = findme( tmploc.times, datname );
 				if ( tmptime == null ) { alt( "没有定义该时段，请到地点管理中检查。", "danger", "ban-circle" ); return 0; }
-				if ( tmptime.substr(0,2) != moment(got[0]).format('ddd') ) alt( "上次分配的日期不匹配定义。请手动检查并分配。", "warning", "alert", -1 );
+				if ( tmptime.substr(0,2) != moment(got[0]).format('ddd') && got[0] != 1 ) alt( "上次分配的日期不匹配定义。请手动检查并分配。", "warning", "alert", -1 );
 				/*
 					日期计算
 					1. 以settings.json中的起始和结束日期为基准，跳过disabledDates中的日期区间，跳过所有不属于此时段的days
@@ -157,7 +174,8 @@ include("showpgr.php");
 				for ( i in [0,1,2,3,4,5,6] ) {
 					if( i != dayOfWeek) disabledDaysOfWeek[disabledDaysOfWeek.length] = i;
 				}
-				mindate = ( moment(got[0]).add(7, "days").isAfter(thisTermStart) ) ? moment(got[0]).add(7, "days") : moment(thisTermStart);
+				//mindate = ( moment(got[0]).add(7, "days").isAfter(thisTermStart) ) ? moment(got[0]).add(7, "days") : moment(thisTermStart);
+				mindate = moment(thisTermStart); //得留意那些从后往前分的疯子
 				$("#dtp1").data("DateTimePicker").daysOfWeekDisabled( disabledDaysOfWeek ).minDate( mindate ).maxDate( moment(thisTermEnd) );
 				disabledDatesArray = [];
 				for ( i in disabledDates ) {
@@ -183,6 +201,7 @@ include("showpgr.php");
 				$("#dtp1").show();
 
 				html = "<pre>";
+				//json被ajax解析后为Object格式，无法用length
 				for( var i = 1; i < Object.keys(got).length; i++ ) { //从1开始，0为日期
 					html += "========================<br>第 " + i + " 批，分配在<b class='assignGroup' data-i='" + i + "'></b><br>";
 					for ( var j = 0; j < Object.keys(got[i]).length; j++ ) {
@@ -199,18 +218,25 @@ include("showpgr.php");
 	tmploc = ''; tmptime = ''; thisTermEnd = 0; disabledDatesArray = [];
 
 	function autoAssign3() {
+		setpgr(50);
 		sel = $("#dtp1").data("DateTimePicker").date().format("YYYYMMDD");
+		$(".assignGroup").html('').removeClass("assigned");
 		for ( var i = 0; i < $(".assignGroup").length; i++ ) {
+			setpgr( (i/$(".assignGroup").length)*100 );
 			for ( var j = sel; j <= thisTermEnd; j++ ) {
-				if ( moment(j.toString()).format("ddd") != tmptime.substr(0,2) || findSameDate(disabledDatesArray, sel)
+				if ( moment(j.toString()).format("ddd") != tmptime.substr(0,2) || findSameDate(disabledDatesArray, j)
 			    || !moment(j.toString()).isBetween(sel - 1, thisTermEnd + 1) ) continue;
-				//if ( moment(j.toString()).isAfter(moment(thisTermEnd)) ) {  }
-				if ( checkCount(j) > 0 ) { console.log(j + " 已经有人占据，跳过。"); continue; }
-				$(".assignGroup")[i].innerHTML = j; sel = moment(j).add(7, "days").format("YYYYMMDD"); break; //下一循环
+				if ( checkCount(j) > 0 ) { console.log(j + " 已经有人占据，跳过。"); j = ( j - 0 ) + 6; continue;  } //+6是因为continue后还会j++一次，达到j+=7的效果，减少循环次数
+				$($(".assignGroup")[i]).addClass("assigned")[0].innerHTML = j; sel = moment(j.toString()).add(7, "days").format("YYYYMMDD"); break; //下一循环
 			}
-			if( $(".assignGroup")[i].innerHTML == '' ) { alt("该学期已经分配完了哦~ 请手动导出并在下学期导入后继续分配。", "danger", "ban-circle"); return 0; }
+			if( $(".assignGroup")[i].innerHTML == '' ) {
+				$(".assignGroup").not(".assigned").html("null");
+				alt("该学期已经分配完了哦~ 请尝试减少一次分配人数，或者手动导出并在下学期导入后继续分配。", "danger", "ban-circle");
+				$("#okbtn")[0].disabled = true; setpgr(100);
+				return 0;
+			}
 		}
-
+		setpgr(100); $("#okbtn")[0].disabled = false; $("#okbtn")[0].onclick = autoAssign4;
 	}
 
 	function findSameDate(arr, val) {
@@ -219,6 +245,44 @@ include("showpgr.php");
 		}
 		return false;
 	}
+
+	function autoAssign4() {
+		if ( $(".assigned").length != $(".assignGroup").length ) {
+			alt ("参数不匹配。", "danger", "ban-circle"); return 0;
+		}
+		var asg = [], ast, stucount = 0; $("#okbtn")[0].disabled = true;
+		for ( var i = 0; i < $(".assigned").length; i++ ) {
+			asg[i] = []; ast = $(".assignGroupId[data-i=" + (i-0+1) + "]");
+			for ( var j = 0; j < ast.length; j++ ) {
+				asg[i][j] = ast[j].innerText;
+			}
+			console.info("Prepared for #"+ i + " assign. people = " + asg[i].toString() + ", date = " + $(".assigned")[i].innerText);
+			$.ajax({
+				url: "passOrNot.php?token="+TOKEN,
+				async: false,
+				type: "POST",
+		    data: {
+					flag: "assign",
+					people: asg[i].toString(),
+					assign: $(".assigned")[i].innerText
+				},
+		    success: function(got){
+		      if ( got-0 > 0 ) {
+						stucount += (got - 0);
+					} else {
+						alt("第 " + i + " 次操作失败。失败信息："+got+"，请联系信息部网页组。","danger","remove");
+					}
+				},
+				error: function() {
+					alt("网络连接失败！", "danger", "ban-circle");
+				}
+			});
+		}
+		$("#okbtn")[0].disabled = false; $("#myModal").modal('hide');
+		alt("自动分配成功~ " + stucount + "个小伙伴得到了派遣~", "success", "ok");
+		updatePageCount();
+	}
+
 </script>
 <div class="modal fade" id="myModal">
   <div class="modal-dialog">
