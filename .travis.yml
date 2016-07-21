@@ -6,3 +6,5 @@ php:
   - '7.0'
   - hhvm
   - nightly
+script:
+  - for i in $(find -type f -name '*.php'); do php -l $i; done
