@@ -1,4 +1,4 @@
-# 执信团委 青年志愿者协会
+# 执信团委 青年志愿者协会  [![语法检查状态](https://travis-ci.org/zhangjingye03/qingzhi.svg?branch=master)](https://travis-ci.org/zhangjingye03/qingzhi)
 
 ![logo](https://raw.githubusercontent.com/zhxtw/qingzhi/master/logo.png)
 
@@ -13,8 +13,6 @@
 后台可以提供~~丰富~~的功能，如自动分配、工时管理等。
 
 **（还没做完呢）**
-
-[![语法检查状态](https://travis-ci.org/zhangjingye03/qingzhi.svg?branch=master)](https://travis-ci.org/zhangjingye03/qingzhi)
 
 ### 特点
 
