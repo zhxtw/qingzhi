@@ -14,6 +14,8 @@
 
 **（还没做完呢）**
 
+[![语法检查状态](https://travis-ci.org/zhangjingye03/qingzhi.svg?branch=master)](https://travis-ci.org/zhangjingye03/qingzhi)
+
 ### 特点
 
 * 简洁易用
