@@ -1,4 +1,4 @@
-# 执信团委 青年志愿者协会  [![语法检查状态](https://travis-ci.org/zhangjingye03/qingzhi.svg?branch=master)](https://travis-ci.org/zhangjingye03/qingzhi)
+# 执信团委 青年志愿者协会  [![语法检查状态](https://travis-ci.org/zhxtw/qingzhi.svg?branch=master)](https://travis-ci.org/zhxtw/qingzhi)
 
 ![logo](https://raw.githubusercontent.com/zhxtw/qingzhi/master/logo.png)
 
