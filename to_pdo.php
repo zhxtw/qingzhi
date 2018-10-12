@@ -16,8 +16,8 @@
   $dbms="mysql";
   $host="localhost";
   $database="qingzhi";
-  $userName="**改成你的用户名**";
-  $passWord="**改成你的密码**";
+  $userName="caoduo";
+  $passWord="123123";
   $dsn="{$dbms}:host={$host};dbname=${database};charset=utf8";
   try{
     $dbcon=new PDO($dsn,$userName,$passWord);
